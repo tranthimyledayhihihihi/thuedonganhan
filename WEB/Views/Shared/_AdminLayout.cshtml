@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UTE Rent Admin</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        /* Admin Layout Container */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 260px;
+            background: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .admin-sidebar.collapsed {
+            width: 80px;
+        }
+
+        /* Logo */
+        .admin-logo {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .admin-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .admin-logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-logo-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .admin-logo-subtitle {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-sidebar.collapsed .admin-logo-text {
+            display: none;
+        }
+
+        /* Navigation */
+        .admin-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .admin-nav-item:hover {
+            background: #f3f4f6;
+            color: #667eea;
+        }
+
+        .admin-nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .admin-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .admin-nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .admin-nav-item span {
+            white-space: nowrap;
+        }
+
+        .admin-sidebar.collapsed .admin-nav-item span {
+            display: none;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .admin-sidebar.collapsed ~ .admin-main {
+            margin-left: 80px;
+        }
+
+        /* Top Bar */
+        .admin-topbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-topbar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .admin-topbar-toggle:hover {
+            background: #f3f4f6;
+            color: #667eea;
+        }
+
+        .admin-topbar-search {
+            position: relative;
+        }
+
+        .admin-topbar-search input {
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            width: 300px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .admin-topbar-search input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .admin-topbar-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .admin-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-topbar-icon {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .admin-topbar-icon:hover {
+            background: #f3f4f6;
+            color: #667eea;
+        }
+
+        .admin-topbar-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: #ef4444;
+            color: white;
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .admin-user-menu {
+            position: relative;
+        }
+
+        .admin-user-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .admin-user-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .admin-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .admin-user-info {
+            text-align: left;
+        }
+
+        .admin-user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .admin-user-role {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .admin-user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .admin-user-dropdown.active {
+            display: block;
+        }
+
+        .admin-user-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .admin-user-dropdown a:hover {
+            background: #f3f4f6;
+            color: #667eea;
+        }
+
+        .admin-user-dropdown a:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+
+        .admin-user-dropdown a:last-child {
+            border-radius: 0 0 10px 10px;
+            color: #ef4444;
+        }
+
+        .admin-user-dropdown a:last-child:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 2rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-topbar-search input {
+                width: 200px;
+            }
+        }
+
+        /* Scrollbar */
+        .admin-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .admin-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .admin-nav::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+
+        .admin-nav::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <!-- Logo -->
+            <div class="admin-logo">
+                <div class="admin-logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="admin-logo-text">
+                    <span class="admin-logo-title">UTE Rent</span>
+                    <span class="admin-logo-subtitle">Admin Panel</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="admin-nav">
+                <a href="@Url.Action("Dashboard", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="@Url.Action("Users", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+                <a href="@Url.Action("Products", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Products" ? "active" : "")">
+                    <i class="fas fa-box"></i>
+                    <span>Quản lý sản phẩm</span>
+                </a>
+                <a href="@Url.Action("Rentals", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Rentals" ? "active" : "")">
+                    <i class="fas fa-handshake"></i>
+                    <span>Quản lý đơn thuê</span>
+                </a>
+                <a href="@Url.Action("Commissions", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Commissions" ? "active" : "")">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Hoa hồng</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <div class="admin-topbar-left">
+                    <button class="admin-topbar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="admin-topbar-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm...">
+                    </div>
+                </div>
+
+                <div class="admin-topbar-right">
+                    <button class="admin-topbar-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="admin-topbar-badge">3</span>
+                    </button>
+
+                    <div class="admin-user-menu">
+                        <button class="admin-user-btn" onclick="toggleUserDropdown()">
+                            <div class="admin-user-avatar">
+                                @{
+                                    var userName = Context.Session.GetString("UserName");
+                                    var firstLetter = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "A";
+                                }
+                                @firstLetter
+                            </div>
+                            <div class="admin-user-info">
+                                <div class="admin-user-name">@userName</div>
+                                <div class="admin-user-role">Quản trị viên</div>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="admin-user-dropdown" id="adminUserDropdown">
+                            <a href="#">
+                                <i class="fas fa-user"></i>
+                                <span>Tài khoản</span>
+                            </a>
+                            <a href="#">
+                                <i class="fas fa-cog"></i>
+                                <span>Cài đặt</span>
+                            </a>
+                            <a href="@Url.Action("Logout", "Account")">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="admin-content">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show mb-4">
+                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-4">
+                        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('adminUserDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.admin-user-menu');
+            const dropdown = document.getElementById('adminUserDropdown');
+            
+            if (dropdown && !userMenu?.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Mobile sidebar toggle
+        if (window.innerWidth <= 768) {
+            function toggleSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                sidebar.classList.toggle('mobile-open');
+            }
+        }
+    </script>
+</body>
+</html>

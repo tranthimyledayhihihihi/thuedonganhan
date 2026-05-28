@@ -1,0 +1,138 @@
+@model WEB.Models.AdminPagedResult<WEB.Models.AdminRentalViewModel>
+@{
+    ViewData["Title"] = "Quản lý đơn thuê";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Rentals" class="row g-3">
+                <div class="col-md-10">
+                    <select name="status" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending" selected="@(ViewBag.Status == "Pending")">Chờ xác nhận</option>
+                        <option value="Confirmed" selected="@(ViewBag.Status == "Confirmed")">Đã xác nhận</option>
+                        <option value="Active" selected="@(ViewBag.Status == "Active")">Đang cho thuê</option>
+                        <option value="Completed" selected="@(ViewBag.Status == "Completed")">Hoàn thành</option>
+                        <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled")">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Lọc
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rentals Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Danh sách đơn thuê (@Model.Pagination.TotalItems)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Items.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Sản phẩm</th>
+                                <th>Người thuê</th>
+                                <th>Chủ sở hữu</th>
+                                <th>Giá thuê</th>
+                                <th>Tiền cọc</th>
+                                <th>Hoa hồng (5%)</th>
+                                <th>Thời gian thuê</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rental in Model.Items)
+                            {
+                                <tr>
+                                    <td><strong>#@rental.RentalId</strong></td>
+                                    <td>@rental.ProductName</td>
+                                    <td>
+                                        <div>@rental.RenterName</div>
+                                        <small class="text-muted">@rental.RenterEmail</small>
+                                    </td>
+                                    <td>@rental.OwnerName</td>
+                                    <td class="fw-bold">@rental.TotalPrice.ToString("N0")đ</td>
+                                    <td>@rental.DepositAmount.ToString("N0")đ</td>
+                                    <td class="text-success fw-bold">@rental.Commission.ToString("N0")đ</td>
+                                    <td>
+                                        <small>
+                                            @rental.StartDate.ToString("dd/MM/yyyy")<br/>
+                                            → @rental.EndDate.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var badgeClass = rental.Status switch
+                                            {
+                                                "Pending" => "bg-warning",
+                                                "Confirmed" => "bg-info",
+                                                "Active" => "bg-success",
+                                                "Completed" => "bg-primary",
+                                                "Cancelled" => "bg-danger",
+                                                _ => "bg-secondary"
+                                            };
+                                            var statusText = rental.Status switch
+                                            {
+                                                "Pending" => "Chờ xác nhận",
+                                                "Confirmed" => "Đã xác nhận",
+                                                "Active" => "Đang thuê",
+                                                "Completed" => "Hoàn thành",
+                                                "Cancelled" => "Đã hủy",
+                                                _ => rental.Status
+                                            };
+                                        }
+                                        <span class="badge @badgeClass">@statusText</span>
+                                    </td>
+                                    <td>@rental.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.Pagination.TotalPages > 1)
+                {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Rentals", new { page = Model.Pagination.CurrentPage - 1, status = ViewBag.Status })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Rentals", new { page = i, status = ViewBag.Status })">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Rentals", new { page = Model.Pagination.CurrentPage + 1, status = ViewBag.Status })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <p class="text-muted text-center py-4">Không tìm thấy đơn thuê nào</p>
+            }
+        </div>
+    </div>
+</div>

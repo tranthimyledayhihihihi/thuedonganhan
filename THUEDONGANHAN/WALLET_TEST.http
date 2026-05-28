@@ -1,0 +1,47 @@
+### ============================================
+### WALLET API TESTING
+### ============================================
+
+@baseUrl = https://localhost:7000/api
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Get Balance
+GET {{baseUrl}}/Wallet/balance
+Authorization: Bearer {{token}}
+
+### 2. Get Transactions
+GET {{baseUrl}}/Wallet/transactions
+Authorization: Bearer {{token}}
+
+### 3. Deposit Money (Nạp tiền)
+POST {{baseUrl}}/Wallet/deposit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 50000,
+  "description": "Test nạp tiền vào ví"
+}
+
+### 4. Withdraw Money (Rút tiền)
+POST {{baseUrl}}/Wallet/withdraw
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 20000,
+  "description": "Test rút tiền từ ví"
+}
+
+### ============================================
+### TEST WITHOUT TOKEN (Should return 401)
+### ============================================
+
+### 5. Deposit without token (Should fail)
+POST {{baseUrl}}/Wallet/deposit
+Content-Type: application/json
+
+{
+  "amount": 50000,
+  "description": "Test without token"
+}

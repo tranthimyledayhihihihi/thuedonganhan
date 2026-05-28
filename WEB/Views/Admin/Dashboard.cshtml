@@ -1,0 +1,368 @@
+@model WEB.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .stat-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .revenue-card {
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }
+    
+    .commission-card {
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(245, 87, 108, 0.3);
+    }
+    
+    .balance-card {
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.3);
+    }
+    
+    .quick-link-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .quick-link-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .quick-link-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+    }
+    
+    .table-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .table-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px 12px 0 0;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .badge-custom {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Chào buổi sáng, Admin! 👋</h2>
+        <p class="text-muted">Đây là tổng quan hệ thống của bạn hôm nay</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="stat-label">Người dùng</div>
+                            <div class="stat-value">@Model.Stats.TotalUsers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="stat-label">Sản phẩm</div>
+                            <div class="stat-value">@Model.Stats.TotalProducts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="stat-label">Đang thuê</div>
+                            <div class="stat-value">@Model.Stats.ActiveRentals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <div class="stat-label">Chờ xác nhận</div>
+                            <div class="stat-value">@Model.Stats.PendingRentals</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="revenue-card card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        <h6 class="ms-2 mb-0 opacity-75">Tổng doanh thu</h6>
+                    </div>
+                    <h2 class="fw-bold mb-2">@Model.Stats.TotalRevenue.ToString("N0")đ</h2>
+                    <p class="mb-0 opacity-75">
+                        <i class="fas fa-check-circle me-1"></i>
+                        @Model.Stats.CompletedRentals đơn hoàn thành
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="commission-card card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-percentage fa-2x opacity-75"></i>
+                        <h6 class="ms-2 mb-0 opacity-75">Hoa hồng (5%)</h6>
+                    </div>
+                    <h2 class="fw-bold mb-2">@Model.Stats.TotalCommission.ToString("N0")đ</h2>
+                    <p class="mb-0 opacity-75">
+                        <i class="fas fa-coins me-1"></i>
+                        Từ các đơn thuê
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="balance-card card">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-wallet fa-2x opacity-75"></i>
+                        <h6 class="ms-2 mb-0 opacity-75">Số dư ví Admin</h6>
+                    </div>
+                    <h2 class="fw-bold mb-2">@Model.Stats.AdminBalance.ToString("N0")đ</h2>
+                    <p class="mb-0 opacity-75">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        Số dư hiện tại
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <a href="@Url.Action("Users", "Admin")" class="quick-link-card card">
+                <div class="card-body text-center p-4">
+                    <div class="quick-link-icon" style="background: rgba(102, 126, 234, 0.1);">
+                        <i class="fas fa-users" style="color: #667eea;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Người dùng</h5>
+                    <p class="text-muted mb-0 small">Quản lý tài khoản</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <a href="@Url.Action("Products", "Admin")" class="quick-link-card card">
+                <div class="card-body text-center p-4">
+                    <div class="quick-link-icon" style="background: rgba(16, 185, 129, 0.1);">
+                        <i class="fas fa-box" style="color: #10b981;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Sản phẩm</h5>
+                    <p class="text-muted mb-0 small">Quản lý kho hàng</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <a href="@Url.Action("Rentals", "Admin")" class="quick-link-card card">
+                <div class="card-body text-center p-4">
+                    <div class="quick-link-icon" style="background: rgba(245, 158, 11, 0.1);">
+                        <i class="fas fa-handshake" style="color: #f59e0b;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Đơn thuê</h5>
+                    <p class="text-muted mb-0 small">Theo dõi giao dịch</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <a href="@Url.Action("Commissions", "Admin")" class="quick-link-card card">
+                <div class="card-body text-center p-4">
+                    <div class="quick-link-icon" style="background: rgba(59, 130, 246, 0.1);">
+                        <i class="fas fa-dollar-sign" style="color: #3b82f6;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Hoa hồng</h5>
+                    <p class="text-muted mb-0 small">Lịch sử thu nhập</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Commissions -->
+    <div class="table-card card">
+        <div class="card-header text-white">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Hoa hồng gần đây
+                </h5>
+                <a href="@Url.Action("Commissions", "Admin")" class="btn btn-sm btn-light">
+                    Xem tất cả
+                </a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.RecentCommissions.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="px-4 py-3">ID</th>
+                                <th class="py-3">Mô tả</th>
+                                <th class="py-3">Số tiền</th>
+                                <th class="py-3">Đơn thuê</th>
+                                <th class="py-3">Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var commission in Model.RecentCommissions)
+                            {
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <span class="badge badge-custom" style="background: #f3f4f6; color: #1f2937;">
+                                            #@commission.TransactionId
+                                        </span>
+                                    </td>
+                                    <td class="py-3">@commission.Description</td>
+                                    <td class="py-3">
+                                        <span class="fw-bold" style="color: #10b981;">
+                                            <i class="fas fa-arrow-up me-1"></i>
+                                            @commission.Amount.ToString("N0")đ
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        @if (commission.ReferenceId.HasValue)
+                                        {
+                                            <span class="badge badge-custom" style="background: #dbeafe; color: #1e40af;">
+                                                #@commission.ReferenceId
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 text-muted">
+                                        <i class="far fa-clock me-1"></i>
+                                        @commission.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Chưa có giao dịch hoa hồng nào</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

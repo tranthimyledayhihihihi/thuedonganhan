@@ -1,0 +1,158 @@
+@model AdminPagedResult<AdminSaleOrderViewModel>
+@{
+    ViewData["Title"] = "Quản lý Đơn mua";
+    var status = ViewBag.Status as string;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Danh sách Đơn mua</h5>
+                        <span class="badge bg-primary">Tổng: @Model.Pagination.TotalItems đơn</span>
+                    </div>
+                </div>
+
+                <div class="card-body px-0 pt-0 pb-2">
+                    <!-- Filter -->
+                    <div class="px-4 py-3">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-4">
+                                <select name="status" class="form-select">
+                                    <option value="">-- Tất cả trạng thái --</option>
+                                    <option value="Pending" selected="@(status == "Pending")">Pending</option>
+                                    <option value="Confirmed" selected="@(status == "Confirmed")">Confirmed</option>
+                                    <option value="Completed" selected="@(status == "Completed")">Completed</option>
+                                    <option value="Cancelled" selected="@(status == "Cancelled")">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i> Lọc
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="SaleOrders" class="btn btn-secondary w-100">
+                                    <i class="fas fa-redo"></i> Reset
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                    @if (Model.Items.Any())
+                    {
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sản phẩm</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Người mua</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Giá bán</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-end">Hoa hồng (5%)</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Trạng thái</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày tạo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">#@order.SaleOrderId</p>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(order.ProductImage))
+                                                    {
+                                                        <img src="@order.ProductImage" class="avatar avatar-sm me-3" alt="product">
+                                                    }
+                                                    <div class="d-flex flex-column">
+                                                        <h6 class="mb-0 text-sm">@order.ProductName</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <h6 class="mb-0 text-sm">@order.BuyerName</h6>
+                                                    <p class="text-xs text-secondary mb-0">@order.BuyerEmail</p>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs font-weight-bold mb-0">@order.SalePrice.ToString("N0") đ</p>
+                                            </td>
+                                            <td class="text-end">
+                                                <p class="text-xs text-success font-weight-bold mb-0">@order.Commission.ToString("N0") đ</p>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (order.Status == "Completed")
+                                                {
+                                                    <span class="badge badge-sm bg-success">Completed</span>
+                                                }
+                                                else if (order.Status == "Pending")
+                                                {
+                                                    <span class="badge badge-sm bg-warning">Pending</span>
+                                                }
+                                                else if (order.Status == "Confirmed")
+                                                {
+                                                    <span class="badge badge-sm bg-info">Confirmed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-sm bg-danger">Cancelled</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <p class="text-xs mb-0">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (Model.Pagination.TotalPages > 1)
+                        {
+                            <div class="px-4 py-3">
+                                <nav>
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
+                                            <a class="page-link" asp-action="SaleOrders" 
+                                               asp-route-page="@(Model.Pagination.CurrentPage - 1)"
+                                               asp-route-status="@status">Trước</a>
+                                        </li>
+
+                                        @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                                        {
+                                            <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="SaleOrders" 
+                                                   asp-route-page="@i"
+                                                   asp-route-status="@status">@i</a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
+                                            <a class="page-link" asp-action="SaleOrders" 
+                                               asp-route-page="@(Model.Pagination.CurrentPage + 1)"
+                                               asp-route-status="@status">Sau</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-3x text-secondary mb-3"></i>
+                            <p class="text-secondary">Không có đơn mua nào</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

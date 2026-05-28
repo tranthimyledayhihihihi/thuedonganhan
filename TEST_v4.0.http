@@ -1,0 +1,289 @@
+### ============================================
+### TEST API v4.0 - HỆ THỐNG THUÊ & BÁN ĐỒ
+### ============================================
+
+@baseUrl = http://localhost:7001
+@token = 
+
+### ============================================
+### 1. ĐĂNG KÝ TÀI KHOẢN MỚI (v4.0)
+### ============================================
+
+### 1.1. Đăng ký với MSSV hợp lệ
+POST {{baseUrl}}/api/Auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Nguyễn Văn Test",
+  "studentCode": "23115053122326",
+  "email": "23115053122326@sv.ute.udn.vn",
+  "phoneNumber": "0909999999",
+  "password": "Test@123",
+  "userType": "Both"
+}
+
+### Response mẫu:
+# {
+#   "success": true,
+#   "message": "Đăng ký thành công! Mã OTP đã được gửi đến 23115053122326@sv.ute.udn.vn. OTP: 123456 (hết hạn sau 10 phút)",
+#   "data": {
+#     "userId": 10,
+#     "fullName": "Nguyễn Văn Test",
+#     "email": "23115053122326@sv.ute.udn.vn",
+#     "role": "User",
+#     "userType": "Both",
+#     "token": null,
+#     "expiresAt": null
+#   }
+# }
+
+### 1.2. Đăng ký với MSSV không hợp lệ (sẽ bị từ chối)
+POST {{baseUrl}}/api/Auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Nguyễn Văn Fake",
+  "studentCode": "99999999999999",
+  "email": "99999999999999@sv.ute.udn.vn",
+  "phoneNumber": "0909888888",
+  "password": "Test@123",
+  "userType": "Both"
+}
+
+### ============================================
+### 2. XÁC THỰC OTP (v4.0 MỚI)
+### ============================================
+
+### 2.1. Xác thực OTP
+POST {{baseUrl}}/api/OTP/verify
+Content-Type: application/json
+
+{
+  "userId": 10,
+  "otpCode": "123456",
+  "otpType": "EmailVerification"
+}
+
+### Response mẫu:
+# {
+#   "message": "Xác thực thành công",
+#   "isVerified": true
+# }
+
+### 2.2. Kiểm tra trạng thái xác thực
+GET {{baseUrl}}/api/OTP/status/10
+
+### 2.3. Gửi lại OTP
+POST {{baseUrl}}/api/OTP/resend
+Content-Type: application/json
+
+{
+  "userId": 10,
+  "otpType": "EmailVerification"
+}
+
+### ============================================
+### 3. ĐĂNG NHẬP
+### ============================================
+
+### 3.1. Đăng nhập với tài khoản đã xác thực
+POST {{baseUrl}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "23115053122326@sv.ute.udn.vn",
+  "password": "Student@123"
+}
+
+### Response mẫu:
+# {
+#   "success": true,
+#   "message": "Đăng nhập thành công",
+#   "data": {
+#     "userId": 2,
+#     "fullName": "Nguyễn Văn An",
+#     "email": "23115053122326@sv.ute.udn.vn",
+#     "role": "User",
+#     "userType": "Both",
+#     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#     "expiresAt": "2026-05-24T10:00:00Z"
+#   }
+# }
+
+### 3.2. Đăng nhập Admin
+POST {{baseUrl}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ute.udn.vn",
+  "password": "Admin@123"
+}
+
+### ============================================
+### 4. TEST TRIGGER - CHẶN GIAO DỊCH KHI CHƯA VERIFY
+### ============================================
+
+### 4.1. Tạo đơn thuê (sẽ bị chặn nếu IsVerified = 0)
+POST {{baseUrl}}/api/Rental
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productId": 1,
+  "quantity": 1,
+  "startDate": "2026-06-01T00:00:00",
+  "endDate": "2026-06-03T00:00:00",
+  "rentalUnit": "Day",
+  "notes": "Test rental"
+}
+
+### Nếu chưa verify OTP, sẽ nhận lỗi:
+# "Tài khoản chưa xác thực email trường. Vui lòng xác thực OTP trước khi đặt thuê."
+
+### 4.2. Tạo đơn mua (sẽ bị chặn nếu IsVerified = 0)
+POST {{baseUrl}}/api/SaleOrder
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productId": 4,
+  "notes": "Test sale order"
+}
+
+### Nếu chưa verify OTP, sẽ nhận lỗi:
+# "Tài khoản chưa xác thực email trường. Vui lòng xác thực OTP trước khi đặt mua."
+
+### ============================================
+### 5. QUẢN LÝ SẢN PHẨM
+### ============================================
+
+### 5.1. Lấy danh sách sản phẩm
+GET {{baseUrl}}/api/Product?page=1&pageSize=10
+
+### 5.2. Chi tiết sản phẩm
+GET {{baseUrl}}/api/Product/1
+
+### 5.3. Tạo sản phẩm mới (cần token)
+POST {{baseUrl}}/api/Product
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productName": "Test Product",
+  "description": "Mô tả sản phẩm test",
+  "condition": "Good",
+  "pricePerDay": 50000,
+  "productType": "Rent",
+  "deposit": 200000,
+  "quantity": 1,
+  "location": "Đà Nẵng",
+  "categoryId": 1
+}
+
+### ============================================
+### 6. QUẢN LÝ SINH VIÊN
+### ============================================
+
+### 6.1. Lấy danh sách sinh viên
+GET {{baseUrl}}/api/Student?page=1&pageSize=10
+
+### 6.2. Tìm kiếm sinh viên
+GET {{baseUrl}}/api/Student/search?keyword=nguyen
+
+### 6.3. Tải template CSV
+GET {{baseUrl}}/api/Student/export-template
+
+### 6.4. Import sinh viên từ CSV (Admin only)
+POST {{baseUrl}}/api/Student/import-csv
+Content-Type: multipart/form-data
+Authorization: Bearer {{token}}
+
+# Upload file CSV với format:
+# StudentCode,FullName,Email,PhoneNumber,Major,Faculty,Class,AcademicYear
+# 23115053122326,Nguyen Van A,23115053122326@sv.ute.udn.vn,0905123456,CNTT,Công nghệ,23T1,2023
+
+### ============================================
+### 7. UPLOAD ẢNH
+### ============================================
+
+### 7.1. Upload ảnh đơn
+POST {{baseUrl}}/api/FileUpload/image
+Content-Type: multipart/form-data
+Authorization: Bearer {{token}}
+
+# Upload file ảnh (jpg, png, gif)
+
+### 7.2. Upload nhiều ảnh cho sản phẩm
+POST {{baseUrl}}/api/FileUpload/product-images/1
+Content-Type: multipart/form-data
+Authorization: Bearer {{token}}
+
+# Upload tối đa 10 ảnh
+
+### 7.3. Lấy danh sách ảnh sản phẩm
+GET {{baseUrl}}/api/FileUpload/product-images/1
+
+### 7.4. Đặt ảnh chính
+PUT {{baseUrl}}/api/FileUpload/product-images/1/set-primary
+Authorization: Bearer {{token}}
+
+### 7.5. Xóa ảnh
+DELETE {{baseUrl}}/api/FileUpload/product-images/1
+Authorization: Bearer {{token}}
+
+### ============================================
+### 8. ĐÁNH GIÁ
+### ============================================
+
+### 8.1. Lấy đánh giá của sản phẩm
+GET {{baseUrl}}/api/Review/product/1
+
+### 8.2. Tạo đánh giá (cần hoàn thành đơn thuê trước)
+POST {{baseUrl}}/api/Review
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productId": 1,
+  "rentalId": 1,
+  "rating": 5,
+  "comment": "Sản phẩm rất tốt, chủ nhiệt tình!"
+}
+
+### ============================================
+### 9. TÀI KHOẢN TEST SẴN CÓ (ĐÃ VERIFY)
+### ============================================
+
+### Admin
+# Email: admin@ute.udn.vn
+# Password: Admin@123
+
+### Sinh viên Both (Nguyễn Văn An)
+# Email: 23115053122326@sv.ute.udn.vn
+# Password: Student@123
+# MSSV: 23115053122326
+
+### Sinh viên Both (Trần Thị Bình)
+# Email: 23115053122327@sv.ute.udn.vn
+# Password: Student@123
+# MSSV: 23115053122327
+
+### Sinh viên Renter (Phạm Thị Dung)
+# Email: 23115053122329@sv.ute.udn.vn
+# Password: Student@123
+# MSSV: 23115053122329
+
+### Sinh viên Owner (Hoàng Văn Em)
+# Email: 23115053122330@sv.ute.udn.vn
+# Password: Student@123
+# MSSV: 23115053122330
+
+### ============================================
+### LƯU Ý v4.0
+### ============================================
+# 1. StudentCode KHÔNG có số 0 đầu: 23115053122326 (không phải 023115053122326)
+# 2. Email phải khớp StudentCode: 23115053122326@sv.ute.udn.vn
+# 3. Đăng ký → Nhận OTP → Xác thực OTP → Đăng nhập
+# 4. Chưa verify OTP thì KHÔNG thể thuê/mua
+# 5. Mỗi MSSV chỉ đăng ký được 1 tài khoản
+# 6. OTP hết hạn sau 10 phút, tối đa 5 lần nhập sai

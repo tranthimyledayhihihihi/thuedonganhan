@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Wallet Debug";
+}
+
+<div class="container mt-5">
+    <h2>🔧 Wallet API Debug Tool</h2>
+    
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5>Session Information</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>JWT Token:</strong> <code id="token">@Context.Session.GetString("JWTToken")</code></p>
+            <p><strong>User Email:</strong> @Context.Session.GetString("UserEmail")</p>
+            <p><strong>User Name:</strong> @Context.Session.GetString("UserName")</p>
+            <p><strong>User ID:</strong> @Context.Session.GetString("UserId")</p>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+            <h5>Test API Calls</h5>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary mb-2" onclick="testGetBalance()">Test Get Balance</button>
+            <button class="btn btn-success mb-2" onclick="testDeposit()">Test Deposit 50,000đ</button>
+            <button class="btn btn-warning mb-2" onclick="testWithdraw()">Test Withdraw 10,000đ</button>
+            
+            <div class="mt-3">
+                <h6>Response:</h6>
+                <pre id="response" class="bg-light p-3 border" style="max-height: 400px; overflow-y: auto;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const baseUrl = 'https://localhost:7000/api';
+    const token = '@Context.Session.GetString("JWTToken")';
+    
+    function log(message) {
+        const responseEl = document.getElementById('response');
+        const timestamp = new Date().toLocaleTimeString();
+        responseEl.textContent += `[${timestamp}] ${message}\n`;
+        console.log(message);
+    }
+    
+    async function testGetBalance() {
+        log('=== Testing GET Balance ===');
+        try {
+            const response = await fetch(`${baseUrl}/Wallet/balance`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            log(`Status: ${response.status} ${response.statusText}`);
+            const data = await response.json();
+            log(`Response: ${JSON.stringify(data, null, 2)}`);
+        } catch (error) {
+            log(`ERROR: ${error.message}`);
+        }
+    }
+    
+    async function testDeposit() {
+        log('=== Testing POST Deposit ===');
+        try {
+            const requestBody = {
+                amount: 50000,
+                description: 'Test deposit from debug page'
+            };
+            
+            log(`Request Body: ${JSON.stringify(requestBody, null, 2)}`);
+            
+            const response = await fetch(`${baseUrl}/Wallet/deposit`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            log(`Status: ${response.status} ${response.statusText}`);
+            const data = await response.json();
+            log(`Response: ${JSON.stringify(data, null, 2)}`);
+        } catch (error) {
+            log(`ERROR: ${error.message}`);
+        }
+    }
+    
+    async function testWithdraw() {
+        log('=== Testing POST Withdraw ===');
+        try {
+            const requestBody = {
+                amount: 10000,
+                description: 'Test withdraw from debug page'
+            };
+            
+            log(`Request Body: ${JSON.stringify(requestBody, null, 2)}`);
+            
+            const response = await fetch(`${baseUrl}/Wallet/withdraw`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            log(`Status: ${response.status} ${response.statusText}`);
+            const data = await response.json();
+            log(`Response: ${JSON.stringify(data, null, 2)}`);
+        } catch (error) {
+            log(`ERROR: ${error.message}`);
+        }
+    }
+</script>

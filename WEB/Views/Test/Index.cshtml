@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Test API Connection";
+}
+
+<div style="padding: 2rem; font-family: monospace;">
+    <h1>🔍 Test API Connection</h1>
+    
+    <div style="background: #f0f0f0; padding: 1rem; margin: 1rem 0; border-radius: 8px;">
+        <h3>Configuration:</h3>
+        <p><strong>Base URL:</strong> @ViewBag.BaseUrl</p>
+        <p><strong>Full URL:</strong> @ViewBag.FullUrl</p>
+    </div>
+    
+    <div style="background: @(ViewBag.Success == true ? "#d4edda" : "#f8d7da"); padding: 1rem; margin: 1rem 0; border-radius: 8px;">
+        <h3>Result:</h3>
+        <p><strong>Status Code:</strong> @ViewBag.StatusCode</p>
+        <p><strong>Success:</strong> @ViewBag.Success</p>
+        
+        @if (ViewBag.Error != null)
+        {
+            <p style="color: red;"><strong>Error:</strong> @ViewBag.Error</p>
+            @if (ViewBag.StackTrace != null)
+            {
+                <pre style="background: white; padding: 1rem; overflow: auto;">@ViewBag.StackTrace</pre>
+            }
+        }
+    </div>
+    
+    @if (ViewBag.RawResponse != null)
+    {
+        <div style="background: #fff; padding: 1rem; margin: 1rem 0; border: 1px solid #ddd; border-radius: 8px;">
+            <h3>Raw Response:</h3>
+            <pre style="overflow: auto; max-height: 400px;">@ViewBag.RawResponse</pre>
+        </div>
+    }
+    
+    <div style="margin-top: 2rem;">
+        <a href="/Product" style="padding: 0.5rem 1rem; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">
+            Go to Product Page
+        </a>
+    </div>
+</div>

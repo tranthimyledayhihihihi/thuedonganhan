@@ -1,0 +1,6 @@
+@THUEDONGANHAN_HostAddress = http://localhost:5269
+
+GET {{THUEDONGANHAN_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

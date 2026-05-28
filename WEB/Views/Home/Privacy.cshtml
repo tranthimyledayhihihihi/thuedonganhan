@@ -1,0 +1,371 @@
+@{
+    ViewData["Title"] = "Giới thiệu";
+}
+
+<link rel="stylesheet" href="~/css/about.css" asp-append-version="true" />
+
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="about-hero-content">
+        <div class="about-hero-badge">
+            <i class="fas fa-star"></i>
+            <span>Nền tảng cho thuê #1 tại UTE</span>
+        </div>
+        <h1 class="about-hero-title">
+            Kết nối cộng đồng – <br />
+            <span class="text-gradient">Sẻ chia giá trị</span>
+        </h1>
+        <p class="about-hero-desc">
+            UTE Rent là nền tảng cho thuê đồ dùng thông minh được xây dựng bởi và dành cho sinh viên UTE. 
+            Chúng tôi tin rằng việc chia sẻ không chỉ giúp tiết kiệm chi phí mà còn tạo nên một cộng đồng gắn kết và bền vững.
+        </p>
+        <div class="about-hero-stats">
+            <div class="stat-item">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Sinh viên</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Sản phẩm</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2000+</div>
+                <div class="stat-label">Giao dịch</div>
+            </div>
+        </div>
+    </div>
+    <div class="about-hero-image">
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="Sinh viên UTE" />
+        <div class="hero-image-overlay"></div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="mission-section">
+    <div class="section-container">
+        <div class="section-header-center">
+            <h2 class="section-title">Sứ mệnh của chúng tôi</h2>
+            <p class="section-subtitle">Tạo nên một cộng đồng chia sẻ bền vững và thông minh</p>
+        </div>
+        
+        <div class="mission-grid">
+            <div class="mission-card">
+                <div class="mission-icon blue">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3>Tiết kiệm chi phí</h3>
+                <p>Giúp sinh viên tiết kiệm đến 70% chi phí so với việc mua mới, đặc biệt với các thiết bị chỉ sử dụng ngắn hạn.</p>
+            </div>
+            
+            <div class="mission-card">
+                <div class="mission-icon purple">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Kết nối cộng đồng</h3>
+                <p>Xây dựng mạng lưới chia sẻ giữa các sinh viên UTE, tạo nên một cộng đồng gắn kết và hỗ trợ lẫn nhau.</p>
+            </div>
+            
+            <div class="mission-card">
+                <div class="mission-icon green">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>Bảo vệ môi trường</h3>
+                <p>Khuyến khích tái sử dụng, giảm thiểu rác thải và tiêu dùng bền vững trong cộng đồng sinh viên.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works-section">
+    <div class="section-container">
+        <div class="section-header-center">
+            <h2 class="section-title">Quy trình đơn giản</h2>
+            <p class="section-subtitle">Chỉ với 3 bước, bạn đã có thể thuê hoặc cho thuê đồ dùng</p>
+        </div>
+        
+        <div class="process-grid">
+            <!-- Dành cho Người thuê -->
+            <div class="process-column">
+                <div class="process-header">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Dành cho Người thuê</h3>
+                </div>
+                
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Tìm kiếm sản phẩm</h4>
+                            <p>Duyệt qua hàng trăm sản phẩm từ laptop, máy ảnh đến lễ phục, sách giáo trình.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Đặt thuê & thanh toán</h4>
+                            <p>Chọn thời gian thuê, thanh toán an toàn qua nhiều phương thức.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Nhận đồ & sử dụng</h4>
+                            <p>Gặp chủ đồ tại địa điểm hẹn, kiểm tra và bắt đầu sử dụng.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dành cho Người cho thuê -->
+            <div class="process-column">
+                <div class="process-header">
+                    <i class="fas fa-box"></i>
+                    <h3>Dành cho Người cho thuê</h3>
+                </div>
+                
+                <div class="process-steps">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Đăng tin miễn phí</h4>
+                            <p>Chụp ảnh, mô tả sản phẩm và đặt giá thuê phù hợp chỉ trong vài phút.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Nhận yêu cầu thuê</h4>
+                            <p>Người thuê sẽ liên hệ với bạn, thỏa thuận thời gian và địa điểm giao nhận.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Giao đồ & nhận tiền</h4>
+                            <p>Giao đồ cho người thuê, nhận thanh toán và kiếm thêm thu nhập thụ động.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-container">
+        <div class="section-header-center">
+            <h2 class="section-title">Tại sao chọn UTE Rent?</h2>
+            <p class="section-subtitle">Những tính năng nổi bật giúp trải nghiệm của bạn tốt hơn</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>An toàn & bảo mật</h3>
+                <p>Xác thực email sinh viên UTE, đảm bảo mọi giao dịch đều diễn ra trong cộng đồng tin cậy.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>Giá cả hợp lý</h3>
+                <p>Giá thuê từ 20.000đ/ngày, tiết kiệm hơn nhiều so với việc mua mới.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Linh hoạt thời gian</h3>
+                <p>Thuê theo ngày, tuần hoặc tháng tùy theo nhu cầu sử dụng của bạn.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>Hỗ trợ 24/7</h3>
+                <p>Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Đánh giá minh bạch</h3>
+                <p>Hệ thống đánh giá và nhận xét giúp bạn chọn được sản phẩm uy tín.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Dễ dàng sử dụng</h3>
+                <p>Giao diện thân thiện, dễ dàng tìm kiếm và đặt thuê chỉ với vài cú click.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="section-container">
+        <div class="section-header-center">
+            <h2 class="section-title">Phát triển bởi Sinh viên UTE</h2>
+            <p class="section-subtitle">Đội ngũ đam mê công nghệ và cộng đồng</p>
+        </div>
+        
+        <div class="team-content">
+            <div class="team-image">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop" alt="Team UTE Rent" />
+            </div>
+            <div class="team-info">
+                <h3>Về chúng tôi</h3>
+                <p>
+                    UTE Rent được phát triển bởi nhóm sinh viên Đại học Sư phạm Kỹ thuật TP.HCM với mong muốn 
+                    tạo ra một nền tảng giúp sinh viên tiết kiệm chi phí và kết nối cộng đồng.
+                </p>
+                <p>
+                    Chúng tôi hiểu rằng sinh viên thường gặp khó khăn về tài chính, đặc biệt khi cần sử dụng 
+                    các thiết bị đắt tiền trong thời gian ngắn. Vì vậy, UTE Rent ra đời như một giải pháp 
+                    thông minh, giúp sinh viên có thể thuê đồ dùng với giá cả phải chăng.
+                </p>
+                <div class="team-values">
+                    <div class="value-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Minh bạch</span>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Uy tín</span>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Cộng đồng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section-about">
+    <div class="section-container">
+        <div class="cta-content">
+            <h2>Sẵn sàng tham gia cộng đồng?</h2>
+            <p>Hãy bắt đầu thuê hoặc cho thuê đồ dùng ngay hôm nay</p>
+            <div class="cta-buttons">
+                @if (string.IsNullOrEmpty(Context.Session.GetString("UserName")))
+                {
+                    <a href="/Account/Register" class="btn-cta-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Đăng ký ngay
+                    </a>
+                    <a href="/Product" class="btn-cta-secondary">
+                        <i class="fas fa-search"></i>
+                        Khám phá sản phẩm
+                    </a>
+                }
+                else
+                {
+                    <a href="/Post/Create" class="btn-cta-primary">
+                        <i class="fas fa-plus-circle"></i>
+                        Đăng tin cho thuê
+                    </a>
+                    <a href="/Product" class="btn-cta-secondary">
+                        <i class="fas fa-shopping-cart"></i>
+                        Tìm đồ để thuê
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="section-container">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <h3>Liên hệ với chúng tôi</h3>
+                <p>Có câu hỏi? Chúng tôi luôn sẵn sàng hỗ trợ bạn!</p>
+                
+                <div class="contact-items">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Email</h4>
+                            <p>support@uterent.edu.vn</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Địa chỉ</h4>
+                            <p>01 Võ Văn Ngân, Thủ Đức, TP.HCM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Hotline</h4>
+                            <p>1900 xxxx (8:00 - 22:00)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="contact-form-wrapper">
+                <h3>Gửi tin nhắn cho chúng tôi</h3>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Họ và tên" required />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" placeholder="Email" required />
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="5" placeholder="Nội dung tin nhắn" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Gửi tin nhắn
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

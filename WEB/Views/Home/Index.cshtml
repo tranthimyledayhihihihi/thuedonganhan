@@ -1,0 +1,403 @@
+@{
+    ViewData["Title"] = "Trang chủ";
+    var allProducts = ViewBag.AllProducts as List<WEB.Models.ProductViewModel> ?? new List<WEB.Models.ProductViewModel>();
+    var myProducts = ViewBag.MyProducts as List<WEB.Models.ProductViewModel> ?? new List<WEB.Models.ProductViewModel>();
+    var jwtToken = Context.Session.GetString("JWTToken");
+    var userName = Context.Session.GetString("UserName");
+    var hasSession = !string.IsNullOrEmpty(jwtToken);
+    var mode = (ViewBag.Mode ?? "home").ToString();
+    
+    // Debug: Log mode value
+    System.Diagnostics.Debug.WriteLine($"[INDEX] Current Mode: {mode}, HasSession: {hasSession}");
+}
+
+<link rel="stylesheet" href="~/css/home-styles.css" asp-append-version="true" />
+
+@if (mode == "renter")
+{
+    <!-- ========== TRANG NGƯỜI THUÊ - CÓ SIDEBAR ========== -->
+    <div class="dashboard-layout">
+        <aside class="sidebar-left">
+            <div class="sidebar-welcome">
+                <div class="welcome-icon">👋</div>
+                <h3>Trung tâm điều khiển</h3>
+                <p>Chào mừng bạn quay lại!</p>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="/?mode=renter" class="menu-item active">
+                    <i class="icon">🛒</i>
+                    <span>Người thuê</span>
+                </a>
+                <a href="/?mode=owner" class="menu-item">
+                    <i class="icon">📦</i>
+                    <span>Người cho thuê</span>
+                </a>
+                <a href="/Post/Create" class="menu-item">
+                    <i class="icon">➕</i>
+                    <span>Đăng sản phẩm mới</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <h2 class="page-title">Gợi ý dành riêng cho bạn</h2>
+            <p class="page-subtitle">Dựa trên các tiêu chí và ngành học của bạn</p>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active">Tất cả</button>
+                <button class="filter-tab">Điện tử</button>
+                <button class="filter-tab">Giáo trình</button>
+            </div>
+
+            @if (allProducts.Any())
+            {
+                <div class="product-grid-3">
+                    @foreach (var product in allProducts.Take(6))
+                    {
+                        <div class="product-card-modern">
+                            @if (product.IsAvailable)
+                            {
+                                <span class="badge-status available">Sẵn sàng</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status rented">Đang thuê</span>
+                            }
+                            <button class="btn-favorite">♡</button>
+                            <img src="@product.ImageUrl" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <div class="product-body">
+                                <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
+                                <h3 class="product-name">@product.ProductName</h3>
+                                <div class="product-footer-flex">
+                                    <div class="product-price-box">
+                                        <span class="price-main">@product.PricePerDay.ToString("N0")đ</span>
+                                        <span class="price-unit">/ngày</span>
+                                    </div>
+                                    <a href="/Product/Details/@product.ProductId" class="btn-rent">Thuê ngay</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-box">
+                    <div class="empty-icon">📦</div>
+                    <h3>Chưa có sản phẩm nào</h3>
+                    <p>Hãy quay lại sau để xem các sản phẩm mới</p>
+                </div>
+            }
+            
+            <div class="text-center" style="margin-top: 2rem;">
+                <a href="/Product" class="btn-view-more">Xem thêm sản phẩm →</a>
+            </div>
+        </main>
+    </div>
+}
+else if (mode == "owner")
+{
+    <!-- ========== TRANG NGƯỜI CHO THUÊ - CÓ SIDEBAR ========== -->
+    <div class="dashboard-layout">
+        <aside class="sidebar-left">
+            <div class="sidebar-welcome">
+                <div class="welcome-icon">👋</div>
+                <h3>Trung tâm điều khiển</h3>
+                <p>Chào mừng bạn quay lại!</p>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="/?mode=renter" class="menu-item">
+                    <i class="icon">🛒</i>
+                    <span>Người thuê</span>
+                </a>
+                <a href="/?mode=owner" class="menu-item active">
+                    <i class="icon">📦</i>
+                    <span>Người cho thuê</span>
+                </a>
+                <a href="/Post/Create" class="menu-item">
+                    <i class="icon">➕</i>
+                    <span>Đăng sản phẩm mới</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-icon blue">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Doanh thu tháng này</div>
+                        <div class="stat-value">@((myProducts.Sum(p => p.PricePerDay) * 30).ToString("N0"))đ</div>
+                        <span class="stat-badge new">+15%</span>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon purple">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Sản phẩm đang cho thuê</div>
+                        <div class="stat-value">@myProducts.Count.ToString("00")</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon yellow">⭐</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Đánh giá trung bình</div>
+                        <div class="stat-value">4.8 ⭐</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>Biểu đồ doanh thu</h3>
+                    <select class="chart-select">
+                        <option>7 ngày qua</option>
+                        <option>30 ngày qua</option>
+                    </select>
+                </div>
+                <div class="chart-placeholder">
+                    <p style="color: #94a3b8; text-align: center; padding: 3rem;">📊 Biểu đồ sẽ hiển thị ở đây</p>
+                </div>
+            </div>
+
+            <div class="section-header-flex">
+                <div>
+                    <h2>Danh sách đang đăng</h2>
+                </div>
+                <a href="/Product" class="link-view-all">Xem tất cả →</a>
+            </div>
+
+            @if (myProducts.Any())
+            {
+                <div class="product-grid-3">
+                    @foreach (var product in myProducts.Take(3))
+                    {
+                        <div class="product-card-owner">
+                            @if (!product.IsApproved)
+                            {
+                                <span class="badge-status pending" style="background: #fef3c7; color: #d97706; border: 1px solid #fde68a;">Chờ duyệt</span>
+                            }
+                            else if (product.IsAvailable)
+                            {
+                                <span class="badge-status available">Sẵn sàng</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status rented">Đang thuê</span>
+                            }
+                            <img src="@product.ImageUrl" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <div class="product-body">
+                                <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
+                                <h3 class="product-name">@product.ProductName</h3>
+                                <div class="product-footer-flex">
+                                    <div class="product-price-box">
+                                        <span class="price-main">@product.PricePerDay.ToString("N0")đ</span>
+                                        <span class="price-unit">/ngày</span>
+                                    </div>
+                                    <div class="product-actions-inline">
+                                        <a href="/Post/Edit/@product.ProductId" class="btn-icon-action" title="Sửa">✏️</a>
+                                        <button class="btn-icon-action" onclick="deleteProduct(@product.ProductId)" title="Xóa">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="add-more-box">
+                        <div class="add-icon">➕</div>
+                        <h4>Thêm mới</h4>
+                        <p>Đăng thêm đồ dùng để tăng thu nhập</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-box">
+                    <div class="empty-icon">📦</div>
+                    <h3>Bạn chưa có sản phẩm nào</h3>
+                    <p>Bắt đầu cho thuê đồ dùng của bạn</p>
+                    <a href="/Post/Create" class="btn-primary">Đăng sản phẩm đầu tiên</a>
+                </div>
+            }
+        </main>
+    </div>
+}
+else
+{
+    <!-- ========== TRANG CHỦ - KHÔNG CÓ SIDEBAR ========== -->
+    <div class="home-layout">
+        <section class="hero-section">
+            <div class="hero-content">
+                @if (hasSession)
+                {
+                    <h1 class="hero-title">
+                        Thuê đồ thông minh,<br />
+                        <span class="text-gradient">tiết kiệm cùng sinh viên</span>
+                    </h1>
+                    <p class="hero-subtitle">Chào mừng @userName quay trở lại!</p>
+                    <p class="hero-desc">Thuê dùng các thiết bị học tập với giá từ chỉ 20.000đ/ngày</p>
+                }
+                else
+                {
+                    <h1 class="hero-title">
+                        Thuê đồ thông minh,<br />
+                        <span class="text-gradient">tiết kiệm cùng sinh viên</span>
+                    </h1>
+                    <p class="hero-desc">Tìm nhanh các thiết bị công nghệ và đồ dùng học tập<br />Thuê dùng với giá từ 20.000đ/ngày</p>
+                }
+                <div class="hero-buttons">
+                    @if (hasSession)
+                    {
+                        <a href="/Product" class="btn-hero-primary">Tiếp tục khám phá</a>
+                        <a href="/?mode=renter" class="btn-hero-secondary">Đăng tin ngay</a>
+                    }
+                    else
+                    {
+                        <a href="/Product" class="btn-hero-primary">Khám phá ngay</a>
+                        <a href="/Account/Register" class="btn-hero-secondary">Đăng ký miễn phí</a>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="search-section-home">
+            <form action="/Product" method="get" class="search-container-home">
+                <div class="search-input-group">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="keyword" placeholder="Tìm kiếm đồ dùng..." class="search-input-home" />
+                </div>
+                <select name="categoryIds" class="search-select">
+                    <option value="">Tất cả danh mục</option>
+                    <option value="1">Điện tử</option>
+                    <option value="2">Học tập</option>
+                    <option value="3">Sách & Giáo trình</option>
+                    <option value="5">Thời trang</option>
+                </select>
+                <select name="maxPrice" class="search-select">
+                    <option value="">Tất cả giá</option>
+                    <option value="50000">Dưới 50k/ngày</option>
+                    <option value="100000">Dưới 100k/ngày</option>
+                </select>
+                <button type="submit" class="btn-search">Lọc</button>
+            </form>
+        </section>
+
+        <section class="products-section-home">
+            <div class="section-header-home">
+                <div>
+                    <h2>Đồ dùng nổi bật</h2>
+                    <p>Sản phẩm được ưa chuộng nhất trong cộng đồng UTE</p>
+                </div>
+                <a href="/Product" class="link-view-all">Xem tất cả đồ dùng →</a>
+            </div>
+
+            @if (allProducts.Any())
+            {
+                <div class="product-grid-3">
+                    @foreach (var product in allProducts.Take(6))
+                    {
+                        <div class="product-card-home">
+                            @if (product.IsAvailable)
+                            {
+                                <span class="badge-status available" style="position: absolute; top: 1rem; left: 1rem; background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2;">Sẵn sàng</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status rented" style="position: absolute; top: 1rem; left: 1rem; background: var(--text-secondary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2;">Đang thuê</span>
+                            }
+                            
+                            <img src="@product.ImageUrl" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <div class="product-body">
+                                <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
+                                <h3 class="product-name">@product.ProductName</h3>
+                                <p class="product-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 3em; margin-bottom: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                                    @(string.IsNullOrEmpty(product.Description) ? "Sản phẩm cho thuê trên UTE Rent" : product.Description)
+                                </p>
+                                <div class="product-footer-flex">
+                                    <div class="product-price-box">
+                                        <span class="price-main">@product.PricePerDay.ToString("N0")đ</span>
+                                        <span class="price-unit">/ngày</span>
+                                    </div>
+                                    <a href="/Product/Details/@product.ProductId" class="btn-rent" style="background: var(--primary-blue); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.875rem;">Thuê ngay</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-box" style="text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
+                    <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                    <h3 style="color: var(--text-primary);">Chưa có sản phẩm nào</h3>
+                    <p style="color: var(--text-secondary);">Hãy quay lại sau để xem các sản phẩm mới nhất</p>
+                </div>
+            }
+
+            @if (!hasSession)
+            {
+                <div class="cta-login-box">
+                    <h3>Đăng nhập để xem thêm sản phẩm và thuê đồ</h3>
+                    <a href="/Account/Login" class="btn-primary">Đăng nhập ngay</a>
+                </div>
+            }
+        </section>
+
+        <section class="categories-section">
+            <h2 class="section-title-center">Danh mục phổ biến</h2>
+            <p class="section-subtitle-center">Khám phá các danh mục sản phẩm được yêu thích</p>
+            <div class="category-grid-4">
+                <a href="/Product?categoryIds=1" class="category-card-img">
+                    <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop" alt="Điện tử">
+                    <div class="category-overlay">
+                        <h3>Thiết bị điện tử</h3>
+                        <p>Laptop, máy tính bảng, camera</p>
+                    </div>
+                </a>
+                <a href="/Product?categoryIds=3" class="category-card-img">
+                    <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&h=400&fit=crop" alt="Sách">
+                    <div class="category-overlay">
+                        <h3>Sách & Tài liệu</h3>
+                        <p>Giáo trình, sách tham khảo</p>
+                    </div>
+                </a>
+                <a href="/Product?categoryIds=5" class="category-card-img">
+                    <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop" alt="Thời trang">
+                    <div class="category-overlay">
+                        <h3>Thời trang</h3>
+                        <p>Áo dài, lễ phục, phụ kiện</p>
+                    </div>
+                </a>
+                <a href="/Product?categoryIds=6" class="category-card-img">
+                    <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&h=400&fit=crop" alt="Nhiếp ảnh">
+                    <div class="category-overlay">
+                        <h3>Phụ kiện khác</h3>
+                        <p>Chuột, bàn phím, tai nghe</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-box">
+                <h2>Bạn có đồ dùng dư thừa?<br />Cho thuê để tăng thu nhập.</h2>
+                <p>Biến chiếc laptop cũ, máy ảnh hay bất kỳ đồ dùng nào thành nguồn thu nhập thụ động.</p>
+                @if (hasSession)
+                {
+                    <a href="/Post/Create" class="btn-primary">Đăng tin cho thuê</a>
+                }
+                else
+                {
+                    <a href="/Account/Register" class="btn-primary">Đăng ký ngay</a>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+<script>
+function deleteProduct(productId) {
+    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+        alert('Chức năng xóa sản phẩm đang được phát triển');
+    }
+}
+</script>

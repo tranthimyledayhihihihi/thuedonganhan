@@ -1,0 +1,105 @@
+@model WEB.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+    <div class="auth-container">
+        <div class="auth-wrapper">
+            <div class="auth-branding">
+                <div class="auth-branding-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <h1>Chào mừng<br />trở lại</h1>
+                <p>Truy cập không gian sống sinh viên và bảng điều khiển quản lý thiết bị của bạn.</p>
+                <div class="auth-branding-image">
+                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&h=400&fit=crop" alt="Library" />
+                </div>
+            </div>
+
+            <div class="auth-card">
+                <a href="/" class="back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Quay lại trang chủ
+                </a>
+
+                <div class="auth-card-header">
+                    <h2>Đăng nhập</h2>
+                    <p>Đăng nhập vào tài khoản của bạn</p>
+                </div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">EMAIL / MÃ SỐ SINH VIÊN (MSSV)</label>
+                        <div class="input-icon">
+                            <span class="input-icon-symbol">@@</span>
+                            <input asp-for="Email" class="form-control" placeholder="23115053122326@sv.ute.udn.vn" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Password" class="form-label">Mật khẩu</label>
+                        <div class="password-wrapper">
+                            <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" id="passwordInput" />
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" id="eyeIcon">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        Đăng nhập →
+                    </button>
+
+                    <div style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        Bạn mới đến Atrium? <a href="/Account/Register" style="color: var(--primary-blue); font-weight: 600; text-decoration: none;">Đăng ký tài khoản mới</a>
+                    </div>
+                </form>
+
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                    <div class="alert alert-info" style="font-size: 0.875rem;">
+                        <strong>💡 Tài khoản Admin:</strong><br />
+                        Email: admin@@ute.udn.vn<br />
+                        Password: Admin@@123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        }
+    </script>
+}

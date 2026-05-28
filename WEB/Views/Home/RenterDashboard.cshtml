@@ -1,0 +1,622 @@
+@{
+    ViewData["Title"] = "Người thuê";
+    var allProducts = ViewBag.AllProducts as List<WEB.Models.ProductViewModel> ?? new List<WEB.Models.ProductViewModel>();
+    var userName = Context.Session.GetString("UserName") ?? "Sinh viên UTE";
+}
+
+<div class="renter-layout">
+    <!-- Sidebar -->
+    <aside class="renter-sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-label">Trung tâm điều khiển</div>
+                <div class="sidebar-sub">Chào mừng bạn quay lại</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="snav-item"><i class="fas fa-home"></i><span>Trang chủ</span></a>
+            <a href="/Home/RenterDashboard" class="snav-item active"><i class="fas fa-shopping-cart"></i><span>Người thuê</span></a>
+            <a href="/Home/OwnerDashboard" class="snav-item"><i class="fas fa-th-large"></i><span>Người cho thuê</span></a>
+        </nav>
+        <div class="sidebar-add-wrap">
+            <a href="/Post/Create" class="sidebar-add-btn">
+                <i class="fas fa-plus-circle"></i> Đăng sản phẩm mới
+            </a>
+        </div>
+    </aside>
+
+    <main class="renter-main">
+        <!-- Hero Banner -->
+        <div class="renter-hero">
+            <div class="renter-hero-content">
+                <h1>Chào mừng trở lại, Sinh viên UTE!</h1>
+                <p>Hôm nay bạn cần tìm thuê thiết bị gì cho đồ án hay muốn chia sẻ vật dụng để kiếm thêm thu nhập?</p>
+                <div class="hero-actions">
+                    <a href="/Product" class="hero-btn hero-btn--outline">Xem đơn thuê mới</a>
+                    <a href="/Home/OwnerDashboard" class="hero-btn hero-btn--outline">Quản lý đồ dùng</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Row: products -->
+        <div class="renter-content-row">
+            <!-- Products Area -->
+            <div class="renter-products-area">
+                <!-- Section Header -->
+                <div class="rpa-header">
+                    <div>
+                        <h2 class="rpa-title">Gợi ý dành riêng cho bạn</h2>
+                        <p class="rpa-sub">Dựa trên các tìm kiếm và ngành học của bạn</p>
+                    </div>
+                    <div class="rpa-tabs">
+                        <button class="rpa-tab active" onclick="filterTab(this,'all')">Tất cả</button>
+                        <button class="rpa-tab" onclick="filterTab(this,'Điện tử')">Điện tử</button>
+                        <button class="rpa-tab" onclick="filterTab(this,'Giáo trình')">Giáo trình</button>
+                    </div>
+                </div>
+
+                @{
+                    var featured = allProducts.FirstOrDefault();
+                    var rest = allProducts.Skip(1).Take(5).ToList();
+                }
+                @if (allProducts.Any())
+                {
+                    <!-- Featured product (first one, large) -->
+                    <div class="rpa-grid">
+                        <!-- Featured card -->
+                        <div class="rpc rpc--featured" data-cat="@(featured.Category?.CategoryName ?? "Khác")">
+                            <div class="rpc-img-wrap">
+                                <span class="rpc-hot">Hot Item</span>
+                                <a href="/Product/Details/@featured.ProductId" style="display: block; width: 100%; height: 100%;">
+                                    <img src="@featured.ImageUrl" alt="@featured.ProductName"
+                                         onerror="this.src='https://via.placeholder.com/600x380/dbeafe/2563eb?text=Product'">
+                                </a>
+                            </div>
+                            <div class="rpc-body">
+                                <div class="rpc-cat">@(featured.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
+                                <div class="rpc-rating">
+                                    <i class="fas fa-star" style="color:#f59e0b;font-size:.8rem;"></i> 4.9 (12 đánh giá)
+                                </div>
+                                <a href="/Product/Details/@featured.ProductId" style="text-decoration: none; color: inherit;">
+                                    <h3 class="rpc-name">@featured.ProductName</h3>
+                                </a>
+                                <p class="rpc-desc">@(featured.Description?.Length > 100 ? featured.Description.Substring(0, 100) + "..." : featured.Description)</p>
+                                <div class="rpc-footer">
+                                    <div class="rpc-price">@featured.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
+                                    <a href="/Product/Details/@featured.ProductId" class="rpc-rent-btn">Thuê ngay</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right column cards -->
+                        <div class="rpa-right-col">
+                            @foreach (var product in rest)
+                            {
+                                <div class="rpc rpc--small" data-cat="@(product.Category?.CategoryName ?? "Khác")">
+                                    <div class="rpc-small-img">
+                                        <a href="/Product/Details/@product.ProductId" style="display: block; width: 100%; height: 100%;">
+                                            <img src="@product.ImageUrl" alt="@product.ProductName"
+                                                 onerror="this.src='https://via.placeholder.com/200x140/e2e8f0/94a3b8?text=No+Image'">
+                                        </a>
+                                    </div>
+                                    <div class="rpc-small-body">
+                                        <div class="rpc-cat">@(product.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
+                                        <a href="/Product/Details/@product.ProductId" style="text-decoration: none; color: inherit;">
+                                            <div class="rpc-name rpc-name--sm">@product.ProductName</div>
+                                        </a>
+                                        <div class="rpc-footer">
+                                            <div class="rpc-price rpc-price--sm">@product.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
+                                            <a href="/Product/Details/@product.ProductId" class="rpc-save-btn"><i class="far fa-bookmark"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;margin-top:1.5rem;">
+                        <a href="/Product" class="rpa-more-btn">Xem thêm sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    </div>
+                }
+                else
+                {
+                    <div class="rpa-empty">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Chưa có sản phẩm nào</h3>
+                        <p>Hãy quay lại sau để xem các sản phẩm mới</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    .renter-layout {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        background: #f1f5f9;
+        font-family: 'Segoe UI',sans-serif;
+    }
+
+    /* Sidebar - dừng trước footer */
+    .renter-sidebar {
+        width: 210px;
+        background: #fff;
+        border-right: 1px solid #e2e8f0;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem 0 1rem;
+        z-index: 100;
+        overflow-y: auto;
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: 0 1.25rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .sidebar-label {
+        font-size: .78rem;
+        color: #2563eb;
+        font-weight: 700;
+    }
+
+    .sidebar-sub {
+        font-size: .72rem;
+        color: #94a3b8;
+        margin-top: .15rem;
+    }
+
+    .sidebar-nav {
+        padding: .75rem 0;
+        flex: 1;
+    }
+
+    .snav-item {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .7rem 1.25rem;
+        color: #64748b;
+        text-decoration: none;
+        font-size: .88rem;
+        font-weight: 500;
+        transition: all .2s;
+    }
+
+        .snav-item i {
+            font-size: .95rem;
+            width: 18px;
+        }
+
+        .snav-item:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .snav-item.active {
+            color: #2563eb;
+            background: #eff6ff;
+            font-weight: 700;
+            border-left: 3px solid #2563eb;
+        }
+
+    .sidebar-add-wrap {
+        padding: 0 1rem;
+    }
+
+    .sidebar-add-btn {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .7rem 1rem;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: .82rem;
+        font-weight: 700;
+        transition: background .2s;
+    }
+
+        .sidebar-add-btn:hover {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+    /* Main */
+    .renter-main {
+        margin-left: 210px;
+        flex: 1;
+        padding: 0 0 3rem;
+    }
+
+    /* Hero Banner */
+    .renter-hero {
+        background: #2563eb;
+        padding: 2.5rem 2.5rem 2.25rem;
+        color: #fff;
+    }
+
+    .renter-hero-content h1 {
+        font-size: 1.65rem;
+        font-weight: 800;
+        margin-bottom: .75rem;
+    }
+
+    .renter-hero-content p {
+        font-size: .88rem;
+        opacity: .85;
+        margin-bottom: 1.5rem;
+        line-height: 1.55;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn {
+        padding: .65rem 1.4rem;
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all .2s;
+    }
+
+    .hero-btn--outline {
+        border: 2px solid rgba(255,255,255,.7);
+        color: #fff;
+    }
+
+        .hero-btn--outline:hover {
+            background: rgba(255,255,255,.15);
+            color: #fff;
+        }
+
+    /* Content row */
+    .renter-content-row {
+        display: flex;
+        gap: 1.5rem;
+        padding: 1.75rem 2rem;
+    }
+
+    /* Products area */
+    .renter-products-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .rpa-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .rpa-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: .2rem;
+    }
+
+    .rpa-sub {
+        font-size: .78rem;
+        color: #94a3b8;
+    }
+
+    .rpa-tabs {
+        display: flex;
+        gap: .5rem;
+    }
+
+    .rpa-tab {
+        padding: .4rem .9rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #64748b;
+        font-size: .78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+        .rpa-tab:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .rpa-tab.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+    /* Products Grid */
+    .rpa-grid {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 1rem;
+    }
+
+    .rpa-right-col {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .85rem;
+    }
+
+    /* Featured Card */
+    .rpc--featured {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+        .rpc--featured .rpc-img-wrap {
+            position: relative;
+            height: 240px;
+            overflow: hidden;
+        }
+
+            .rpc--featured .rpc-img-wrap img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+    .rpc-hot {
+        position: absolute;
+        top: .75rem;
+        left: .75rem;
+        background: #ef4444;
+        color: #fff;
+        padding: .28rem .7rem;
+        border-radius: 6px;
+        font-size: .7rem;
+        font-weight: 700;
+        z-index: 2;
+    }
+
+    .rpc--featured .rpc-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+    }
+
+    .rpc-cat {
+        font-size: .68rem;
+        color: #2563eb;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: .3rem;
+    }
+
+    .rpc-rating {
+        font-size: .78rem;
+        color: #64748b;
+        margin-bottom: .35rem;
+    }
+
+    .rpc-name {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: .5rem;
+        line-height: 1.35;
+    }
+
+    .rpc-name--sm {
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .rpc-desc {
+        font-size: .8rem;
+        color: #64748b;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .rpc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .rpc-price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+
+    .rpc-price--sm {
+        font-size: .9rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+
+        .rpc-price span, .rpc-price--sm span {
+            font-size: .72rem;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+    .rpc-rent-btn {
+        padding: .6rem 1.25rem;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: .82rem;
+        font-weight: 700;
+        transition: background .2s;
+    }
+
+        .rpc-rent-btn:hover {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+    .rpc-save-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        text-decoration: none;
+        font-size: .9rem;
+        transition: all .2s;
+    }
+
+        .rpc-save-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+    /* Small cards */
+    .rpc--small {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        display: flex;
+    }
+
+    .rpc-small-img {
+        width: 120px;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+        .rpc-small-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .rpc-small-body {
+        flex: 1;
+        padding: .85rem 1rem;
+    }
+
+    /* More button */
+    .rpa-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .65rem 1.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        color: #2563eb;
+        font-size: .85rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: #fff;
+        transition: all .2s;
+    }
+
+        .rpa-more-btn:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+    /* Empty */
+    .rpa-empty {
+        text-align: center;
+        padding: 4rem;
+        background: #fff;
+        border-radius: 14px;
+    }
+
+        .rpa-empty i {
+            font-size: 3.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .rpa-empty h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: .5rem;
+        }
+
+        .rpa-empty p {
+            color: #94a3b8;
+        }
+
+    @@media(max-width:900px) {
+        .rpa-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .rpa-right-col {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+    @@media(max-width:768px) {
+        .renter-sidebar {
+            left: -210px;
+            transition: left .3s;
+        }
+
+        .renter-main {
+            margin-left: 0;
+        }
+
+        .renter-hero {
+            padding: 1.5rem;
+        }
+
+        .renter-content-row {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<script>
+    function filterTab(el, cat) {
+        document.querySelectorAll('.rpa-tab').forEach(function(t){ t.classList.remove('active'); });
+        el.classList.add('active');
+        document.querySelectorAll('.rpc').forEach(function(c){
+            if (cat === 'all' || c.dataset.cat === cat) {
+                c.style.display = '';
+            } else {
+                c.style.display = 'none';
+            }
+        });
+    }
+</script>

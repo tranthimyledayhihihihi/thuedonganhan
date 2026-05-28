@@ -1,0 +1,968 @@
+@{
+    ViewData["Title"] = "Người cho thuê";
+    var myProducts = ViewBag.MyProducts as List<WEB.Models.ProductViewModel> ?? new List<WEB.Models.ProductViewModel>();
+    var myRentals = ViewBag.MyRentals as List<WEB.Models.RentalViewModel> ?? new List<WEB.Models.RentalViewModel>();
+    var userName = Context.Session.GetString("UserName") ?? "Sinh viên";
+
+    var totalProducts = myProducts.Count;
+    var rentedProducts = myProducts.Count(p => !p.IsAvailable);
+    var availableProducts = myProducts.Count(p => p.IsAvailable);
+    var totalRevenue = myProducts.Sum(p => p.PricePerDay) * 30;
+}
+
+<div class="owner-layout">
+    <!-- Sidebar -->
+    <aside class="owner-sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-label">Trung tâm điều khiển</div>
+                <div class="sidebar-sub">Chào mừng bạn quay lại</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="snav-item"><i class="fas fa-home"></i><span>Trang chủ</span></a>
+            <a href="/Home/RenterDashboard" class="snav-item"><i class="fas fa-shopping-cart"></i><span>Người thuê</span></a>
+            <a href="/Home/OwnerDashboard" class="snav-item active"><i class="fas fa-th-large"></i><span>Người cho thuê</span></a>
+        </nav>
+        <div class="sidebar-add-wrap">
+            <a href="/Post/Create" class="sidebar-add-btn">
+                <i class="fas fa-plus-circle"></i> Đăng sản phẩm mới
+            </a>
+        </div>
+    </aside>
+
+    <main class="owner-main">
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-tv"></i></div>
+                <div class="stat-body">
+                    <div class="stat-label">Doanh thu tháng này</div>
+                    <div class="stat-value">@totalRevenue.ToString("N0")đ</div>
+                    <span class="stat-badge green">+12%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-archive"></i></div>
+                <div class="stat-body">
+                    <div class="stat-label">Sản phẩm đang cho thuê</div>
+                    <div class="stat-value" style="color:#7c3aed;">@totalProducts.ToString("00")</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gray"><i class="fas fa-th"></i></div>
+                <div class="stat-body">
+                    <div class="stat-label">Đánh giá trung bình</div>
+                    <div class="stat-value">4.8 <i class="fas fa-star" style="color:#f59e0b;font-size:1rem;"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart + Promo -->
+        <div class="chart-promo-row">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <span class="chart-title">Biểu đồ doanh thu</span>
+                    <select class="chart-period">
+                        <option>7 ngày qua</option>
+                        <option>30 ngày qua</option>
+                        <option>3 tháng qua</option>
+                    </select>
+                </div>
+                <div class="chart-bars-wrap">
+                    <canvas id="revenueChart" height="180"></canvas>
+                </div>
+                <div class="chart-days">
+                    <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
+                </div>
+            </div>
+            <div class="promo-card">
+                <div class="promo-title">Trở thành Diamond Renter</div>
+                <div class="promo-desc">Bạn chỉ còn 2 lượt thuê nữa để đạt mốc Diamond và nhận ưu đãi giảm 2% phí dịch vụ.</div>
+                <a href="#" class="promo-btn">Chi tiết mốc</a>
+            </div>
+        </div>
+
+        <!-- Rental Management List -->
+        <div class="rentals-section">
+            <div class="rs-header">
+                <span class="rs-title">Danh sách đơn thuê hiện tại</span>
+                <div class="rs-tabs">
+                    <span class="rs-tab active">Tất cả</span>
+                    <span class="rs-tab">Đang thuê</span>
+                    <span class="rs-tab">Chờ giao</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="rentals-table">
+                    <thead>
+                        <tr>
+                            <th>KHÁCH HÀNG</th>
+                            <th>SẢN PHẨM & CHẤT LIỆU</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>ĐỊA ĐIỂM</th>
+                            <th>TỔNG THANH TOÁN</th>
+                            <th>THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (myRentals.Any())
+                        {
+                            foreach (var rental in myRentals)
+                            {
+                                var statusClass = rental.Status == "Pending" ? "status-yellow" : 
+                                                 (rental.Status == "Confirmed" ? "status-blue" :
+                                                 (rental.Status == "Active" ? "status-green" : "status-purple"));
+                                var statusText = rental.Status == "Pending" ? "Chờ xác nhận" : 
+                                                 (rental.Status == "Confirmed" ? "Chờ giao" :
+                                                 (rental.Status == "Active" ? "Đang thuê" : 
+                                                 (rental.Status == "Completed" ? "Hoàn thành" : rental.Status)));
+                                                 
+                                <tr>
+                                    <td>
+                                        <div class="rt-customer">
+                                            <div class="avatar"><img src="https://ui-avatars.com/api/?name=@(rental.Renter?.FullName ?? "User")&background=dbeafe&color=2563eb" alt=""></div>
+                                            <div class="info">
+                                                <div class="name">@(rental.Renter?.FullName ?? "Khách hàng")</div>
+                                                <div class="id">ID: #RT-@rental.RentalId</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rt-product">
+                                            <div class="pname">@(rental.Product?.ProductName ?? "Sản phẩm")</div>
+                                            <div class="pcol">@(rental.Product?.Category?.CategoryName ?? "Thiết bị")</div>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge @statusClass">@statusText</span></td>
+                                    <td>
+                                        <div class="rt-loc">
+                                            <i class="fas fa-map-marker-alt"></i> @(rental.Product?.Location ?? "Chưa rõ")
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="rt-price">
+                                            <div class="amount">@rental.TotalPrice.ToString("N0")đ</div>
+                                            <div class="date">@rental.StartDate.ToString("dd/MM") - @rental.EndDate.ToString("dd/MM/yyyy")</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (rental.Status == "Pending")
+                                        {
+                                            <form asp-controller="Home" asp-action="ConfirmRental" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                                <button type="submit" class="action-btn action-btn--orange">Xác nhận đơn</button>
+                                            </form>
+                                        }
+                                        else if (rental.Status == "Confirmed")
+                                        {
+                                            <form asp-controller="Home" asp-action="ConfirmDelivery" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                                <button type="submit" class="action-btn">Xác nhận giao</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <a href="/Home/OwnerRentalDetails/@rental.RentalId" class="action-link">Xem chi tiết</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">Chưa có đơn thuê nào.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="rs-footer">
+                <span class="rs-showing">Hiển thị @myRentals.Count đơn thuê</span>
+                <div class="rs-pagination">
+                    <button disabled><i class="fas fa-chevron-left"></i></button>
+                    <button><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products List -->
+        <div class="products-section" style="margin-top: 1.5rem;">
+            <div class="ps-header">
+                <span class="ps-title">Danh sách đang đăng</span>
+                <a href="/Product" class="ps-view-all">Xem tất cả &rarr;</a>
+            </div>
+            <div class="pcards-row">
+                @if (myProducts.Any())
+                {
+                    @foreach (var product in myProducts.Take(3))
+                    {
+                        <div class="pcard">
+                            <div class="pcard-img-wrap">
+                                @if (!product.IsApproved)
+                                {
+                                    <span class="pcard-badge pcard-badge--yellow" style="background:#fef3c7;color:#d97706;border:1px solid #fde68a;">Chờ duyệt</span>
+                                }
+                                else if (product.IsAvailable)
+                                {
+                                    <span class="pcard-badge pcard-badge--green">Sẵn sàng</span>
+                                }
+                                else
+                                {
+                                    <span class="pcard-badge pcard-badge--orange">Đang thuê</span>
+                                }
+                                <img src="@product.ImageUrl" alt="@product.ProductName"
+                                     onerror="this.src='https://via.placeholder.com/300x200/e2e8f0/94a3b8?text=No+Image'">
+                            </div>
+                            <div class="pcard-body">
+                                <div class="pcard-cat">@(product.Category?.CategoryName ?? "Khác")</div>
+                                <div class="pcard-name">@product.ProductName</div>
+                                <div class="pcard-price">@product.PricePerDay.ToString("N0")đ<span>/ngày</span></div>
+                            </div>
+                            <button class="pcard-more"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+                    }
+                }
+                <!-- Add new card always shown -->
+                <div class="pcard pcard--add">
+                    <a href="/Post/Create" class="pcard-add-inner">
+                        <div class="pcard-add-icon"><i class="fas fa-plus-circle"></i></div>
+                        <div class="pcard-add-label">Thêm món mới</div>
+                        <div class="pcard-add-sub">Đăng thêm đồ dùng để tăng thu nhập hàng tháng của bạn</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    .owner-layout {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        background: #f1f5f9;
+        font-family: 'Segoe UI',sans-serif;
+    }
+
+    /* Sidebar - dừng trước footer, không che footer */
+    .owner-sidebar {
+        width: 210px;
+        background: #fff;
+        border-right: 1px solid #e2e8f0;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem 0 1rem;
+        z-index: 100;
+        overflow-y: auto;
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: 0 1.25rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .sidebar-label {
+        font-size: .78rem;
+        color: #2563eb;
+        font-weight: 700;
+    }
+
+    .sidebar-sub {
+        font-size: .72rem;
+        color: #94a3b8;
+        margin-top: .15rem;
+    }
+
+    .sidebar-nav {
+        padding: .75rem 0;
+        flex: 1;
+    }
+
+    .snav-item {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .7rem 1.25rem;
+        color: #64748b;
+        text-decoration: none;
+        font-size: .88rem;
+        font-weight: 500;
+        transition: all .2s;
+    }
+
+        .snav-item i {
+            font-size: .95rem;
+            width: 18px;
+        }
+
+        .snav-item:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .snav-item.active {
+            color: #2563eb;
+            background: #eff6ff;
+            font-weight: 700;
+            border-left: 3px solid #2563eb;
+        }
+
+    .sidebar-add-wrap {
+        padding: 0 1rem;
+    }
+
+    .sidebar-add-btn {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .7rem 1rem;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: .82rem;
+        font-weight: 700;
+        transition: background .2s;
+    }
+
+        .sidebar-add-btn:hover {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+    /* Main */
+    .owner-main {
+        margin-left: 210px;
+        flex: 1;
+        padding: 2rem 2rem 3rem;
+    }
+
+    /* Stats */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+
+        .stat-icon.blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .stat-icon.purple {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .stat-icon.gray {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+    .stat-body {
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: .75rem;
+        color: #94a3b8;
+        margin-bottom: .3rem;
+    }
+
+    .stat-value {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1;
+    }
+
+    .stat-badge {
+        display: inline-block;
+        margin-top: .35rem;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        font-size: .7rem;
+        font-weight: 700;
+    }
+
+        .stat-badge.green {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+    /* Chart + Promo */
+    .chart-promo-row {
+        display: grid;
+        grid-template-columns: 1fr 270px;
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .chart-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem 1rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .chart-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .chart-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .chart-period {
+        padding: .35rem .75rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: .78rem;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .chart-bars-wrap {
+        position: relative;
+        height: 180px;
+    }
+
+    .chart-days {
+        display: flex;
+        justify-content: space-between;
+        padding: .5rem .5rem 0;
+    }
+
+        .chart-days span {
+            font-size: .7rem;
+            color: #94a3b8;
+        }
+
+    .promo-card {
+        background: #2563eb;
+        border-radius: 14px;
+        padding: 1.75rem 1.5rem;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .promo-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: .75rem;
+    }
+
+    .promo-desc {
+        font-size: .8rem;
+        line-height: 1.55;
+        opacity: .88;
+        margin-bottom: 1.25rem;
+    }
+
+    .promo-btn {
+        display: inline-block;
+        padding: .6rem 1.25rem;
+        background: #fff;
+        color: #2563eb;
+        border-radius: 8px;
+        font-size: .82rem;
+        font-weight: 700;
+        text-decoration: none;
+        width: fit-content;
+    }
+
+        .promo-btn:hover {
+            opacity: .9;
+            color: #2563eb;
+        }
+
+    /* Rentals List Section */
+    .rentals-section {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .rs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .rs-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .rs-tabs {
+        display: flex;
+        gap: 1.25rem;
+    }
+
+    .rs-tab {
+        font-size: .85rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        padding-bottom: .25rem;
+    }
+    
+    .rs-tab.active {
+        color: #2563eb;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .rentals-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+
+    .rentals-table th {
+        text-align: left;
+        font-size: .75rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 1rem .5rem;
+        border-bottom: 1px solid #f1f5f9;
+        letter-spacing: .5px;
+    }
+
+    .rentals-table td {
+        padding: 1.25rem .5rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    /* Customer Info */
+    .rt-customer {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+    }
+    
+    .rt-customer .avatar img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .rt-customer .name {
+        font-size: .9rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .rt-customer .id {
+        font-size: .75rem;
+        color: #94a3b8;
+        margin-top: .15rem;
+    }
+
+    /* Product Info */
+    .rt-product .pname {
+        font-size: .9rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .rt-product .pcol {
+        font-size: .75rem;
+        color: #2563eb;
+        margin-top: .15rem;
+    }
+
+    /* Badges */
+    .status-badge {
+        display: inline-block;
+        padding: .35rem .75rem;
+        border-radius: 20px;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+    
+    .status-green { background: #dcfce7; color: #16a34a; }
+    .status-yellow { background: #fef9c3; color: #ca8a04; }
+    .status-purple { background: #ede9fe; color: #7c3aed; }
+    .status-blue { background: #dbeafe; color: #2563eb; }
+
+    /* Location */
+    .rt-loc {
+        font-size: .82rem;
+        color: #475569;
+        line-height: 1.4;
+    }
+    
+    .rt-loc i {
+        color: #94a3b8;
+        margin-right: .25rem;
+    }
+
+    /* Price */
+    .rt-price .amount {
+        font-size: .95rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+    
+    .rt-price .date {
+        font-size: .75rem;
+        color: #94a3b8;
+        margin-top: .15rem;
+    }
+
+    /* Actions */
+    .action-link {
+        font-size: .85rem;
+        font-weight: 700;
+        color: #2563eb;
+        text-decoration: none;
+    }
+    
+    .action-link:hover { text-decoration: underline; }
+    
+    .action-btn {
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        padding: .5rem 1rem;
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    
+    .action-btn:hover {
+        background: #1d4ed8;
+    }
+    .action-btn--orange {
+        background: #f59e0b;
+    }
+    .action-btn--orange:hover {
+        background: #d97706;
+    }
+
+    /* Footer */
+    .rs-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+    }
+    
+    .rs-showing {
+        font-size: .82rem;
+        color: #94a3b8;
+    }
+    
+    .rs-pagination {
+        display: flex;
+        gap: .5rem;
+    }
+    
+    .rs-pagination button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        border-radius: 6px;
+        color: #64748b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .rs-pagination button:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    /* Products */
+    .products-section {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .ps-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
+
+    .ps-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .ps-view-all {
+        font-size: .82rem;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .ps-view-all:hover {
+            text-decoration: underline;
+        }
+
+    .pcards-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill,minmax(210px,1fr));
+        gap: 1rem;
+    }
+
+    /* Product Card */
+    .pcard {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        position: relative;
+        transition: box-shadow .2s;
+    }
+
+        .pcard:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,.1);
+        }
+
+    .pcard-img-wrap {
+        position: relative;
+        height: 145px;
+        overflow: hidden;
+    }
+
+        .pcard-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s;
+        }
+
+    .pcard:hover .pcard-img-wrap img {
+        transform: scale(1.04);
+    }
+
+    .pcard-badge {
+        position: absolute;
+        top: .6rem;
+        left: .6rem;
+        padding: .22rem .6rem;
+        border-radius: 6px;
+        font-size: .68rem;
+        font-weight: 700;
+        z-index: 2;
+    }
+
+    .pcard-badge--green {
+        background: #10b981;
+        color: #fff;
+    }
+
+    .pcard-badge--orange {
+        background: #f59e0b;
+        color: #fff;
+    }
+
+    .pcard-body {
+        padding: .9rem 1rem .75rem;
+    }
+
+    .pcard-cat {
+        font-size: .65rem;
+        color: #2563eb;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: .3rem;
+    }
+
+    .pcard-name {
+        font-size: .88rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: .4rem;
+    }
+
+    .pcard-price {
+        font-size: .95rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+
+        .pcard-price span {
+            font-size: .72rem;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+    .pcard-more {
+        position: absolute;
+        top: .6rem;
+        right: .6rem;
+        width: 28px;
+        height: 28px;
+        background: rgba(255,255,255,.85);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: .8rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Add Card */
+    .pcard--add {
+        border: 2px dashed #cbd5e1;
+        background: #f8fafc;
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pcard-add-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        padding: 1.5rem 1rem;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .pcard-add-icon {
+        font-size: 2rem;
+        color: #94a3b8;
+    }
+
+    .pcard-add-label {
+        font-size: .88rem;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .pcard-add-sub {
+        font-size: .74rem;
+        color: #94a3b8;
+        line-height: 1.4;
+    }
+
+    @@media(max-width:1100px) {
+        .chart-promo-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width:768px) {
+        .owner-sidebar {
+            left: -210px;
+            transition: left .3s;
+        }
+
+        .owner-main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function(){
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['T2','T3','T4','T5','T6','T7','CN'],
+                datasets:[{
+                    data:[320000,480000,310000,540000,430000,720000,610000],
+                    backgroundColor: ['#bfdbfe','#bfdbfe','#bfdbfe','#bfdbfe','#bfdbfe','#1d4ed8','#bfdbfe'],
+                    borderRadius:6,borderSkipped:false
+                }]
+            },
+            options:{
+                responsive:true,maintainAspectRatio:false,
+                plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed.y.toLocaleString('vi-VN')+'đ';}}}},
+                scales:{
+                    x:{grid:{display:false},ticks:{display:false}},
+                    y:{grid:{color:'#f1f5f9'},ticks:{callback:function(v){return (v/1000)+'k';},font:{size:11}}}
+                }
+            }
+        });
+    })();
+</script>

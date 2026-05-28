@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UTE Rent</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* Footer full-width khi ở trang dashboard */
+        .dashboard-page .simple-footer {
+            width: 100% !important;
+            margin-left: 0 !important;
+            position: relative;
+            z-index: 200;
+        }
+    </style>
+</head>
+@{
+            var bodyIsDash = ViewData["Title"]?.ToString() == "Người thuê" || ViewData["Title"]?.ToString() == "Người cho thuê";
+}
+<body class="@(bodyIsDash ? "dashboard-page" : "")">
+    @{
+        var userName = Context.Session.GetString("UserName");
+    }
+    <header class="modern-header">
+        <nav class="modern-navbar">
+            <div class="navbar-container">
+                <!-- Logo & Brand -->
+                <a class="brand-logo" asp-controller="Home" asp-action="Index">
+                    <div class="logo-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">UTE Rent</span>
+                        <span class="brand-tagline">Cho thuê thông minh</span>
+                    </div>
+                </a>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Navigation Links -->
+                <div class="nav-menu" id="navMenu">
+                    <div style="display: flex; gap: 2rem; margin-left: 3rem;">
+                        <a class="nav-item" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home"></i>
+                            <span>Trang chủ</span>
+                        </a>
+                        <a class="nav-item" asp-controller="Product" asp-action="Index">
+                            <i class="fas fa-th-large"></i>
+                            <span>Sản phẩm</span>
+                        </a>
+                        <a class="nav-item" asp-controller="Post" asp-action="Create">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Đăng tin</span>
+                        </a>
+                        <a class="nav-item" asp-controller="Home" asp-action="Privacy">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Giới thiệu</span>
+                        </a>
+                    </div>
+
+                    <!-- User Actions -->
+                    <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                        <a href="/Product/Cart" class="notification-btn" title="Giỏ hàng" style="text-decoration: none; position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #475569; border: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i>
+                            <span id="cart-badge" style="background: #ef4444; position: absolute; top: -5px; right: -5px; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid white; display: none;">0</span>
+                        </a>
+
+                        @if (!string.IsNullOrEmpty(userName))
+                        {
+                            <!-- Wallet balance display in Navbar -->
+                            <a href="/Wallet" class="wallet-nav-btn" title="Ví tài khoản" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-weight: 700; text-decoration: none; border: 1px solid rgba(245, 158, 11, 0.2); transition: all 0.3s ease; font-size: 0.9rem;">
+                                <i class="fas fa-wallet" style="font-size: 1rem;"></i>
+                                <span id="nav-wallet-balance">0đ</span>
+                            </a>
+
+                            <button class="notification-btn" title="Thông báo">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge">3</span>
+                            </button>
+
+                            <div class="user-menu">
+                                <button class="user-menu-btn" onclick="toggleUserDropdown()">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="user-name">@userName</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="user-dropdown" id="userDropdown">
+                                    <div class="dropdown-header">
+                                        <div class="user-avatar-large">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="user-name-large">@userName</div>
+                                            <div class="user-email">@Context.Session.GetString("UserEmail")</div>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    @if (Context.Session.GetString("UserRole") == "Admin")
+                                    {
+                                        <a href="/Admin/Dashboard" class="dropdown-item" style="color: #6366f1; font-weight: bold; background: rgba(99, 102, 241, 0.05);">
+                                            <i class="fas fa-user-shield" style="color: #6366f1;"></i>
+                                            <span>Quản trị hệ thống</span>
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                    }
+                                    <a href="/Wallet" class="dropdown-item">
+                                        <i class="fas fa-wallet" style="color: #f59e0b;"></i>
+                                        <span>Ví ký quỹ: <strong id="dropdown-wallet-balance" style="color: #d97706;">0đ</strong></span>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <i class="fas fa-user-circle"></i>
+                                        <span>Tài khoản của tôi</span>
+                                    </a>
+                                    <a href="/Home/RenterDashboard" class="dropdown-item">
+                                        <i class="fas fa-box"></i>
+                                        <span>Đơn thuê của tôi</span>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Yêu thích</span>
+                                    </a>
+                                    <a href="#" class="dropdown-item">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Cài đặt</span>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a asp-controller="Account" asp-action="Logout" class="dropdown-item logout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Đăng xuất</span>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="btn-login" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Đăng nhập</span>
+                            </a>
+                            <a class="btn-register" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Đăng ký</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" style="flex: 1;">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" style="margin: 1.5rem auto; max-width: 1200px; padding: 0 1rem;">
+                ✅ @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" style="margin: 1.5rem auto; max-width: 1200px; padding: 0 1rem;">
+                ❌ @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @* Tabs cho Người thuê / Người cho thuê - Chỉ hiển thị khi đã đăng nhập, KHÔNG phải Admin và KHÔNG ở trang dashboard *@
+        @{
+            var isDashboard = ViewData["Title"]?.ToString() == "Người thuê" || ViewData["Title"]?.ToString() == "Người cho thuê";
+            var isAdmin = Context.Session.GetString("UserRole") == "Admin";
+        }
+        @if (!string.IsNullOrEmpty(userName) && !isDashboard && !isAdmin)
+        {
+            <div class="user-mode-tabs">
+                <div class="user-mode-tabs-container">
+                    <a href="/Home/RenterDashboard" class="user-mode-tab">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Người thuê</span>
+                    </a>
+                    <a href="/Home/OwnerDashboard" class="user-mode-tab">
+                        <i class="fas fa-box"></i>
+                        <span>Người cho thuê</span>
+                    </a>
+                </div>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="simple-footer">
+        <div class="simple-footer-content">
+            <div class="simple-footer-grid">
+                <!-- Logo Column -->
+                <div class="simple-footer-column">
+                    <div class="simple-footer-logo">
+                        <div class="simple-logo-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <span class="simple-logo-text">UTE Rent</span>
+                    </div>
+                    <p class="simple-footer-tagline">
+                        Nền tảng cho thuê đồ thông minh dành<br />
+                        riêng cho sinh viên UTE.
+                    </p>
+                </div>
+
+                <!-- Dịch vụ Column -->
+                <div class="simple-footer-column">
+                    <h4 class="simple-footer-heading">Dịch vụ</h4>
+                    <ul class="simple-footer-links">
+                        <li><a href="/Product">Cho thuê thiết bị</a></li>
+                        <li><a href="/Post/Create">Đăng tin miễn phí</a></li>
+                        <li><a href="#">Bảo hiểm đồ dùng</a></li>
+                    </ul>
+                </div>
+
+                <!-- Hỗ trợ Column -->
+                <div class="simple-footer-column">
+                    <h4 class="simple-footer-heading">Hỗ trợ</h4>
+                    <ul class="simple-footer-links">
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                        <li><a href="#">Quy định chung</a></li>
+                        <li><a href="#">Liên hệ chúng tôi</a></li>
+                    </ul>
+                </div>
+
+                <!-- Theo dõi Column -->
+                <div class="simple-footer-column">
+                    <h4 class="simple-footer-heading">Theo dõi chúng tôi</h4>
+                    <div class="simple-social-links">
+                        <a href="#" class="simple-social-link" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="simple-social-link" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="simple-footer-bottom">
+                <p class="simple-copyright">
+                    © 2024 UTE Rent. Developed for UTE Students Community.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <button class="scroll-to-top" id="scrollToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/animations.js" asp-append-version="true"></script>
+    <script src="~/js/advanced-effects.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            navMenu.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Toggle User Dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdown');
+
+            if (dropdown && !userMenu?.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+
+            const navMenu = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (navMenu && !navMenu.contains(event.target) && !toggle?.contains(event.target)) {
+                navMenu.classList.remove('active');
+                toggle?.classList.remove('active');
+            }
+        });
+
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/Hide Scroll to Top Button
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (scrollBtn) {
+                if (window.pageYOffset > 300) {
+                    scrollBtn.classList.add('visible');
+                } else {
+                    scrollBtn.classList.remove('visible');
+                }
+            }
+        });
+
+        // Header và Tabs scroll effect - ẩn khi scroll xuống, hiện khi scroll lên
+        let lastScroll = 0;
+        const header = document.querySelector('.modern-header');
+        const tabs = document.querySelector('.user-mode-tabs');
+
+        // Thêm class has-tabs vào body nếu có tabs để đẩy nội dung xuống
+        if (tabs) document.body.classList.add('has-tabs');
+
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset;
+
+            // Nếu scroll xuống và đã scroll hơn 100px
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                // Ẩn header và tabs khi scroll xuống
+                header.classList.add('scroll-down');
+                header.classList.remove('scroll-up');
+                if (tabs) {
+                    tabs.classList.add('scroll-down');
+                    tabs.classList.remove('scroll-up');
+                }
+            } 
+            // Nếu scroll lên
+            else if (currentScroll < lastScroll) {
+                // Hiện header và tabs khi scroll lên
+                header.classList.remove('scroll-down');
+                header.classList.add('scroll-up');
+                if (tabs) {
+                    tabs.classList.remove('scroll-down');
+                    tabs.classList.add('scroll-up');
+                }
+            }
+
+            // Thêm shadow khi scroll
+            if (currentScroll > 50) {
+                header.classList.add('scrolled');
+                if (tabs) tabs.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+                if (tabs) tabs.classList.remove('scrolled');
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Fetch Wallet Balance dynamically using AJAX/fetch with JWT Token
+        @if (!string.IsNullOrEmpty(userName))
+        {
+            <text>
+            async function fetchNavbarWalletBalance() {
+                try {
+                    const response = await fetch('/Wallet/GetBalance', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            const formatted = new Intl.NumberFormat('vi-VN').format(result.data) + 'đ';
+                            const navBalance = document.getElementById('nav-wallet-balance');
+                            const dropBalance = document.getElementById('dropdown-wallet-balance');
+                            if (navBalance) navBalance.innerText = formatted;
+                            if (dropBalance) dropBalance.innerText = formatted;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi tải số dư ví lên navbar: ", e);
+                }
+            }
+
+            // Gọi tải số dư ví ngay khi load trang
+            window.addEventListener('DOMContentLoaded', fetchNavbarWalletBalance);
+            </text>
+        }
+
+        // Cập nhật số lượng giỏ hàng trên badge
+        function updateLayoutCartBadge() {
+            try {
+                let cart = JSON.parse(localStorage.getItem('uterent_cart') || '[]');
+                let badge = document.getElementById('cart-badge');
+                if (badge) {
+                    if (cart.length > 0) {
+                        badge.innerText = cart.length;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            } catch(e) {
+                console.error("Lỗi cập nhật badge giỏ hàng:", e);
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', updateLayoutCartBadge);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1395 @@
+@model WEB.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = Model?.ProductName ?? "Chi tiết sản phẩm";
+}
+
+<div class="product-details-container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/">
+            <i class="fas fa-arrow-left"></i>
+            Quay lại
+        </a>
+        <span class="breadcrumb-separator">/</span>
+        <span>UTE</span>
+        <span class="breadcrumb-separator">/</span>
+        <span>Listings</span>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="margin-bottom: 2rem; padding: 1rem; border-radius: 12px; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="margin-bottom: 2rem; padding: 1rem; border-radius: 12px; background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="product-details-grid">
+        <!-- Left: Images -->
+        <div class="product-images-section">
+            <div class="product-badge-top">TÀI LIỆU CHÍNH</div>
+            
+            <div class="product-main-image">
+                <button class="product-favorite-large">
+                    <i class="far fa-heart"></i>
+                </button>
+                <img src="@Model?.ImageUrl" alt="@Model?.ProductName" id="mainImage" />
+            </div>
+
+            <div class="product-thumbnails">
+                <img src="@Model?.ImageUrl" alt="Thumbnail 1" class="thumbnail active" onclick="changeImage(this.src)" />
+            </div>
+        </div>
+
+        <!-- Right: Product Info -->
+        <div class="product-info-section">
+            <div class="product-category-badge">HỌC LIỆU</div>
+            
+            <h1 class="product-title">@Model?.ProductName</h1>
+            
+            <div class="product-rating">
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span class="rating-number">5.0</span>
+                </div>
+                <span class="review-count">(24 đánh giá)</span>
+            </div>
+
+            <p class="product-description">
+                @Model?.Description
+            </p>
+
+            <!-- Size/Options -->
+            <div class="product-options">
+                <div class="option-group">
+                    <label>Danh mục</label>
+                    <div class="size-buttons">
+                        <button class="size-btn active">@Model?.Category?.CategoryName</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label>Vị Trí</label>
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>@Model?.Location</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price section updated to gorgeous design -->
+            <div class="product-price-section" style="margin-bottom: 1.5rem;">
+                <div class="price-main" style="display: flex; align-items: baseline; gap: 0.5rem;">
+                    <span class="price-amount" style="font-size: 2.2rem; font-weight: 800; color: #2563eb;">@Model?.PricePerDay.ToString("N0")đ</span>
+                    <span class="price-unit" style="font-size: 1rem; color: #64748b; font-weight: 600;">/ ngày</span>
+                </div>
+                <div class="price-note" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                    <i class="fas fa-shield-alt" style="color: #10b981;"></i>
+                    <span>Tiền đặt cọc bảo đảm: <strong>@Model?.Deposit.ToString("N0")đ</strong> (Hoàn trả lại 100% khi nhận lại đồ)</span>
+                </div>
+            </div>
+
+            <!-- CHỌN GÓI THUÊ BẮT ĐẦU -->
+            <div style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                <label style="font-size: 0.85rem; color: #475569; font-weight: 800; margin-bottom: 0.75rem; display: block; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <i class="fas fa-cubes" style="color: #2563eb; margin-right: 0.25rem;"></i> Chọn gói thuê từ chủ sản phẩm
+                </label>
+                
+                <div class="rental-packages-grid">
+                    <!-- Gói Giờ -->
+                    <div class="rental-package-card @(Model?.PricePerHour.HasValue == true && Model.PricePerHour.Value > 0 ? "" : "disabled")" 
+                         id="pkg-Hour" 
+                         onclick="selectPackage('Hour', @(Model?.PricePerHour ?? 0))">
+                        <span class="package-badge"><i class="fas fa-bolt"></i></span>
+                        <div class="package-title">Theo giờ</div>
+                        <div class="package-price">
+                            @(Model?.PricePerHour.HasValue == true && Model.PricePerHour.Value > 0 
+                                ? Model.PricePerHour.Value.ToString("N0") + "đ" 
+                                : "N/A")
+                        </div>
+                    </div>
+
+                    <!-- Gói Ngày -->
+                    <div class="rental-package-card active" 
+                         id="pkg-Day" 
+                         onclick="selectPackage('Day', @(Model?.PricePerDay ?? 0))">
+                        <span class="package-badge"><i class="fas fa-calendar-day"></i></span>
+                        <div class="package-title">Theo ngày</div>
+                        <div class="package-price">@Model?.PricePerDay.ToString("N0")đ</div>
+                    </div>
+
+                    <!-- Gói Tuần -->
+                    <div class="rental-package-card @(Model?.PricePerWeek.HasValue == true && Model.PricePerWeek.Value > 0 ? "" : "disabled")" 
+                         id="pkg-Week" 
+                         onclick="selectPackage('Week', @(Model?.PricePerWeek ?? 0))">
+                        <span class="package-badge"><i class="fas fa-calendar-week"></i></span>
+                        <div class="package-title">Theo tuần</div>
+                        <div class="package-price">
+                            @(Model?.PricePerWeek.HasValue == true && Model.PricePerWeek.Value > 0 
+                                ? Model.PricePerWeek.Value.ToString("N0") + "đ" 
+                                : "N/A")
+                        </div>
+                    </div>
+
+                    <!-- Gói Tháng -->
+                    <div class="rental-package-card @(Model?.PricePerMonth.HasValue == true && Model.PricePerMonth.Value > 0 ? "" : "disabled")" 
+                         id="pkg-Month" 
+                         onclick="selectPackage('Month', @(Model?.PricePerMonth ?? 0))">
+                        <span class="package-badge"><i class="fas fa-calendar-alt"></i></span>
+                        <div class="package-title">Theo tháng</div>
+                        <div class="package-price">
+                            @(Model?.PricePerMonth.HasValue == true && Model.PricePerMonth.Value > 0 
+                                ? Model.PricePerMonth.Value.ToString("N0") + "đ" 
+                                : "N/A")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Thuê Đồ chính thức -->
+            <form id="rentForm" asp-action="Rent" method="post" style="width: 100%;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model?.ProductId" />
+                <input type="hidden" id="rentalUnit" name="rentalUnit" value="Day" />
+                <input type="hidden" id="duration" name="duration" value="1" />
+
+                <!-- Chi tiết số lượng & Ngày bắt đầu -->
+                <div class="duration-picker-container">
+                    <label id="durationLabel" style="font-size: 0.85rem; color: #64748b; font-weight: 700; margin-bottom: 0.5rem; display: block; text-transform: uppercase;">
+                        Số ngày thuê
+                    </label>
+                    <div class="duration-input-wrapper">
+                        <button type="button" class="duration-btn" onclick="adjustDuration(-1)">−</button>
+                        <input type="number" id="rentalDuration" value="1" min="1" class="duration-display" onchange="updateDurationInput(this.value)" onkeyup="updateDurationInput(this.value)" />
+                        <button type="button" class="duration-btn" onclick="adjustDuration(1)">+</button>
+                    </div>
+
+                    <label style="font-size: 0.85rem; color: #64748b; font-weight: 700; margin-bottom: 0.5rem; display: block; text-transform: uppercase; margin-top: 1.25rem;">
+                        Ngày & Giờ nhận đồ
+                    </label>
+                    <input type="datetime-local" id="startDate" name="startDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" style="width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 12px; outline: none; font-weight: 600; color: #1e293b; background: #f8fafc; transition: border-color 0.2s;" onchange="updateCalculations()" />
+                </div>
+
+                <!-- Bảng tính tiền chi tiết (Escrow Checkout Summary) -->
+                <div class="checkout-summary-box">
+                    <div style="font-size: 0.8rem; font-weight: 800; color: #64748b; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Tóm tắt thanh toán ký quỹ</div>
+                    
+                    <div class="summary-row">
+                        <span>Giá gói thuê:</span>
+                        <strong id="summaryUnitPrice">@Model?.PricePerDay.ToString("N0") đ</strong>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Thời lượng thuê:</span>
+                        <strong id="summaryDuration">x 1 ngày</strong>
+                    </div>
+
+                    <div class="summary-row" style="padding-bottom: 0.5rem; border-bottom: 1px solid #cbd5e1; margin-bottom: 0.5rem;">
+                        <span>Thành tiền thuê:</span>
+                        <strong id="summaryRentTotal" style="color: #1e293b;">@Model?.PricePerDay.ToString("N0") đ</strong>
+                    </div>
+
+                    <div class="summary-row" style="color: #64748b;">
+                        <span>
+                            Tiền đặt cọc (hoàn 100%): 
+                            <i class="fas fa-question-circle" title="Tiền cọc này sẽ được hoàn trả lại ví của bạn ngay khi chủ nhà nhận lại đồ nguyên vẹn" style="cursor: help;"></i>
+                        </span>
+                        <strong>+ @Model?.Deposit.ToString("N0") đ</strong>
+                    </div>
+
+                    <div class="summary-row total">
+                        <span style="color: #1e293b;">Tổng cộng tạm giữ:</span>
+                        <span id="summaryGrandTotal" style="color: #2563eb; font-size: 1.35rem; font-weight: 800;">
+                            @((Model?.PricePerDay + Model?.Deposit ?? 0).ToString("N0")) đ
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="product-actions" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <div style="padding: 1.25rem; background: #eff6ff; color: #1d4ed8; border-radius: 16px; border: 1px solid #bfdbfe; text-align: center; font-weight: 700; box-shadow: 0 4px 6px rgba(29, 78, 216, 0.05);">
+                            <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i> Đây là sản phẩm do bạn đăng (Không thể tự thuê)
+                        </div>
+                    }
+                    else
+                    {
+                        @if (ViewBag.IsLoggedIn == true)
+                        {
+                            <button type="submit" class="btn-rent-now" style="width: 100%; padding: 1.25rem; border-radius: 16px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);">
+                                <i class="fas fa-credit-card" style="margin-right: 0.5rem;"></i>
+                                THUÊ NGAY KÝ QUỸ
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="/Account/Login?returnUrl=@Context.Request.Path" class="btn-rent-now" style="text-decoration: none; padding: 1.25rem; border-radius: 16px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); text-align: center;">
+                                <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                                ĐĂNG NHẬP ĐỂ THUÊ ĐỒ
+                            </a>
+                        }
+
+                        <button type="button" class="btn-add-to-cart" onclick="addToCart()" style="width: 100%; padding: 1.25rem; border-radius: 16px; font-size: 1.1rem; font-weight: 700; background: #ffffff; color: #0f172a; border: 2px solid #e2e8f0; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <i class="fas fa-shopping-bag" style="color: #64748b;"></i>
+                            THÊM VÀO GIỎ HÀNG
+                        </button>
+                    }
+                </div>
+            </form>
+
+
+            <!-- Dynamic Calendar -->
+            <div class="calendar-section">
+                <div class="calendar-nav-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; font-weight: 800; color: #1e293b;">
+                        <i class="fas fa-calendar-alt" style="color: #2563eb;"></i>
+                        <span id="calendarMonthTitle">Tháng 5, 2026</span>
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="duration-btn" style="width: 32px; height: 32px; font-size: 0.9rem; font-weight: 800;" onclick="prevMonth()">−</button>
+                        <button type="button" class="duration-btn" style="width: 32px; height: 32px; font-size: 0.9rem; font-weight: 800;" onclick="nextMonth()">+</button>
+                    </div>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="calendar-header">
+                        <span>T2</span>
+                        <span>T3</span>
+                        <span>T4</span>
+                        <span>T5</span>
+                        <span>T6</span>
+                        <span>T7</span>
+                        <span>CN</span>
+                    </div>
+                    <div class="calendar-days" id="calendarDaysContainer">
+                        <!-- Dynamic days generated by JS -->
+                    </div>
+                    <div class="calendar-note" style="margin-top: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 1.25rem; font-size: 0.78rem; color: #64748b;">
+                        <span style="display: flex; align-items: center; gap: 0.35rem;">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #eff6ff; display: inline-block; border: 1px solid #bfdbfe;"></span> Trống
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 0.35rem;">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #fee2e2; display: inline-block; border: 1px solid #fecaca;"></span> Đã đặt
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 0.35rem;">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background: #2563eb; display: inline-block;"></span> Hôm nay
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <h2>Đánh giá từ người thuê</h2>
+        <p class="reviews-subtitle">Phản hồi thực tế từ cộng đồng sinh viên</p>
+
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" class="review-avatar" />
+                    <div class="review-user-info">
+                        <div class="review-user-name">Minh Anh</div>
+                        <div class="review-user-badge">Verified Rent</div>
+                    </div>
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="review-text">
+                    "Sách Giải tích nâng cao là tài liệu học tập thiết yếu dành cho sinh viên khối ngành kỹ thuật. 
+                    Nội dung bao gồm các chuyên đề về tích phân, đạo hàm và phương trình vi phân, được trình bày 
+                    rõ ràng và dễ hiểu."
+                </p>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="https://ui-avatars.com/api/?name=Thuy+Trang&background=c084fc&color=fff" alt="Thúy Trang" class="review-avatar" />
+                    <div class="review-user-info">
+                        <div class="review-user-name">Thúy Trang</div>
+                        <div class="review-user-badge">Verified Rent</div>
+                    </div>
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="review-text">
+                    "Đã sách rất tốt, mình thấy chủ nhà rất nhiệt tình. Thủ thuê nhanh gọn, chỉ cần cho vào hồ sơ 
+                    chính ngay đơn vào. Chúng ta đã thống nhất là ngày 1 tháng 11 hoàn toàn ổn, đúng không?"
+                </p>
+            </div>
+        </div>
+
+        <a href="#" class="view-all-reviews">
+            Xem tất cả 32 đánh giá
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Premium Rental Packages Grid */
+    .rental-packages-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .rental-package-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 85px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .rental-package-card:hover:not(.disabled) {
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+        background: #f1f5f9;
+    }
+    .rental-package-card.active {
+        border-color: #2563eb;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+    }
+    .rental-package-card.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+    }
+    .rental-package-card .package-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .rental-package-card.active .package-title {
+        color: #1d4ed8;
+    }
+    .rental-package-card .package-price {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-top: 0.5rem;
+    }
+    .rental-package-card.active .package-price {
+        color: #1d4ed8;
+    }
+    .rental-package-card .package-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+    .rental-package-card.active .package-badge {
+        color: #2563eb;
+    }
+
+    /* Duration Picker & Inputs */
+    .duration-picker-container {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+    .duration-input-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafc;
+        border: 2px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 0.4rem 0.8rem;
+        margin-top: 0.5rem;
+        transition: border-color 0.2s;
+    }
+    .duration-input-wrapper:focus-within {
+        border-color: #2563eb;
+    }
+    .duration-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .duration-btn:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+    }
+    .duration-display {
+        border: none;
+        background: transparent;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e293b;
+        text-align: center;
+        width: 70px;
+        outline: none;
+    }
+
+    /* Checkout summary box */
+    .checkout-summary-box {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 20px;
+        padding: 1.25rem;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
+        color: #475569;
+        font-weight: 500;
+    }
+    .summary-row.total {
+        margin-top: 0.85rem;
+        padding-top: 0.85rem;
+        border-top: 2px dashed #cbd5e1;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .product-details-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .breadcrumb a {
+        color: var(--primary-blue);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+
+    .breadcrumb-separator {
+        color: #cbd5e1;
+    }
+
+    .product-details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        margin-bottom: 4rem;
+    }
+
+    /* Images Section */
+    .product-images-section {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+        max-height: calc(100vh - 120px);
+        overflow: hidden;
+    }
+
+    .product-badge-top {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #fecaca;
+        color: #dc2626;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .product-main-image {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        aspect-ratio: 4/3;
+        max-height: 500px;
+    }
+
+    .product-main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .product-favorite-large {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #dc2626;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .product-favorite-large:hover {
+        transform: scale(1.1);
+    }
+
+    .product-thumbnails {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .thumbnail {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .thumbnail:hover,
+    .thumbnail.active {
+        border-color: var(--primary-blue);
+    }
+
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .thumbnail-more {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+
+    /* Product Info Section */
+    .product-category-badge {
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        background: #dbeafe;
+        color: var(--primary-blue);
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .product-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stars {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #fbbf24;
+    }
+
+    .rating-number {
+        margin-left: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .review-count {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .product-description {
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+
+    .product-options {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .option-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .size-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .size-btn {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        background: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .size-btn:hover,
+    .size-btn.active {
+        border-color: var(--primary-blue);
+        background: #eff6ff;
+        color: var(--primary-blue);
+    }
+
+    .location-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+    }
+
+    .product-price-section {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+    }
+
+    .price-main {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .price-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+
+    .price-unit {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+    }
+
+    .price-note {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .product-actions {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-rent-now {
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-rent-now:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-add-cart {
+        padding: 1rem;
+        background: white;
+        color: var(--primary-blue);
+        border: 2px solid var(--primary-blue);
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-add-cart:hover {
+        background: #eff6ff;
+    }
+
+    .calendar-section {
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+    }
+
+    .calendar-section h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .calendar-grid {
+        margin-bottom: 1rem;
+    }
+
+    .calendar-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+    }
+
+    .day-btn {
+        aspect-ratio: 1;
+        border: none;
+        border-radius: 50%;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .day-btn.available {
+        background: #eff6ff;
+        color: var(--primary-blue);
+    }
+
+    .day-btn.available:hover {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .day-btn.booked {
+        background: #fee2e2 !important;
+        color: #ef4444 !important;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+
+    .day-btn.past {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    .day-btn.selected {
+        background: #2563eb !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        transform: scale(1.1);
+        border-radius: 50%;
+    }
+
+    .day-btn.range-selected {
+        background: #dbeafe !important;
+        color: #1e40af !important;
+        border-radius: 0%;
+    }
+
+    .day-btn.today {
+        border: 2px solid #2563eb;
+        background: white;
+        color: #2563eb;
+    }
+
+    .btn-add-to-cart:hover {
+        background: #f8fafc !important;
+        border-color: #94a3b8 !important;
+        color: #0f172a !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05) !important;
+    }
+    .btn-add-to-cart:active {
+        transform: translateY(0);
+    }
+
+    .calendar-note {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    /* Reviews Section */
+    .reviews-section {
+        margin-top: 4rem;
+    }
+
+    .reviews-section h2 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .reviews-subtitle {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .reviews-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .review-card {
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+    }
+
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .review-user-info {
+        flex: 1;
+    }
+
+    .review-user-name {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .review-user-badge {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .review-stars {
+        color: #fbbf24;
+    }
+
+    .review-text {
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+
+    .view-all-reviews {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: gap 0.3s ease;
+    }
+
+    .view-all-reviews:hover {
+        gap: 1rem;
+    }
+
+    @@media (max-width: 1024px) {
+        .product-details-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .product-images-section {
+            position: static;
+            max-height: none;
+        }
+
+        .product-main-image {
+            max-height: 400px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .product-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .product-thumbnails {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>
+
+<script>
+    let currentUnit = 'Day';
+    let currentPrice = @(Model?.PricePerDay ?? 0);
+    const depositAmount = @(Model?.Deposit ?? 0);
+
+    // Dynamic calendar state
+    let currentMonthDate = new Date();
+    let bookedRanges = [];
+    let selectedStartDate = null;
+    let selectedEndDate = null;
+
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src.replace('w=200&h=200', 'w=800&h=600');
+        
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        if (window.event) {
+            window.event.target.classList.add('active');
+        }
+    }
+
+    function selectPackage(unit, price) {
+        const card = document.getElementById('pkg-' + unit);
+        if (card.classList.contains('disabled')) {
+            return; // ignore clicks on disabled packages
+        }
+
+        // Remove active class from all package cards
+        document.querySelectorAll('.rental-package-card').forEach(c => c.classList.remove('active'));
+        
+        // Add active to selected
+        card.classList.add('active');
+
+        // Update state
+        currentUnit = unit;
+        currentPrice = price;
+
+        // Update hidden form input
+        document.getElementById('rentalUnit').value = unit;
+
+        // Update labels
+        let labelText = "Số ngày thuê";
+        let unitText = "ngày";
+        if (unit === 'Hour') {
+            labelText = "Số giờ thuê";
+            unitText = "giờ";
+        } else if (unit === 'Week') {
+            labelText = "Số tuần thuê";
+            unitText = "tuần";
+        } else if (unit === 'Month') {
+            labelText = "Số tháng thuê";
+            unitText = "tháng";
+        }
+
+        document.getElementById('durationLabel').innerText = labelText;
+
+        // Auto-adapt selection duration if range is already selected
+        if (selectedStartDate && selectedEndDate) {
+            let diffTime = Math.abs(selectedEndDate - selectedStartDate);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            let finalDuration = 1;
+            if (unit === 'Hour') {
+                finalDuration = Math.ceil(diffTime / (1000 * 60 * 60)) + 24;
+            } else if (unit === 'Week') {
+                finalDuration = Math.ceil(diffDays / 7);
+            } else if (unit === 'Month') {
+                let months = (selectedEndDate.getFullYear() - selectedStartDate.getFullYear()) * 12 + (selectedEndDate.getMonth() - selectedStartDate.getMonth());
+                finalDuration = months || 1;
+            } else {
+                finalDuration = diffDays;
+            }
+            document.getElementById('rentalDuration').value = finalDuration;
+            document.getElementById('duration').value = finalDuration;
+        }
+
+        updateCalculations();
+    }
+
+    function adjustDuration(change) {
+        const input = document.getElementById('rentalDuration');
+        let val = parseInt(input.value) || 1;
+        val += change;
+        if (val < 1) val = 1;
+        input.value = val;
+        updateDurationInput(val);
+    }
+
+    function updateDurationInput(val) {
+        let cleanVal = parseInt(val) || 1;
+        if (cleanVal < 1) cleanVal = 1;
+        
+        document.getElementById('duration').value = cleanVal;
+        
+        // If range is selected but user manually adjusts duration, reset the end date to sync with duration
+        if (selectedStartDate && selectedEndDate) {
+            selectedEndDate = null;
+            renderCalendar();
+        }
+        
+        updateCalculations();
+    }
+
+    function updateCalculations() {
+        const duration = parseInt(document.getElementById('duration').value) || 1;
+        const totalRent = currentPrice * duration;
+        const grandTotal = totalRent + depositAmount;
+
+        let unitText = "ngày";
+        if (currentUnit === 'Hour') unitText = "giờ";
+        if (currentUnit === 'Week') unitText = "tuần";
+        if (currentUnit === 'Month') unitText = "tháng";
+
+        const formatter = new Intl.NumberFormat('vi-VN');
+
+        // Update summary box
+        document.getElementById('summaryUnitPrice').innerText = formatter.format(currentPrice) + ' đ/' + unitText;
+        document.getElementById('summaryDuration').innerText = 'x ' + duration + ' ' + unitText;
+        document.getElementById('summaryRentTotal').innerText = formatter.format(totalRent) + ' đ';
+        document.getElementById('summaryGrandTotal').innerText = formatter.format(grandTotal) + ' đ';
+    }
+
+    // Dynamic Calendar Logic
+    function fetchBookedDates() {
+        const productId = @Model?.ProductId;
+        fetch('/Product/GetBookedDates/' + productId)
+            .then(res => res.json())
+            .then(res => {
+                if (res && res.success && res.data) {
+                    bookedRanges = res.data.map(d => ({
+                        start: new Date(d.startDate),
+                        end: new Date(d.endDate)
+                    }));
+                }
+                renderCalendar();
+            })
+            .catch(err => {
+                console.error("Lỗi khi tải lịch:", err);
+                renderCalendar();
+            });
+    }
+
+    function renderCalendar() {
+        const container = document.getElementById('calendarDaysContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const year = currentMonthDate.getFullYear();
+        const month = currentMonthDate.getMonth();
+
+        // Update Title: e.g. "Tháng 5, 2026"
+        document.getElementById('calendarMonthTitle').innerText = `Tháng ${month + 1}, ${year}`;
+
+        // Get first day of month and day of week (0-6 where 0 is Sun, 1 is Mon...)
+        const firstDay = new Date(year, month, 1);
+        let startDayIndex = firstDay.getDay(); 
+        
+        // Shift index to make Monday the first column (0: T2, 1: T3... 6: CN)
+        let shift = (startDayIndex === 0) ? 6 : (startDayIndex - 1);
+
+        // Render empty cells
+        for (let i = 0; i < shift; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'day-cell-empty';
+            emptyCell.style.visibility = 'hidden';
+            container.appendChild(emptyCell);
+        }
+
+        // Get total days in month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Current real date
+        const todayDate = new Date();
+        const todayMidnight = new Date();
+        todayMidnight.setHours(0, 0, 0, 0);
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'day-btn';
+            btn.innerText = d;
+
+            const checkDate = new Date(year, month, d, 12, 0, 0);
+            const checkDateEnd = new Date(year, month, d, 23, 59, 59, 999);
+
+            // Is past?
+            const isPast = (checkDateEnd < todayMidnight);
+
+            // Is today?
+            const isToday = (d === todayDate.getDate() && month === todayDate.getMonth() && year === todayDate.getFullYear());
+
+            // Is booked?
+            const isBooked = bookedRanges.some(range => {
+                let s = new Date(range.start); s.setHours(0, 0, 0, 0);
+                let e = new Date(range.end); e.setHours(23, 59, 59, 999);
+                let c = new Date(year, month, d, 12, 0, 0);
+                return (c >= s && c <= e);
+            });
+
+            // Check if day is selected or within selected range
+            let isSelected = false;
+            let isRangeSelected = false;
+
+            if (selectedStartDate && !selectedEndDate) {
+                isSelected = (d === selectedStartDate.getDate() && month === selectedStartDate.getMonth() && year === selectedStartDate.getFullYear());
+            } else if (selectedStartDate && selectedEndDate) {
+                let checkTime = checkDate.getTime();
+                let startTime = new Date(selectedStartDate).setHours(0, 0, 0, 0);
+                let endTime = new Date(selectedEndDate).setHours(23, 59, 59, 999);
+
+                if (checkTime >= startTime && checkTime <= endTime) {
+                    let startDay = selectedStartDate.getDate() === d && selectedStartDate.getMonth() === month && selectedStartDate.getFullYear() === year;
+                    let endDay = selectedEndDate.getDate() === d && selectedEndDate.getMonth() === month && selectedEndDate.getFullYear() === year;
+                    
+                    if (startDay || endDay) {
+                        isSelected = true;
+                    } else {
+                        isRangeSelected = true;
+                    }
+                }
+            }
+
+            if (isBooked) {
+                btn.classList.add('booked');
+                btn.disabled = true;
+            } else if (isPast) {
+                btn.classList.add('past');
+                btn.disabled = true;
+            } else {
+                btn.classList.add('available');
+                if (isSelected) {
+                    btn.classList.add('selected');
+                } else if (isRangeSelected) {
+                    btn.classList.add('range-selected');
+                } else if (isToday) {
+                    btn.classList.add('today');
+                }
+
+                // Click event listener
+                btn.addEventListener('click', () => {
+                    handleDateClick(year, month, d);
+                });
+            }
+
+            container.appendChild(btn);
+        }
+    }
+
+    function checkBookingBetween(start, end) {
+        let hasBooking = false;
+        let temp = new Date(start);
+        while (temp <= end) {
+            if (bookedRanges.some(range => {
+                let rs = new Date(range.start); rs.setHours(0, 0, 0, 0);
+                let re = new Date(range.end); re.setHours(23, 59, 59, 999);
+                let rc = new Date(temp); rc.setHours(12, 0, 0, 0);
+                return (rc >= rs && rc <= re);
+            })) {
+                hasBooking = true;
+                break;
+            }
+            temp.setDate(temp.getDate() + 1);
+        }
+        return hasBooking;
+    }
+
+    function handleDateClick(year, month, day) {
+        let clickedDate = new Date(year, month, day, 12, 0, 0);
+
+        if (!selectedStartDate) {
+            selectedStartDate = clickedDate;
+            selectedEndDate = null;
+        } else if (selectedStartDate && !selectedEndDate) {
+            if (clickedDate < selectedStartDate) {
+                selectedStartDate = clickedDate;
+            } else {
+                if (checkBookingBetween(selectedStartDate, clickedDate)) {
+                    alert("Khoảng thời gian này đã có ngày được đặt! Vui lòng chọn khoảng khác.");
+                    return;
+                }
+                selectedEndDate = clickedDate;
+            }
+        } else if (selectedStartDate && selectedEndDate) {
+            if (clickedDate < selectedStartDate) {
+                selectedStartDate = clickedDate;
+                selectedEndDate = null;
+            } else {
+                if (checkBookingBetween(selectedStartDate, clickedDate)) {
+                    alert("Khoảng thời gian này đã có ngày được đặt! Vui lòng chọn khoảng khác.");
+                    return;
+                }
+                selectedEndDate = clickedDate;
+            }
+        }
+
+        // Set Start Date in form input
+        const y = selectedStartDate.getFullYear();
+        const m = String(selectedStartDate.getMonth() + 1).padStart(2, '0');
+        const d = String(selectedStartDate.getDate()).padStart(2, '0');
+        document.getElementById('startDate').value = `${y}-${m}-${d}T12:00`;
+
+        // Calculate duration based on range
+        let finalDuration = 1;
+        if (selectedStartDate && selectedEndDate) {
+            let diffTime = Math.abs(selectedEndDate - selectedStartDate);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (currentUnit === 'Hour') {
+                finalDuration = Math.ceil(diffTime / (1000 * 60 * 60)) + 24;
+            } else if (currentUnit === 'Week') {
+                finalDuration = Math.ceil(diffDays / 7);
+            } else if (currentUnit === 'Month') {
+                let months = (selectedEndDate.getFullYear() - selectedStartDate.getFullYear()) * 12 + (selectedEndDate.getMonth() - selectedStartDate.getMonth());
+                finalDuration = months || 1;
+            } else {
+                finalDuration = diffDays;
+            }
+        }
+
+        document.getElementById('rentalDuration').value = finalDuration;
+        document.getElementById('duration').value = finalDuration;
+
+        updateCalculations();
+        renderCalendar();
+    }
+
+    function prevMonth() {
+        currentMonthDate.setMonth(currentMonthDate.getMonth() - 1);
+        renderCalendar();
+    }
+
+    function nextMonth() {
+        currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
+        renderCalendar();
+    }
+
+    function addToCart() {
+        const productId = @Model?.ProductId;
+        const productName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.ProductName));
+        const imageUrl = "@(Model?.ImageUrl ?? "/images/default-product.png")";
+        const duration = parseInt(document.getElementById('duration').value) || 1;
+        const startDate = document.getElementById('startDate').value;
+
+        let cart = JSON.parse(localStorage.getItem('uterent_cart') || '[]');
+        
+        // Filter out old entries for the same product to allow replacing it with the new configuration
+        cart = cart.filter(item => item.productId !== productId);
+
+        cart.push({
+            productId: productId,
+            name: productName,
+            imageUrl: imageUrl,
+            price: currentPrice,
+            unit: currentUnit,
+            duration: duration,
+            deposit: depositAmount,
+            startDate: startDate
+        });
+
+        localStorage.setItem('uterent_cart', JSON.stringify(cart));
+        
+        // Update layout cart badge instantly
+        if (typeof updateLayoutCartBadge === 'function') {
+            updateLayoutCartBadge();
+        }
+
+        alert("🛒 Đã thêm sản phẩm \"" + productName + "\" vào giỏ hàng của bạn!");
+    }
+
+    // Initialize calculations and dynamic calendar on load
+    window.addEventListener('DOMContentLoaded', (event) => {
+        // Pre-select Day or first available package
+        const initialUnit = 'Day';
+        const initialPrice = @(Model?.PricePerDay ?? 0);
+        selectPackage(initialUnit, initialPrice);
+
+        // Fetch and load calendar days dynamically from DB
+        fetchBookedDates();
+    });
+</script>

@@ -1,0 +1,903 @@
+@model List<WEB.Models.ProductViewModel>
+
+@{
+    ViewData["Title"] = "Sản phẩm cho thuê";
+}
+
+<div class="product-index-container">
+    <!-- Hero Section -->
+    <div class="product-hero">
+        <div class="hero-content">
+            <h1>Khám phá thiết bị cho thuê</h1>
+            <p>Hơn 1,000+ sản phẩm từ cộng đồng sinh viên UTE</p>
+            
+            <div class="hero-search">
+                <form asp-action="Search" method="get" class="search-form">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="keyword" placeholder="Tìm kiếm laptop, máy ảnh, sách..." class="search-input" value="@ViewBag.Keyword" />
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Tìm kiếm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <form action="/Product" method="get" id="filterForm" class="product-main-content">
+        <input type="hidden" name="keyword" value="@ViewBag.Keyword" />
+        <!-- Sidebar Filters -->
+        <aside class="product-sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    Bộ lọc
+                </h3>
+
+                <div class="filter-group">
+                    <h4 class="filter-group-title">Danh mục</h4>
+                    <div class="filter-options">
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (WEB.Models.CategoryViewModel category in ViewBag.Categories)
+                            {
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" name="categoryIds" value="@category.CategoryId" onchange="document.getElementById('filterForm').submit();" @(ViewBag.CategoryIds != null && ((string)ViewBag.CategoryIds).Split(',').Contains(category.CategoryId.ToString()) ? "checked" : "") />
+                                    <span class="checkmark"></span>
+                                    <span class="filter-label">@category.CategoryName</span>
+                                </label>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <h4 class="filter-group-title">Giá thuê (VNĐ/ngày)</h4>
+                    <div class="price-range">
+                        <input type="number" name="minPrice" placeholder="Từ" class="price-input" value="@ViewBag.MinPrice" />
+                        <span class="price-separator">-</span>
+                        <input type="number" name="maxPrice" placeholder="Đến" class="price-input" value="@ViewBag.MaxPrice" />
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <h4 class="filter-group-title">Đánh giá</h4>
+                    <div class="filter-options">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" />
+                            <span class="checkmark"></span>
+                            <span class="filter-label">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" />
+                            <span class="checkmark"></span>
+                            <span class="filter-label">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                trở lên
+                            </span>
+                        </label>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" />
+                            <span class="checkmark"></span>
+                            <span class="filter-label">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                trở lên
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="filter-apply-btn" style="width: 100%; padding: 0.75rem; background: var(--primary-blue); border: none; border-radius: 10px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                    <i class="fas fa-check"></i>
+                    Áp dụng bộ lọc
+                </button>
+                <button type="button" class="filter-reset-btn" onclick="window.location.href='/Product'">
+                    <i class="fas fa-redo"></i>
+                    Đặt lại bộ lọc
+                </button>
+            </div>
+        </aside>
+
+        <!-- Products Grid -->
+        <div class="product-content">
+            <div class="product-toolbar">
+                <div class="product-count">
+                    <strong>@(Model?.Count ?? 0)</strong> sản phẩm
+                </div>
+                <div class="product-sort">
+                    <label>Sắp xếp:</label>
+                    <select name="sortBy" class="sort-select" onchange="document.getElementById('filterForm').submit();">
+                        @if (ViewBag.SortBy == "newest" || string.IsNullOrEmpty(ViewBag.SortBy))
+                        {
+                            <option value="newest" selected>Mới nhất</option>
+                        }
+                        else
+                        {
+                            <option value="newest">Mới nhất</option>
+                        }
+
+                        @if (ViewBag.SortBy == "price_asc")
+                        {
+                            <option value="price_asc" selected>Giá thấp đến cao</option>
+                        }
+                        else
+                        {
+                            <option value="price_asc">Giá thấp đến cao</option>
+                        }
+
+                        @if (ViewBag.SortBy == "price_desc")
+                        {
+                            <option value="price_desc" selected>Giá cao đến thấp</option>
+                        }
+                        else
+                        {
+                            <option value="price_desc">Giá cao đến thấp</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="products-grid">
+                    @foreach (var product in Model)
+                    {
+                        <div class="product-card">
+                            <div class="product-card-image">
+                                <a asp-action="Details" asp-route-id="@product.ProductId">
+                                    <img src="@product.ImageUrl" alt="@product.ProductName" />
+                                </a>
+                                <button class="product-favorite">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <div class="product-badge">Mới</div>
+                            </div>
+                            <div class="product-card-content">
+                                <div class="product-category">@product.Category?.CategoryName?.ToUpper()</div>
+                                <h3 class="product-name">
+                                    <a asp-action="Details" asp-route-id="@product.ProductId">
+                                        @product.ProductName
+                                    </a>
+                                </h3>
+                                <div class="product-rating">
+                                    <div class="stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <span class="rating-text">5.0 (24)</span>
+                                </div>
+                                <div class="product-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>@product.Location</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price-amount">@product.PricePerDay.ToString("N0")đ</span>
+                                    <span class="price-unit">/ngày</span>
+                                </div>
+                                <div class="product-actions">
+                                    <a asp-action="Details" asp-route-id="@product.ProductId" class="btn-view">
+                                        Xem chi tiết
+                                    </a>
+                                    @if (Context.Session.GetString("JWTToken") != null)
+                                    {
+                                        <button class="btn-quick-rent" onclick="window.location.href='/Product/Details/@product.ProductId'" title="Thuê nhanh">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn-quick-rent" onclick="alert('Vui lòng đăng nhập để thuê đồ!'); window.location.href='/Account/Login?returnUrl=/Product/Details/@product.ProductId'" title="Đăng nhập để thuê">
+                                            <i class="fas fa-lock"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">4</button>
+                    <span class="pagination-dots">...</span>
+                    <button class="pagination-btn">12</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <h3>Không tìm thấy sản phẩm</h3>
+                    <p>Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
+                    <a asp-action="Index" class="btn-back-home">
+                        <i class="fas fa-home"></i>
+                        Về trang chủ
+                    </a>
+                </div>
+            }
+        </div>
+    </form>
+</div>
+
+<style>
+    .product-index-container {
+        background: #f8f9fa;
+        min-height: calc(100vh - 70px);
+    }
+
+    .product-hero {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        padding: 4rem 2rem;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-content p {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .hero-search {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-input-wrapper i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.125rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        background: white;
+    }
+
+    .search-btn {
+        padding: 1rem 2rem;
+        background: white;
+        color: var(--primary-blue);
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .product-main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+    }
+
+    /* Sidebar */
+    .product-sidebar {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .filter-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-group-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .filter-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-checkbox input:checked ~ .checkmark {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+
+    .filter-checkbox input:checked ~ .checkmark::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 0.875rem;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .filter-label {
+        flex: 1;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .filter-label .fas,
+    .filter-label .far {
+        color: #fbbf24;
+        font-size: 0.75rem;
+    }
+
+    .filter-count {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .filter-divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 1.5rem 0;
+    }
+
+    .price-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .price-input {
+        flex: 1;
+        min-width: 0; /* Cho phép input co lại nhỏ hơn kích thước mặc định */
+        padding: 0.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+    }
+
+    .price-separator {
+        color: var(--text-secondary);
+    }
+
+    .price-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .price-tag {
+        padding: 0.375rem 0.75rem;
+        background: #f8f9fa;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .price-tag:hover {
+        background: #eff6ff;
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+    }
+
+    .filter-reset-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .filter-reset-btn:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+
+    /* Products Content */
+    .product-content {
+        flex: 1;
+    }
+
+    .product-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-count {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .product-count strong {
+        color: var(--text-primary);
+        font-size: 1.125rem;
+    }
+
+    .product-sort {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .product-sort label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .sort-select {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        background: white;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-card-image {
+        position: relative;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+    }
+
+    .product-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-card-image img {
+        transform: scale(1.05);
+    }
+
+    .product-favorite {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        color: #dc2626;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .product-favorite:hover {
+        transform: scale(1.1);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        background: #fecaca;
+        color: #dc2626;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .product-card-content {
+        padding: 1.25rem;
+    }
+
+    .product-category {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background: #dbeafe;
+        color: var(--primary-blue);
+        border-radius: 4px;
+        font-size: 0.625rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .product-name {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+
+    .product-name a {
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .product-name a:hover {
+        color: var(--primary-blue);
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stars {
+        display: flex;
+        gap: 0.125rem;
+        color: #fbbf24;
+        font-size: 0.75rem;
+    }
+
+    .rating-text {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .product-location {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+    }
+
+    .product-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+
+    .price-unit {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .product-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+    }
+
+    .btn-view {
+        padding: 0.625rem 1rem;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-quick-rent {
+        width: 40px;
+        height: 40px;
+        background: white;
+        color: var(--primary-blue);
+        border: 2px solid var(--primary-blue);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-quick-rent:hover {
+        background: #eff6ff;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .pagination-btn {
+        min-width: 40px;
+        height: 40px;
+        padding: 0 0.75rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pagination-dots {
+        color: var(--text-secondary);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .btn-back-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back-home:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    @@media (max-width: 1024px) {
+        .product-main-content {
+            grid-template-columns: 1fr;
+        }
+
+        .product-sidebar {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 1.75rem;
+        }
+
+        .search-form {
+            flex-direction: column;
+        }
+
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+
+        .product-toolbar {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+
+<script>
+    // Xử lý price tags
+    document.querySelectorAll('.price-tag').forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            e.preventDefault();
+            const text = this.textContent.trim();
+            let minPrice = '';
+            let maxPrice = '';
+            
+            if (text === 'Dưới 10k') { minPrice = 0; maxPrice = 10000; }
+            else if (text === '10k - 50k') { minPrice = 10000; maxPrice = 50000; }
+            else if (text === '50k - 100k') { minPrice = 50000; maxPrice = 100000; }
+            else if (text === 'Trên 100k') { minPrice = 100000; maxPrice = ''; }
+            
+            document.querySelector('input[name="minPrice"]').value = minPrice;
+            document.querySelector('input[name="maxPrice"]').value = maxPrice;
+            
+            document.getElementById('filterForm').submit();
+        });
+    });
+    
+    // Auto-submit when typing prices and pressing Enter, or focus out
+    document.querySelectorAll('input[name="minPrice"], input[name="maxPrice"]').forEach(input => {
+        input.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
+
+<style>
+    .price-tag.active {
+        background: #eff6ff;
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+</style>

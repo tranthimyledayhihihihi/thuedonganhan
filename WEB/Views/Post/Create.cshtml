@@ -1,0 +1,909 @@
+@{
+    ViewData["Title"] = "Đăng Tin Cho Thuê";
+    var categories = ViewBag.Categories as List<WEB.Models.CategoryViewModel> ?? new List<WEB.Models.CategoryViewModel>();
+}
+
+<div class="post-create-container">
+    <div class="post-sidebar">
+        <div class="sidebar-header">
+            <h3>Lender Portal</h3>
+            <p>Quản lý cửa hàng của bạn</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="/?mode=owner" class="sidebar-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="/Post/Create" class="sidebar-nav-item active">
+                <i class="fas fa-plus-circle"></i>
+                <span>Đăng bài</span>
+            </a>
+            <a href="/?mode=owner" class="sidebar-nav-item">
+                <i class="fas fa-wrench"></i>
+                <span>Thiết bị của tôi</span>
+            </a>
+            <a href="#" class="sidebar-nav-item">
+                <i class="fas fa-envelope"></i>
+                <span>Tin nhắn</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <img src="https://ui-avatars.com/api/?name=@(ViewBag.UserName ?? "User")&background=2563eb&color=fff" alt="User" class="sidebar-user-avatar" />
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">@(ViewBag.UserName ?? "User")</div>
+                <div class="sidebar-user-role">UTE Student</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-main">
+        <div class="post-header">
+            <a href="/?mode=owner" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại Bảng điều khiển
+            </a>
+            <h1>Đăng Tin Cho Thuê</h1>
+            <p>Chia sẻ thiết bị của bạn với cộng đồng sinh viên UTE.</p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                ❌ Có lỗi xảy ra khi đăng tin
+            </div>
+        }
+
+        <form asp-action="Create" method="post" class="post-form" id="postForm">
+            @Html.AntiForgeryToken()
+            
+            <div class="form-section">
+                <div class="form-section-left">
+                    <div class="form-group">
+                        <label class="form-label">TÊN SẢN PHẨM *</label>
+                        <input type="text" name="ProductName" class="form-control" placeholder="Ví dụ: Máy ảnh Sony A7III, Laptop Dell XPS..." required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">DANH MỤC *</label>
+                            <select name="CategoryId" class="form-control" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                @foreach (var category in categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">SỐ LƯỢNG *</label>
+                            <input type="number" name="Quantity" class="form-control" value="1" min="1" required />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">GIÁ THUÊ THEO GIỜ (VNĐ)</label>
+                            <div class="input-with-suffix">
+                                <input type="number" name="PricePerHour" class="form-control" placeholder="20000" min="0" step="1000" />
+                                <span class="input-suffix">VNĐ</span>
+                            </div>
+                            <small class="form-text">Để trống nếu không cho thuê theo giờ</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">GIÁ THUÊ (VNĐ/NGÀY) *</label>
+                            <div class="input-with-suffix">
+                                <input type="number" name="PricePerDay" class="form-control" placeholder="50000" min="1000" step="1000" required />
+                                <span class="input-suffix">VNĐ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">GIÁ THUÊ THEO TUẦN (VNĐ)</label>
+                            <div class="input-with-suffix">
+                                <input type="number" name="PricePerWeek" class="form-control" placeholder="300000" min="0" step="10000" />
+                                <span class="input-suffix">VNĐ</span>
+                            </div>
+                            <small class="form-text">Để trống nếu không cho thuê theo tuần</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">GIÁ THUÊ THEO THÁNG (VNĐ)</label>
+                            <div class="input-with-suffix">
+                                <input type="number" name="PricePerMonth" class="form-control" placeholder="1000000" min="0" step="10000" />
+                                <span class="input-suffix">VNĐ</span>
+                            </div>
+                            <small class="form-text">Để trống nếu không cho thuê theo tháng</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">TIỀN CỌC (VNĐ) *</label>
+                            <div class="input-with-suffix">
+                                <input type="number" name="Deposit" class="form-control" placeholder="500000" min="0" step="10000" required />
+                                <span class="input-suffix">VNĐ</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">ĐỊA ĐIỂM</label>
+                            <input type="text" name="Location" class="form-control" placeholder="Ví dụ: Ký túc xá A, Khu A UTE..." />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">MÔ TẢ SẢN PHẨM *</label>
+                        <textarea name="Description" class="form-control" rows="6" placeholder="Mô tả chi tiết tình trạng máy, các phụ kiện đi kèm..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">LỊCH KHÔNG CHO THUÊ</label>
+                        <div class="calendar-container">
+                            <input type="text" id="unavailableDatesInput" name="UnavailableDates" hidden />
+                            <div id="calendar"></div>
+                            <div class="selected-dates-display">
+                                <p class="calendar-note">
+                                    <i class="fas fa-info-circle"></i>
+                                    Click vào các ngày bạn không muốn cho thuê (ví dụ: ngày bạn cần dùng đồ)
+                                </p>
+                                <div id="selectedDatesList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-right">
+                    <div class="image-upload-section">
+                        <h3>HÌNH ẢNH SẢN PHẨM</h3>
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div class="image-upload-placeholder" id="uploadPlaceholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Kéo thả ảnh vào đây</p>
+                                <p class="small">hoặc nhấn để chọn từ thiết bị</p>
+                                <p class="small">TỐI ĐA 5 ẢNH (JPG, PNG, tối đa 5MB/ảnh)</p>
+                            </div>
+                            <input type="file" id="imageUpload" name="images" multiple accept="image/*" style="display: none;" />
+                            <input type="hidden" id="imageUrlInput" name="ImageUrl" />
+                        </div>
+
+                        <div class="image-preview-grid" id="imagePreviewGrid">
+                            <!-- Images will be added here dynamically -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        ĐĂNG TIN NGAY
+                    </button>
+
+                    <div class="form-note">
+                        <h4>📝 LƯU Ý</h4>
+                        <p>Bằng việc nhấn "ĐĂNG TIN NGAY", bạn đồng ý với <a href="/Home/Privacy">Điều khoản sử dụng</a> của UTE Rent.</p>
+                    </div>
+
+                    <div class="promo-box">
+                        <i class="fas fa-lightbulb"></i>
+                        <h4>MẸO ĐĂNG TIN HIỆU QUẢ</h4>
+                        <p>Sử dụng hình ảnh rõ nét và mô tả chi tiết để tăng khả năng cho thuê nhanh hơn 200%.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .post-create-container {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .post-sidebar {
+        width: 280px;
+        background: white;
+        padding: 2rem 0;
+        border-right: 1px solid #e2e8f0;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 0 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sidebar-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .sidebar-header p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 1.5rem 0;
+    }
+
+    .sidebar-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.875rem 1.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .sidebar-nav-item:hover {
+        background: #f8fafc;
+        color: var(--primary-blue);
+    }
+
+    .sidebar-nav-item.active {
+        background: #eff6ff;
+        color: var(--primary-blue);
+        border-right: 3px solid var(--primary-blue);
+    }
+
+    .sidebar-nav-item i {
+        width: 20px;
+        font-size: 1.125rem;
+    }
+
+    .sidebar-user {
+        padding: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .sidebar-user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+    }
+
+    .sidebar-user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+    }
+
+    .sidebar-user-role {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .post-main {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin-bottom: 2rem;
+    }
+
+    .post-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .post-header p {
+        color: var(--text-secondary);
+    }
+
+    .post-form {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--shadow);
+    }
+
+    .form-section {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 3rem;
+    }
+
+    .form-section-left {
+        flex: 1;
+    }
+
+    .form-section-right {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: #f8f9fa;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        background: white;
+        border-color: var(--primary-blue);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .input-with-suffix {
+        position: relative;
+    }
+
+    .input-suffix {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .image-upload-section h3 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .image-upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .image-upload-area:hover {
+        border-color: var(--primary-blue);
+        background: #f8fafc;
+    }
+
+    .image-upload-placeholder i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+
+    .image-upload-placeholder p {
+        color: var(--text-secondary);
+        margin: 0.5rem 0;
+    }
+
+    .image-upload-placeholder .small {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .image-preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-remove-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+        line-height: 1;
+    }
+
+    .image-add-btn {
+        aspect-ratio: 1;
+        border: 2px dashed #cbd5e1;
+        border-radius: 10px;
+        background: #f8f9fa;
+        color: #cbd5e1;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-add-btn:hover {
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .form-note {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .form-note h4 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-note p {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+
+    .form-note a {
+        color: var(--primary-blue);
+        text-decoration: none;
+    }
+
+    .promo-box {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .promo-box i {
+        font-size: 2rem;
+        color: #f59e0b;
+        margin-bottom: 0.5rem;
+    }
+
+    .promo-box h4 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 0.5rem;
+    }
+
+    .promo-box p {
+        font-size: 0.75rem;
+        color: #78350f;
+        line-height: 1.5;
+    }
+
+    .image-upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+    }
+
+    .image-upload-area:hover {
+        border-color: var(--primary-blue);
+        background: #eff6ff;
+    }
+
+    .image-upload-area.dragover {
+        border-color: var(--primary-blue);
+        background: #eff6ff;
+        transform: scale(1.02);
+    }
+
+    .image-upload-placeholder i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+
+    .image-upload-placeholder p {
+        color: var(--text-secondary);
+        margin: 0.5rem 0;
+    }
+
+    .image-upload-placeholder .small {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .image-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        min-height: 100px;
+    }
+
+    .image-preview-item {
+        position: relative;
+        aspect-ratio: 1;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 2px solid #e2e8f0;
+    }
+
+    .image-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-remove-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1.125rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .image-remove-btn:hover {
+        background: #dc2626;
+        transform: scale(1.1);
+    }
+
+    /* Calendar Styles */
+    .calendar-container {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+    }
+
+    .calendar-note {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .calendar-note i {
+        color: var(--primary-blue);
+    }
+
+    #calendar {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .selected-dates-display {
+        margin-top: 1rem;
+    }
+
+    #selectedDatesList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .selected-date-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: #fee2e2;
+        color: #991b1b;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .selected-date-tag button {
+        background: none;
+        border: none;
+        color: #991b1b;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .selected-date-tag button:hover {
+        color: #7f1d1d;
+    }
+
+    .form-text {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    @@media (max-width: 1024px) {
+        .form-section {
+            grid-template-columns: 1fr;
+        }
+
+        .form-section-right {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .post-sidebar {
+            display: none;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Thêm Flatpickr cho calendar -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // ========== IMAGE UPLOAD ==========
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    let uploadedImages = [];
+
+    // Click to upload
+    imageUploadArea.addEventListener('click', () => {
+        imageUpload.click();
+    });
+
+    // Drag and drop
+    imageUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        imageUploadArea.classList.add('dragover');
+    });
+
+    imageUploadArea.addEventListener('dragleave', () => {
+        imageUploadArea.classList.remove('dragover');
+    });
+
+    imageUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        imageUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    // File input change
+    imageUpload.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        if (uploadedImages.length + files.length > 5) {
+            alert('Bạn chỉ có thể upload tối đa 5 ảnh!');
+            return;
+        }
+
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) {
+                alert('Chỉ chấp nhận file ảnh!');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước ảnh không được vượt quá 5MB!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                uploadedImages.push(imageData);
+                renderImagePreviews();
+                
+                // Lưu ảnh đầu tiên vào ImageUrl (tạm thời dùng base64)
+                if (uploadedImages.length === 1) {
+                    imageUrlInput.value = imageData;
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function renderImagePreviews() {
+        imagePreviewGrid.innerHTML = '';
+        
+        uploadedImages.forEach((imageData, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${imageData}" alt="Preview ${index + 1}" />
+                <button type="button" class="image-remove-btn" onclick="removeImage(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            imagePreviewGrid.appendChild(previewItem);
+        });
+
+        // Ẩn/hiện placeholder
+        if (uploadedImages.length > 0) {
+            uploadPlaceholder.style.display = 'none';
+        } else {
+            uploadPlaceholder.style.display = 'block';
+        }
+    }
+
+    function removeImage(index) {
+        uploadedImages.splice(index, 1);
+        renderImagePreviews();
+        
+        // Cập nhật ImageUrl
+        if (uploadedImages.length > 0) {
+            imageUrlInput.value = uploadedImages[0];
+        } else {
+            imageUrlInput.value = '';
+        }
+    }
+
+    // ========== CALENDAR FOR UNAVAILABLE DATES ==========
+    let selectedDates = [];
+    
+    const calendar = flatpickr("#calendar", {
+        inline: true,
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        onChange: function(selectedDatesArray, dateStr, instance) {
+            selectedDates = selectedDatesArray.map(date => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            });
+            
+            updateSelectedDatesList();
+            updateUnavailableDatesInput();
+        }
+    });
+
+    function updateSelectedDatesList() {
+        const listContainer = document.getElementById('selectedDatesList');
+        
+        if (selectedDates.length === 0) {
+            listContainer.innerHTML = '<p style="color: #94a3b8; font-size: 0.875rem;">Chưa chọn ngày nào</p>';
+            return;
+        }
+
+        listContainer.innerHTML = selectedDates.map(date => `
+            <div class="selected-date-tag">
+                <i class="fas fa-calendar-times"></i>
+                ${formatDate(date)}
+                <button type="button" onclick="removeDate('${date}')">×</button>
+            </div>
+        `).join('');
+    }
+
+    function removeDate(dateStr) {
+        selectedDates = selectedDates.filter(d => d !== dateStr);
+        
+        // Cập nhật calendar
+        const dateObj = new Date(dateStr);
+        calendar.setDate(selectedDates.map(d => new Date(d)), false);
+        
+        updateSelectedDatesList();
+        updateUnavailableDatesInput();
+    }
+
+    function updateUnavailableDatesInput() {
+        document.getElementById('unavailableDatesInput').value = JSON.stringify(selectedDates);
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    // Initialize
+    updateSelectedDatesList();
+</script>

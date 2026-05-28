@@ -1,0 +1,190 @@
+### ============================================================
+### ADMIN API ENDPOINTS TEST - v4.0
+### Hệ thống Thuê & Bán Đồ Ngắn Hạn - UTE Đà Nẵng
+### ============================================================
+
+@baseUrl = https://localhost:7000
+@adminToken = YOUR_ADMIN_JWT_TOKEN_HERE
+
+### ============================================================
+### 1. LOGIN AS ADMIN
+### ============================================================
+POST {{baseUrl}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ute.udn.vn",
+  "password": "Admin@123"
+}
+
+### ============================================================
+### 2. DASHBOARD - Thống kê tổng quan
+### ============================================================
+GET {{baseUrl}}/api/Admin/dashboard
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 3. STATISTICS - Thống kê chi tiết
+### ============================================================
+GET {{baseUrl}}/api/Admin/statistics
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 4. USERS - Danh sách người dùng
+### ============================================================
+
+### Lấy tất cả users (page 1)
+GET {{baseUrl}}/api/Admin/users?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Tìm kiếm user
+GET {{baseUrl}}/api/Admin/users?search=Nguyễn&page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+### Lấy chi tiết user
+GET {{baseUrl}}/api/Admin/users/2
+Authorization: Bearer {{adminToken}}
+
+### Toggle user active/inactive
+PUT {{baseUrl}}/api/Admin/users/2/toggle-active
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 5. STUDENTS - Danh sách sinh viên
+### ============================================================
+
+### Lấy tất cả students
+GET {{baseUrl}}/api/Admin/students?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Tìm kiếm student theo MSSV
+GET {{baseUrl}}/api/Admin/students?search=23115053122326
+Authorization: Bearer {{adminToken}}
+
+### Lọc student theo status
+GET {{baseUrl}}/api/Admin/students?status=Active&page=1
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 6. PRODUCTS - Danh sách sản phẩm
+### ============================================================
+
+### Lấy tất cả products
+GET {{baseUrl}}/api/Admin/products?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Tìm kiếm product
+GET {{baseUrl}}/api/Admin/products?search=MacBook&page=1
+Authorization: Bearer {{adminToken}}
+
+### Xóa product
+DELETE {{baseUrl}}/api/Admin/products/1
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 7. RENTALS - Danh sách đơn thuê
+### ============================================================
+
+### Lấy tất cả rentals
+GET {{baseUrl}}/api/Admin/rentals?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Lọc rental theo status
+GET {{baseUrl}}/api/Admin/rentals?status=Completed&page=1
+Authorization: Bearer {{adminToken}}
+
+### Lọc rental Pending
+GET {{baseUrl}}/api/Admin/rentals?status=Pending
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 8. SALE ORDERS - Danh sách đơn mua
+### ============================================================
+
+### Lấy tất cả sale orders
+GET {{baseUrl}}/api/Admin/sale-orders?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Lọc sale order theo status
+GET {{baseUrl}}/api/Admin/sale-orders?status=Completed
+Authorization: Bearer {{adminToken}}
+
+### Lọc sale order Pending
+GET {{baseUrl}}/api/Admin/sale-orders?status=Pending
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 9. PAYMENTS - Danh sách thanh toán
+### ============================================================
+
+### Lấy tất cả payments
+GET {{baseUrl}}/api/Admin/payments?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo payment type
+GET {{baseUrl}}/api/Admin/payments?paymentType=RentalFee
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo payment status
+GET {{baseUrl}}/api/Admin/payments?paymentStatus=Completed
+Authorization: Bearer {{adminToken}}
+
+### Lọc kết hợp
+GET {{baseUrl}}/api/Admin/payments?paymentType=Commission&paymentStatus=Completed
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 10. TRANSACTIONS - Danh sách giao dịch
+### ============================================================
+
+### Lấy tất cả transactions
+GET {{baseUrl}}/api/Admin/transactions?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo type
+GET {{baseUrl}}/api/Admin/transactions?type=Commission
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo userId
+GET {{baseUrl}}/api/Admin/transactions?userId=2
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 11. COMMISSIONS - Danh sách hoa hồng
+### ============================================================
+
+### Lấy danh sách hoa hồng
+GET {{baseUrl}}/api/Admin/commissions?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 12. CATEGORIES - Danh sách danh mục
+### ============================================================
+
+### Lấy tất cả categories
+GET {{baseUrl}}/api/Admin/categories
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### 13. REVIEWS - Danh sách đánh giá
+### ============================================================
+
+### Lấy tất cả reviews
+GET {{baseUrl}}/api/Admin/reviews?page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo productId
+GET {{baseUrl}}/api/Admin/reviews?productId=1
+Authorization: Bearer {{adminToken}}
+
+### Lọc theo rating
+GET {{baseUrl}}/api/Admin/reviews?rating=5
+Authorization: Bearer {{adminToken}}
+
+### ============================================================
+### NOTES:
+### 1. Thay {{adminToken}} bằng JWT token thực sau khi login
+### 2. Tất cả endpoints yêu cầu Role = "Admin"
+### 3. Pagination: page bắt đầu từ 1, pageSize tối đa 100
+### 4. Search hỗ trợ tìm kiếm không phân biệt hoa thường
+### ============================================================

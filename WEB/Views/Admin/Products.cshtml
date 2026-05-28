@@ -1,0 +1,164 @@
+@model WEB.Models.AdminPagedResult<WEB.Models.AdminProductViewModel>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Products" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm, chủ sở hữu..." value="@ViewBag.Search">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Danh sách sản phẩm (@Model.Pagination.TotalItems)</h5>
+            @if (Model.Items.Any(p => !p.IsApproved))
+            {
+                <form method="post" asp-action="ApproveAllProducts" class="d-inline mb-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-light text-primary fw-bold" onclick="return confirm('Duyệt toàn bộ sản phẩm đang chờ đăng? Hành động này sẽ hiển thị tất cả các bài đăng lên trang web.')">
+                        <i class="fas fa-check-double"></i> Duyệt toàn bộ yêu cầu
+                    </button>
+                </form>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.Items.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th>Chủ sở hữu</th>
+                                <th>Giá/ngày</th>
+                                <th>Tiền cọc</th>
+                                <th>Số lượng</th>
+                                <th>Vị trí</th>
+                                <th>Lượt thuê</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.Items)
+                            {
+                                <tr>
+                                    <td><strong>#@product.ProductId</strong></td>
+                                    <td>@product.ProductName</td>
+                                    <td>
+                                        <span class="badge bg-secondary">@product.CategoryName</span>
+                                    </td>
+                                    <td>
+                                        <div>@product.OwnerName</div>
+                                        <small class="text-muted">@product.OwnerEmail</small>
+                                    </td>
+                                    <td class="fw-bold">@product.PricePerDay.ToString("N0")đ</td>
+                                    <td>@product.Deposit.ToString("N0")đ</td>
+                                    <td>
+                                        <span class="badge @(product.Quantity > 0 ? "bg-success" : "bg-danger")">
+                                            @product.Quantity
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(product.Location))
+                                        {
+                                            <small>@product.Location</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@product.RentalCount</span>
+                                    </td>
+                                     <td>
+                                         @if (!product.IsApproved)
+                                         {
+                                             <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Chờ duyệt</span>
+                                         }
+                                         else if (product.IsAvailable)
+                                         {
+                                             <span class="badge bg-success"><i class="fas fa-check"></i> Đang hoạt động</span>
+                                         }
+                                         else
+                                         {
+                                             <span class="badge bg-secondary">Tạm ẩn</span>
+                                         }
+                                     </td>
+                                    <td>@product.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                     <td>
+                                         @if (!product.IsApproved)
+                                         {
+                                             <form method="post" asp-action="ApproveProduct" asp-route-productId="@product.ProductId" class="d-inline">
+                                                 @Html.AntiForgeryToken()
+                                                 <button type="submit" class="btn btn-sm btn-success me-1" title="Duyệt đăng bài">
+                                                     <i class="fas fa-check"></i> Duyệt
+                                                 </button>
+                                             </form>
+                                         }
+                                         <form method="post" asp-action="DeleteProduct" asp-route-productId="@product.ProductId" class="d-inline">
+                                             @Html.AntiForgeryToken()
+                                             <button type="submit" class="btn btn-sm btn-danger"
+                                                     onclick="return confirm('Xóa sản phẩm này? Thao tác không thể hoàn tác!')" title="Xóa bài đăng">
+                                                 <i class="fas fa-trash"></i>
+                                             </button>
+                                         </form>
+                                     </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.Pagination.TotalPages > 1)
+                {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Products", new { page = Model.Pagination.CurrentPage - 1, search = ViewBag.Search })">
+                                    Trước
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Products", new { page = i, search = ViewBag.Search })">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("Products", new { page = Model.Pagination.CurrentPage + 1, search = ViewBag.Search })">
+                                    Sau
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <p class="text-muted text-center py-4">Không tìm thấy sản phẩm nào</p>
+            }
+        </div>
+    </div>
+</div>
