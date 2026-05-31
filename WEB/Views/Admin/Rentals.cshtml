@@ -2,137 +2,498 @@
 @{
     ViewData["Title"] = "Quản lý đơn thuê";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var currentStatus = ViewBag.Status as string ?? "";
+    var currentPage   = Model.Pagination.CurrentPage;
+
+    // Summary stats
+    decimal totalRevenue   = Model.Items.Sum(r => r.TotalPrice);
+    int     activeCount    = Model.Items.Count(r => r.Status == "Active");
+    int     pendingCount   = Model.Items.Count(r => r.Status == "Pending");
+    int     completedCount = Model.Items.Count(r => r.Status == "Completed");
 }
 
-<div class="container-fluid py-4">
-    <!-- Filter -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" asp-action="Rentals" class="row g-3">
-                <div class="col-md-10">
-                    <select name="status" class="form-select">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="Pending" selected="@(ViewBag.Status == "Pending")">Chờ xác nhận</option>
-                        <option value="Confirmed" selected="@(ViewBag.Status == "Confirmed")">Đã xác nhận</option>
-                        <option value="Active" selected="@(ViewBag.Status == "Active")">Đang cho thuê</option>
-                        <option value="Completed" selected="@(ViewBag.Status == "Completed")">Hoàn thành</option>
-                        <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled")">Đã hủy</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter"></i> Lọc
-                    </button>
-                </div>
-            </form>
+<style>
+/* ── Header ──────────────────────────────────────────── */
+.rm-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; flex-wrap: wrap;
+    gap: 1rem; margin-bottom: 1.5rem;
+}
+.rm-header-left {}
+.rm-breadcrumb {
+    font-size: .72rem; font-weight: 700; color: #4f46e5;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: .3rem;
+}
+.rm-header-left h1 {
+    font-size: 1.65rem; font-weight: 800;
+    color: #111827; margin-bottom: .2rem;
+}
+.rm-header-left p { font-size: .875rem; color: #6b7280; max-width: 420px; }
+.rm-header-right { display: flex; align-items: center; gap: .6rem; }
+
+.rm-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .6rem 1.1rem; border: none; border-radius: 10px;
+    font-size: .875rem; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all .18s; text-decoration: none;
+}
+.rm-btn-primary { background: #4f46e5; color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,.3); }
+.rm-btn-primary:hover { background: #4338ca; color: #fff; }
+.rm-btn-outline { background: #fff; color: #374151; border: 1.5px solid #e5e7eb; }
+.rm-btn-outline:hover { border-color: #4f46e5; color: #4f46e5; }
+.rm-btn-sm { padding: .35rem .75rem; font-size: .78rem; }
+
+/* ── Filter bar ──────────────────────────────────────── */
+.rm-filter-bar {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #e5e7eb; padding: 1.1rem 1.4rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    display: flex; align-items: flex-end; gap: 1rem;
+    flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.rm-filter-group { display: flex; flex-direction: column; gap: .35rem; }
+.rm-filter-label {
+    font-size: .68rem; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+.rm-select, .rm-date-input {
+    padding: .6rem .9rem; border: 1.5px solid #e5e7eb;
+    border-radius: 9px; font-size: .875rem; font-family: inherit;
+    background: #f9fafb; color: #374151; transition: all .2s;
+    min-width: 160px;
+}
+.rm-select:focus, .rm-date-input:focus {
+    outline: none; border-color: #4f46e5;
+    background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+}
+.rm-date-input { min-width: 140px; }
+.rm-filter-apply {
+    padding: .6rem 1.4rem; background: #4f46e5; color: #fff;
+    border: none; border-radius: 9px; font-size: .875rem;
+    font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: all .18s; align-self: flex-end;
+}
+.rm-filter-apply:hover { background: #4338ca; }
+
+/* ── Main panel ──────────────────────────────────────── */
+.rm-panel {
+    background: #fff; border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    overflow: hidden; margin-bottom: 1.5rem;
+}
+
+/* ── Table ───────────────────────────────────────────── */
+.rm-table { width: 100%; border-collapse: collapse; }
+.rm-table th {
+    font-size: .68rem; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: .6px;
+    padding: .75rem 1.2rem; text-align: left;
+    border-bottom: 1px solid #f3f4f6; background: #fafafa;
+    white-space: nowrap;
+}
+.rm-table td {
+    padding: 1rem 1.2rem; border-bottom: 1px solid #f9fafb;
+    font-size: .875rem; color: #374151; vertical-align: middle;
+}
+.rm-table tr:last-child td { border-bottom: none; }
+.rm-table tr:hover td { background: #fafafa; }
+
+/* Order ID */
+.rm-order-id {
+    font-size: .82rem; font-weight: 700;
+    color: #4f46e5; font-family: monospace;
+}
+
+/* Product cell */
+.rm-product-cell { display: flex; align-items: center; gap: .75rem; }
+.rm-thumb {
+    width: 44px; height: 44px; border-radius: 9px;
+    object-fit: cover; flex-shrink: 0;
+    border: 1px solid #e5e7eb; background: #f3f4f6;
+}
+.rm-thumb-placeholder {
+    width: 44px; height: 44px; border-radius: 9px;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    display: flex; align-items: center; justify-content: center;
+    color: #818cf8; font-size: 1.1rem; flex-shrink: 0;
+    border: 1px solid #e0e7ff;
+}
+.rm-prod-name { font-weight: 600; color: #111827; font-size: .875rem; line-height: 1.3; }
+.rm-prod-sub  { font-size: .75rem; color: #9ca3af; margin-top: .1rem; }
+
+/* Person cell */
+.rm-person-name { font-weight: 600; color: #111827; font-size: .875rem; }
+.rm-person-sub  { font-size: .75rem; color: #9ca3af; }
+
+/* Duration */
+.rm-duration { font-size: .875rem; color: #374151; white-space: nowrap; }
+.rm-duration-days { font-weight: 700; color: #111827; }
+
+/* Price */
+.rm-price { font-weight: 700; color: #111827; font-size: .95rem; }
+
+/* Status badge */
+.rm-badge {
+    display: inline-block; padding: .3rem .8rem;
+    border-radius: 20px; font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .3px;
+    white-space: nowrap;
+}
+.s-active    { background: #dbeafe; color: #1d4ed8; }
+.s-pending   { background: #fef3c7; color: #d97706; }
+.s-confirmed { background: #ede9fe; color: #7c3aed; }
+.s-completed { background: #dcfce7; color: #16a34a; }
+.s-cancelled { background: #fee2e2; color: #dc2626; }
+
+/* Action menu */
+.rm-action-btn {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: none; border: 1px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: center;
+    color: #6b7280; cursor: pointer; transition: all .18s;
+    font-size: .9rem;
+}
+.rm-action-btn:hover { background: #f3f4f6; color: #374151; border-color: #d1d5db; }
+
+/* ── Footer ──────────────────────────────────────────── */
+.rm-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .875rem 1.4rem; border-top: 1px solid #f3f4f6;
+    flex-wrap: wrap; gap: .75rem;
+}
+.rm-footer-info { font-size: .82rem; color: #6b7280; }
+.rm-pages { display: flex; gap: .35rem; align-items: center; }
+.rm-page-btn {
+    min-width: 34px; height: 34px; padding: 0 .5rem;
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    background: #fff; color: #374151; font-size: .82rem; font-weight: 600;
+    cursor: pointer; transition: all .18s; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.rm-page-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+.rm-page-btn.active { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.rm-page-btn.disabled { opacity: .35; pointer-events: none; }
+
+/* ── Summary cards ───────────────────────────────────── */
+.rm-summary-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.25rem; margin-top: 1.5rem;
+}
+.rm-summary-card {
+    border-radius: 16px; padding: 1.75rem 2rem;
+    color: #fff; position: relative; overflow: hidden;
+}
+.rm-summary-card.trend {
+    background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%);
+}
+.rm-summary-card.revenue {
+    background: linear-gradient(135deg, #be185d 0%, #ec4899 100%);
+}
+.rm-summary-card::before {
+    content: ''; position: absolute;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,.07);
+    top: -60px; right: -60px;
+}
+.rm-summary-label {
+    font-size: .72rem; font-weight: 700; opacity: .75;
+    text-transform: uppercase; letter-spacing: .6px; margin-bottom: .5rem;
+}
+.rm-summary-value {
+    font-size: 2.25rem; font-weight: 800; margin-bottom: .4rem; line-height: 1;
+}
+.rm-summary-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: rgba(255,255,255,.2); padding: .25rem .65rem;
+    border-radius: 20px; font-size: .78rem; font-weight: 600;
+    margin-bottom: 1rem;
+}
+.rm-summary-desc { font-size: .82rem; opacity: .8; line-height: 1.5; max-width: 280px; }
+.rm-summary-btn {
+    display: inline-block; margin-top: 1.25rem;
+    padding: .55rem 1.25rem; background: rgba(255,255,255,.2);
+    border: 1.5px solid rgba(255,255,255,.5);
+    border-radius: 20px; color: #fff; font-size: .82rem;
+    font-weight: 600; text-decoration: none; transition: all .18s;
+}
+.rm-summary-btn:hover { background: rgba(255,255,255,.3); color: #fff; }
+.rm-summary-img {
+    position: absolute; right: 1.5rem; bottom: 1.5rem;
+    width: 110px; height: 110px; border-radius: 12px;
+    object-fit: cover; opacity: .85;
+}
+.rm-revenue-stat { margin-top: .5rem; }
+.rm-revenue-sub { font-size: .8rem; opacity: .75; margin-top: .25rem; }
+.rm-progress-wrap { margin-top: 1rem; }
+.rm-progress-label { font-size: .75rem; opacity: .75; margin-bottom: .4rem; }
+.rm-progress-bar {
+    height: 6px; background: rgba(255,255,255,.25);
+    border-radius: 3px; overflow: hidden;
+}
+.rm-progress-fill {
+    height: 100%; background: rgba(255,255,255,.8);
+    border-radius: 3px; width: 68%;
+}
+
+/* ── Empty ───────────────────────────────────────────── */
+.rm-empty { text-align: center; padding: 4rem 1rem; color: #9ca3af; }
+.rm-empty i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+/* ── Responsive ──────────────────────────────────────── */
+@@media (max-width: 900px) {
+    .rm-summary-row { grid-template-columns: 1fr; }
+    .rm-summary-img { display: none; }
+}
+@@media (max-width: 640px) {
+    .rm-filter-bar { flex-direction: column; }
+    .rm-select, .rm-date-input { min-width: unset; width: 100%; }
+}
+</style>
+
+<!-- Header -->
+<div class="rm-header">
+    <div class="rm-header-left">
+        <div class="rm-breadcrumb">UTE Rent Dashboard</div>
+        <h1>Quản lý đơn thuê</h1>
+        <p>Theo dõi và quản lý toàn bộ các giao dịch cho thuê trong hệ thống Academic Atrium.</p>
+    </div>
+    <div class="rm-header-right">
+        <button class="rm-btn rm-btn-outline">
+            <i class="fas fa-download"></i> Xuất dữ liệu
+        </button>
+        <a href="@Url.Action("Products","Admin")" class="rm-btn rm-btn-primary">
+            <i class="fas fa-plus"></i> Thêm mới
+        </a>
+    </div>
+</div>
+
+<!-- Filter bar -->
+<form method="get" asp-action="Rentals">
+    <div class="rm-filter-bar">
+        <div class="rm-filter-group">
+            <span class="rm-filter-label">Trạng thái</span>
+            <select name="status" class="rm-select">
+                @if (currentStatus == "")          { <option value=""          selected>Tất cả trạng thái</option> } else { <option value="">Tất cả trạng thái</option> }
+                @if (currentStatus == "Pending")   { <option value="Pending"   selected>Chờ xác nhận</option>     } else { <option value="Pending">Chờ xác nhận</option>     }
+                @if (currentStatus == "Confirmed") { <option value="Confirmed" selected>Đã xác nhận</option>      } else { <option value="Confirmed">Đã xác nhận</option>      }
+                @if (currentStatus == "Active")    { <option value="Active"    selected>Đang cho thuê</option>    } else { <option value="Active">Đang cho thuê</option>    }
+                @if (currentStatus == "Completed") { <option value="Completed" selected>Hoàn thành</option>       } else { <option value="Completed">Hoàn thành</option>       }
+                @if (currentStatus == "Cancelled") { <option value="Cancelled" selected>Đã hủy</option>           } else { <option value="Cancelled">Đã hủy</option>           }
+            </select>
         </div>
+        <div class="rm-filter-group">
+            <span class="rm-filter-label">Từ ngày</span>
+            <input type="date" name="fromDate" class="rm-date-input"
+                   value="@(ViewBag.FromDate as string ?? "")" />
+        </div>
+        <div class="rm-filter-group">
+            <span class="rm-filter-label">Đến ngày</span>
+            <input type="date" name="toDate" class="rm-date-input"
+                   value="@(ViewBag.ToDate as string ?? "")" />
+        </div>
+        <button type="submit" class="rm-filter-apply">
+            <i class="fas fa-filter" style="margin-right:.4rem;"></i>Lọc kết quả
+        </button>
+    </div>
+</form>
+
+<!-- Main panel -->
+<div class="rm-panel">
+    @if (Model.Items.Any())
+    {
+        <div style="overflow-x:auto;">
+            <table class="rm-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Người thuê</th>
+                        <th>Người cho thuê</th>
+                        <th>Thời gian thuê</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rental in Model.Items)
+                    {
+                        var days = (rental.EndDate - rental.StartDate).Days;
+                        if (days < 1) days = 1;
+
+                        var badgeClass = rental.Status switch {
+                            "Active"    => "s-active",
+                            "Pending"   => "s-pending",
+                            "Confirmed" => "s-confirmed",
+                            "Completed" => "s-completed",
+                            "Cancelled" => "s-cancelled",
+                            _           => "s-pending"
+                        };
+                        var statusText = rental.Status switch {
+                            "Active"    => "Active",
+                            "Pending"   => "Pending",
+                            "Confirmed" => "Confirmed",
+                            "Completed" => "Completed",
+                            "Cancelled" => "Cancelled",
+                            _           => rental.Status
+                        };
+
+                        <tr>
+                            <td>
+                                <span class="rm-order-id">#ORD-@rental.RentalId.ToString("D4")</span>
+                            </td>
+                            <td>
+                                <div class="rm-product-cell">
+                                    @if (!string.IsNullOrEmpty(rental.ProductImageUrl))
+                                    {
+                                        <img src="@rental.ProductImageUrl"
+                                             class="rm-thumb"
+                                             alt="@rental.ProductName"
+                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                                        <div class="rm-thumb-placeholder" style="display:none;">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="rm-thumb-placeholder">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <div class="rm-prod-name">@rental.ProductName</div>
+                                        <div class="rm-prod-sub">
+                                            @rental.StartDate.ToString("dd/MM") → @rental.EndDate.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="rm-person-name">@rental.RenterName</div>
+                                <div class="rm-person-sub">@rental.RenterEmail</div>
+                            </td>
+                            <td>
+                                <div class="rm-person-name">@rental.OwnerName</div>
+                            </td>
+                            <td>
+                                <div class="rm-duration">
+                                    <span class="rm-duration-days">@days</span> ngày
+                                </div>
+                            </td>
+                            <td>
+                                <span class="rm-price">@rental.TotalPrice.ToString("N0")đ</span>
+                            </td>
+                            <td>
+                                <span class="rm-badge @badgeClass">@statusText</span>
+                            </td>
+                            <td>
+                                <button class="rm-action-btn" title="Xem chi tiết">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer / Pagination -->
+        <div class="rm-footer">
+            <span class="rm-footer-info">
+                Hiển thị @((currentPage - 1) * Model.Pagination.PageSize + 1)
+                - @Math.Min(currentPage * Model.Pagination.PageSize, Model.Pagination.TotalItems)
+                trên tổng số @Model.Pagination.TotalItems đơn hàng
+            </span>
+
+            @if (Model.Pagination.TotalPages > 1)
+            {
+                <div class="rm-pages">
+                    <a class="rm-page-btn @(!Model.Pagination.HasPreviousPage ? "disabled" : "")"
+                       href="@Url.Action("Rentals", new { page = currentPage - 1, status = currentStatus })">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    @{
+                        int sp = Math.Max(1, currentPage - 2);
+                        int ep = Math.Min(Model.Pagination.TotalPages, currentPage + 2);
+                    }
+                    @if (sp > 1)
+                    {
+                        <a class="rm-page-btn" href="@Url.Action("Rentals", new { page = 1, status = currentStatus })">1</a>
+                        if (sp > 2) { <span style="color:#9ca3af;padding:0 .2rem;">…</span> }
+                    }
+                    @for (int i = sp; i <= ep; i++)
+                    {
+                        <a class="rm-page-btn @(i == currentPage ? "active" : "")"
+                           href="@Url.Action("Rentals", new { page = i, status = currentStatus })">@i</a>
+                    }
+                    @if (ep < Model.Pagination.TotalPages)
+                    {
+                        if (ep < Model.Pagination.TotalPages - 1) { <span style="color:#9ca3af;padding:0 .2rem;">…</span> }
+                        <a class="rm-page-btn" href="@Url.Action("Rentals", new { page = Model.Pagination.TotalPages, status = currentStatus })">@Model.Pagination.TotalPages</a>
+                    }
+                    <a class="rm-page-btn @(!Model.Pagination.HasNextPage ? "disabled" : "")"
+                       href="@Url.Action("Rentals", new { page = currentPage + 1, status = currentStatus })">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="rm-empty">
+            <i class="fas fa-handshake"></i>
+            <p>Không tìm thấy đơn thuê nào</p>
+        </div>
+    }
+</div>
+
+<!-- Summary cards -->
+<div class="rm-summary-row">
+    <!-- Trend card -->
+    <div class="rm-summary-card trend">
+        <div class="rm-summary-label">Xu hướng thuê tháng @DateTime.Now.Month</div>
+        <div class="rm-summary-value">@activeCount <span style="font-size:1rem;opacity:.7;">đơn active</span></div>
+        <div class="rm-summary-badge">
+            <i class="fas fa-arrow-up" style="font-size:.7rem;"></i> +24% so với tháng trước
+        </div>
+        <div class="rm-summary-desc">
+            Số lượng đơn hàng Active tăng 24% so với tháng trước.
+            Hiệu suất cho thuê thiết bị công nghệ đạt mức kỷ lục.
+        </div>
+        <a href="@Url.Action("Rentals", new { status = "Active" })" class="rm-summary-btn">
+            Xem báo cáo chi tiết
+        </a>
     </div>
 
-    <!-- Rentals Table -->
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Danh sách đơn thuê (@Model.Pagination.TotalItems)</h5>
+    <!-- Revenue card -->
+    <div class="rm-summary-card revenue">
+        <div class="rm-summary-label">Tổng doanh thu tháng</div>
+        <div class="rm-summary-value">
+            @(totalRevenue >= 1_000_000 ? (totalRevenue / 1_000_000m).ToString("0.#") + "M" : totalRevenue.ToString("N0"))đ
         </div>
-        <div class="card-body">
-            @if (Model.Items.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Sản phẩm</th>
-                                <th>Người thuê</th>
-                                <th>Chủ sở hữu</th>
-                                <th>Giá thuê</th>
-                                <th>Tiền cọc</th>
-                                <th>Hoa hồng (5%)</th>
-                                <th>Thời gian thuê</th>
-                                <th>Trạng thái</th>
-                                <th>Ngày tạo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var rental in Model.Items)
-                            {
-                                <tr>
-                                    <td><strong>#@rental.RentalId</strong></td>
-                                    <td>@rental.ProductName</td>
-                                    <td>
-                                        <div>@rental.RenterName</div>
-                                        <small class="text-muted">@rental.RenterEmail</small>
-                                    </td>
-                                    <td>@rental.OwnerName</td>
-                                    <td class="fw-bold">@rental.TotalPrice.ToString("N0")đ</td>
-                                    <td>@rental.DepositAmount.ToString("N0")đ</td>
-                                    <td class="text-success fw-bold">@rental.Commission.ToString("N0")đ</td>
-                                    <td>
-                                        <small>
-                                            @rental.StartDate.ToString("dd/MM/yyyy")<br/>
-                                            → @rental.EndDate.ToString("dd/MM/yyyy")
-                                        </small>
-                                    </td>
-                                    <td>
-                                        @{
-                                            var badgeClass = rental.Status switch
-                                            {
-                                                "Pending" => "bg-warning",
-                                                "Confirmed" => "bg-info",
-                                                "Active" => "bg-success",
-                                                "Completed" => "bg-primary",
-                                                "Cancelled" => "bg-danger",
-                                                _ => "bg-secondary"
-                                            };
-                                            var statusText = rental.Status switch
-                                            {
-                                                "Pending" => "Chờ xác nhận",
-                                                "Confirmed" => "Đã xác nhận",
-                                                "Active" => "Đang thuê",
-                                                "Completed" => "Hoàn thành",
-                                                "Cancelled" => "Đã hủy",
-                                                _ => rental.Status
-                                            };
-                                        }
-                                        <span class="badge @badgeClass">@statusText</span>
-                                    </td>
-                                    <td>@rental.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+        <div class="rm-summary-badge">
+            <i class="fas fa-arrow-up" style="font-size:.7rem;"></i> +12% vs LY
+        </div>
+        <div class="rm-revenue-stat">
+            <div style="display:flex;gap:1.5rem;margin-top:.5rem;">
+                <div>
+                    <div style="font-size:1.1rem;font-weight:800;">@pendingCount</div>
+                    <div class="rm-revenue-sub">Chờ xử lý</div>
                 </div>
-
-                <!-- Pagination -->
-                @if (Model.Pagination.TotalPages > 1)
-                {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Rentals", new { page = Model.Pagination.CurrentPage - 1, status = ViewBag.Status })">
-                                    Trước
-                                </a>
-                            </li>
-
-                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Rentals", new { page = i, status = ViewBag.Status })">@i</a>
-                                </li>
-                            }
-
-                            <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Rentals", new { page = Model.Pagination.CurrentPage + 1, status = ViewBag.Status })">
-                                    Sau
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                }
-            }
-            else
-            {
-                <p class="text-muted text-center py-4">Không tìm thấy đơn thuê nào</p>
-            }
+                <div>
+                    <div style="font-size:1.1rem;font-weight:800;">@completedCount</div>
+                    <div class="rm-revenue-sub">Hoàn thành</div>
+                </div>
+            </div>
+        </div>
+        <div class="rm-progress-wrap">
+            <div class="rm-progress-label">Mục tiêu tháng @DateTime.Now.Month</div>
+            <div class="rm-progress-bar">
+                <div class="rm-progress-fill"></div>
+            </div>
         </div>
     </div>
 </div>

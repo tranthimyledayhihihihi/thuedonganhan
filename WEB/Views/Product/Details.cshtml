@@ -2,12 +2,459 @@
 
 @{
     ViewData["Title"] = Model?.ProductName ?? "Chi tiết sản phẩm";
+
+    // Dynamic mock reviews
+    var reviews = new List<dynamic>();
+    var categoryName = Model?.Category?.CategoryName?.ToLower() ?? "";
+    var productName = Model?.ProductName?.ToLower() ?? "";
+
+    if (productName.Contains("áo dài") || categoryName.Contains("áo dài"))
+    {
+        reviews.Add(new {
+            UserName = "Hoàng Yến",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Hoang+Yen&background=10b981&color=fff",
+            Stars = 5,
+            Comment = "Áo dài mặc lên phom dáng rất chuẩn, chất liệu vải mềm mại thoáng mát cực kỳ hợp cho buổi chụp ảnh kỷ yếu. Chị chủ cho thuê lại siêu nhiệt tình hướng dẫn và cho mượn thêm cả kẹp tóc xinh xắn!"
+        });
+        reviews.Add(new {
+            UserName = "Thu Thảo",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Thu+Thao&background=3b82f6&color=fff",
+            Stars = 5,
+            Comment = "Tà áo dài thướt tha, đường may rất khéo và màu sắc tươi tắn lên ảnh cực kỳ nổi bật. Đồ được giặt là sạch sẽ thơm tho trước khi giao. Sẽ tiếp tục thuê ở đây vào các dịp lễ sau."
+        });
+    }
+    else if (productName.Contains("lễ phục") || categoryName.Contains("lễ phục") || productName.Contains("tốt nghiệp"))
+    {
+        reviews.Add(new {
+            UserName = "Quốc Bảo",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Quoc+Bao&background=3b82f6&color=fff",
+            Stars = 5,
+            Comment = "Lễ phục tốt nghiệp mới tinh, sạch sẽ thơm tho, xếp nếp phẳng phiu sẵn sàng. Thuê đồ nhanh chóng, thủ tục đơn giản giúp mình hoàn thành buổi lễ ra trường trọn vẹn. Sẽ giới thiệu cho bạn bè khóa sau!"
+        });
+        reviews.Add(new {
+            UserName = "Thanh Tùng",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Thanh+Tung&background=10b981&color=fff",
+            Stars = 5,
+            Comment = "Đồ tốt nghiệp vải đẹp, mũ cử nhân cứng cáp đội rất vừa đầu. Giao nhận đúng hẹn ngay trước cổng trường rất tiện cho sinh viên nhận bằng. Cảm ơn chủ đồ!"
+        });
+    }
+    else if (productName.Contains("vest") || productName.Contains("suit"))
+    {
+        reviews.Add(new {
+            UserName = "Tuấn Anh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Tuan+Anh&background=f59e0b&color=fff",
+            Stars = 5,
+            Comment = "Bộ vest lên form cực kỳ tôn dáng, chất vải dày dặn và đứng dáng rất sang trọng. Mình thuê để đi phỏng vấn thử việc và đã trúng tuyển, cảm ơn bộ vest may mắn này và sự nhiệt tình của chủ đồ!"
+        });
+        reviews.Add(new {
+            UserName = "Đình Phong",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Dinh+Phong&background=10b981&color=fff",
+            Stars = 5,
+            Comment = "Vest sạch đẹp như mới, thơm tho không một vết bẩn. Được kèm cả cà vạt rất chu đáo. Thủ tục thuê nhanh gọn, giá cả sinh viên rất hợp lý!"
+        });
+    }
+    else if (productName.Contains("macbook") || productName.Contains("laptop"))
+    {
+        reviews.Add(new {
+            UserName = "Đức Huy",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Duc+Huy&background=0d9488&color=fff",
+            Stars = 5,
+            Comment = "MacBook dùng siêu mượt, pin trâu dùng liên tục cả ngày làm tiểu luận không lo hết. Máy sạch sẽ không một vết xước lớn, màn hình sắc nét. Chủ máy nhiệt tình bàn giao máy chu đáo kèm cục sạc chính hãng."
+        });
+        reviews.Add(new {
+            UserName = "Như Quỳnh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Nhu+Quynh&background=c084fc&color=fff",
+            Stars = 5,
+            Comment = "Cấu hình mạnh mẽ cân tốt mọi tác vụ đồ án của mình. Máy sạch sẽ, bàn phím gõ êm. Thủ tục ký quỹ an toàn giúp mình cực kỳ an tâm khi giao dịch."
+        });
+    }
+    else if (productName.Contains("ipad") || productName.Contains("tablet"))
+    {
+        reviews.Add(new {
+            UserName = "Hải Yến",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Hai+Yen&background=ec4899&color=fff",
+            Stars = 5,
+            Comment = "iPad kèm Apple Pencil vẽ ghi chú slide bài giảng siêu đỉnh, màn hình cảm ứng nhạy mượt mà cực kỳ thích hợp cho học tập. Máy còn rất mới và được dán cường lực bảo vệ kỹ càng!"
+        });
+        reviews.Add(new {
+            UserName = "Hoàng Long",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Hoang+Long&background=3b82f6&color=fff",
+            Stars = 5,
+            Comment = "Pin siêu bền, loa to rõ học online rất tiện. Apple Pencil viết vẽ trơn tru không bị delay. Chủ đồ thân thiện, thủ tục giao nhận nhanh gọn lẹ."
+        });
+    }
+    else if (productName.Contains("tai nghe") || productName.Contains("headphone") || productName.Contains("sony") || categoryName.Contains("âm thanh"))
+    {
+        reviews.Add(new {
+            UserName = "Minh Trí",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Minh+Tri&background=2563eb&color=fff",
+            Stars = 5,
+            Comment = "Tai nghe chống ồn Sony WH-1000XM4 siêu đỉnh, âm bass đập ấm và chắc tai, đeo lâu không hề bị đau tai tí nào. Học nhóm ở quán cà phê ồn ào bật chống ồn lên là tập trung làm bài được ngay."
+        });
+        reviews.Add(new {
+            UserName = "Mỹ Linh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=My+Linh&background=f43f5e&color=fff",
+            Stars = 5,
+            Comment = "Kết nối Bluetooth nhanh chóng ổn định, pin dùng mãi không hết. Chủ đồ thân thiện nhiệt tình hướng dẫn cách chỉnh EQ qua app Sony cực kỳ chuyên nghiệp."
+        });
+    }
+    else if (productName.Contains("máy ảnh") || productName.Contains("camera") || categoryName.Contains("máy ảnh"))
+    {
+        reviews.Add(new {
+            UserName = "Nhật Minh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Nhat+Minh&background=10b981&color=fff",
+            Stars = 5,
+            Comment = "Máy ảnh hoạt động hoàn hảo, cảm biến sạch bong, lens kính trong veo không trầy xước. Bộ pin đi kèm rất bền giúp mình chụp liên tục cả ngày kỉ yếu không lo hết pin. Chủ sản phẩm bàn giao đồ cực kỳ uy tín!"
+        });
+        reviews.Add(new {
+            UserName = "Khánh Vy",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Khanh+Vy&background=ec4899&color=fff",
+            Stars = 5,
+            Comment = "Chụp ảnh kỷ yếu lớp ra màu siêu đẹp, sắc nét đến từng chi tiết. Được chủ máy tặng thêm thẻ nhớ dung lượng cao chụp tẹt ga không lo đầy bộ nhớ. Sẽ tiếp tục ủng hộ!"
+        });
+    }
+    else if (productName.Contains("máy chiếu") || productName.Contains("projector") || categoryName.Contains("trình chiếu"))
+    {
+        reviews.Add(new {
+            UserName = "Quang Huy",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Quang+Huy&background=f59e0b&color=fff",
+            Stars = 5,
+            Comment = "Máy chiếu Epson EB-X05 độ sáng cao, chiếu lên tường phòng trọ vẫn rõ nét kể cả khi bật đèn điện. Đầy đủ dây HDMI dài và bộ điều khiển remote. Cực kỳ thích hợp cho buổi thuyết trình tiểu luận nhóm!"
+        });
+        reviews.Add(new {
+            UserName = "Thảo Nguyên",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Thao+Nguyen&background=8b5cf6&color=fff",
+            Stars = 5,
+            Comment = "Dễ dàng setup, quạt tản nhiệt chạy êm không ồn. Màu sắc chiếu phim sắc nét, cả nhóm xem phim bóng đá rất đã mắt. Cảm ơn chủ máy chiếu!"
+        });
+    }
+    else if (productName.Contains("xe đạp") || productName.Contains("giant") || productName.Contains("bike"))
+    {
+        reviews.Add(new {
+            UserName = "Đăng Khoa",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Dang+Khoa&background=06b6d4&color=fff",
+            Stars = 5,
+            Comment = "Xe đạp Giant ATX 810 chạy siêu nhẹ, bộ xích líp sang số mượt mà, phanh nhạy và an toàn. Mình thuê đạp dạo quanh bán đảo Sơn Trà cuối tuần cực kỳ sướng chân. Xe được bảo dưỡng xích dầu đầy đủ trước khi giao!"
+        });
+        reviews.Add(new {
+            UserName = "Hương Giang",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Huong+Giang&background=ec4899&color=fff",
+            Stars = 5,
+            Comment = "Lốp xe bám đường tốt, khung sườn cứng cáp. Được chủ xe chuẩn bị thêm khóa số và mũ bảo hiểm rất an tâm khi di chuyển. Chủ xe siêu thân thiện nhiệt tình!"
+        });
+    }
+    else if (productName.Contains("guitar") || productName.Contains("đàn") || categoryName.Contains("nhạc cụ"))
+    {
+        reviews.Add(new {
+            UserName = "Xuân Trường",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Xuan+Truong&background=10b981&color=fff",
+            Stars = 5,
+            Comment = "Đàn Guitar Yamaha F310 bấm rất êm tay, action chuẩn không bị rè phím chút nào, âm thanh ấm vang cực kỳ hay. Mình thuê để biểu diễn văn nghệ lớp, ai cũng khen âm đàn. Kèm bao da và phím gảy đầy đủ!"
+        });
+        reviews.Add(new {
+            UserName = "Phương Linh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Phuong+Linh&background=eab308&color=fff",
+            Stars = 5,
+            Comment = "Đàn được lên dây chuẩn chỉnh sẵn sàng trước khi giao. Gỗ đàn sáng bóng thơm tho, chủ đàn còn cho mượn thêm capo miễn phí. Cho 5 sao dịch vụ uy tín!"
+        });
+    }
+    else if (productName.Contains("xe máy") || productName.Contains("wave") || categoryName.Contains("xe cộ"))
+    {
+        reviews.Add(new {
+            UserName = "Tiến Đạt",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Tien+Dat&background=3b82f6&color=fff",
+            Stars = 5,
+            Comment = "Xe Wave RSX đi cực kỳ tiết kiệm xăng, máy móc êm ru chạy đầm và bốc, phanh và đèn còi hoạt động hoàn hảo. Xe đầy đủ giấy tờ đi đường và 2 mũ bảo hiểm sạch sẽ. Rất tiện lợi cho việc di chuyển công việc!"
+        });
+        reviews.Add(new {
+            UserName = "Thanh Hằng",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Thanh+Hang&background=db2777&color=fff",
+            Stars = 5,
+            Comment = "Xe đi rất êm và bền bỉ, lốp căng xích êm dắt nhẹ nhàng. Giao nhận đúng giờ tại ga Đà Nẵng cực kỳ chu đáo. Đánh giá 5 sao!"
+        });
+    }
+    else // Default academic/books
+    {
+        reviews.Add(new {
+            UserName = "Minh Anh",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff",
+            Stars = 5,
+            Comment = "Tài liệu giáo trình học tập vô cùng thiết yếu và đầy đủ nội dung. Sách được bọc giữ gìn cẩn thận, chữ in rõ nét, có cả các chú thích ghi chú rất hữu ích giúp mình vượt qua kỳ thi môn chuyên ngành dễ dàng!"
+        });
+        reviews.Add(new {
+            UserName = "Thúy Trang",
+            AvatarUrl = "https://ui-avatars.com/api/?name=Thuy+Trang&background=c084fc&color=fff",
+            Stars = 5,
+            Comment = "Sách còn rất mới, trang giấy phẳng phiu không bị rách nát. Chủ sở hữu phản hồi tin nhắn siêu tốc, hẹn giờ giao sách tại thư viện trường cực kỳ tiện lợi cho sinh viên. Rất hài lòng!"
+        });
+    }
+
+    // Dynamic product badges
+    var badgeTop = "TÀI LIỆU CHÍNH";
+    var categoryBadge = "HỌC LIỆU";
+
+    if (categoryName.Contains("trang phục") || categoryName.Contains("áo dài") || productName.Contains("áo dài") || productName.Contains("lễ phục"))
+    {
+        badgeTop = "TRANG PHỤC CAO CẤP";
+        categoryBadge = "TRANG PHỤC";
+    }
+    else if (categoryName.Contains("thiết bị") || categoryName.Contains("điện tử") || productName.Contains("máy ảnh") || productName.Contains("loa") || productName.Contains("sony") || productName.Contains("chiếu"))
+    {
+        badgeTop = "THIẾT BỊ CÔNG NGHỆ";
+        categoryBadge = "THIẾT BỊ";
+    }
+
+    // Dynamic thumbnails list to avoid repeating the same main image
+    var displayImages = new List<string>();
+    var mainImageUrl = Model?.ImageUrl;
+    
+    // We only override if it's a seed placeholder (contains unsplash or is null/empty)
+    bool isPlaceholder = string.IsNullOrEmpty(mainImageUrl) || mainImageUrl.Contains("unsplash.com");
+    
+    if (isPlaceholder)
+    {
+        // Perfect overrides for mock data placeholders to match local high-quality images
+        if (productName.Contains("áo dài") || categoryName.Contains("áo dài"))
+        {
+            mainImageUrl = "/images/aodai.png";
+        }
+        else if (productName.Contains("lễ phục") || productName.Contains("tốt nghiệp"))
+        {
+            mainImageUrl = "/images/dototnghiep.png";
+        }
+        else if (productName.Contains("vest") || productName.Contains("suit"))
+        {
+            mainImageUrl = "/images/vestnam.png";
+        }
+        else if (productName.Contains("tai nghe") || productName.Contains("headphone") || categoryName.Contains("âm thanh") || productName.Contains("sony wh-1000xm4"))
+        {
+            mainImageUrl = "/images/tainghe.png";
+        }
+        else if (productName.Contains("máy chiếu") || productName.Contains("projector") || categoryName.Contains("trình chiếu"))
+        {
+            mainImageUrl = "/images/maychieu.png";
+        }
+        else if (productName.Contains("guitar") || productName.Contains("đàn") || categoryName.Contains("nhạc cụ"))
+        {
+            mainImageUrl = "/images/guitar.png";
+        }
+        else if (productName.Contains("xe đạp") || productName.Contains("giant") || productName.Contains("bike"))
+        {
+            mainImageUrl = "/images/xedap.png";
+        }
+        else if (productName.Contains("ipad") || productName.Contains("tablet"))
+        {
+            mainImageUrl = "/images/ipad.png";
+        }
+        else if (productName.Contains("macbook") || productName.Contains("laptop"))
+        {
+            mainImageUrl = "/images/mac.png";
+        }
+        else if (productName.Contains("máy ảnh") || productName.Contains("camera") || categoryName.Contains("máy ảnh"))
+        {
+            mainImageUrl = "/images/mayanh.png";
+        }
+        else if (categoryName.Contains("sách") || categoryName.Contains("giáo trình") || productName.Contains("sách"))
+        {
+            mainImageUrl = "/images/giaitich1.png";
+        }
+    }
+
+    if (!string.IsNullOrEmpty(mainImageUrl))
+    {
+        displayImages.Add(mainImageUrl);
+    }
+
+    if (Model?.ProductImages != null && Model.ProductImages.Any())
+    {
+        foreach (var img in Model.ProductImages)
+        {
+            if (!string.IsNullOrEmpty(img) && !displayImages.Contains(img))
+            {
+                displayImages.Add(img);
+            }
+        }
+    }
+    
+    if (isPlaceholder)
+    {
+        // Add realistic product perspective stock photos based on category/product type
+        if (productName.Contains("áo dài") || categoryName.Contains("áo dài"))
+        {
+            var extra = new List<string> {
+                "https://down-vn.img.susercontent.com/file/sg-11134201-7rauq-machlz7wuvyp42.webp",
+                "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m6s3efkjxflk0a.webp",
+                "https://down-vn.img.susercontent.com/file/vn-11134207-7ras8-mc2z1eac8bjmba.webp",
+                "https://down-vn.img.susercontent.com/file/vn-11134207-7ras8-mc2z1l1oc86q49.webp"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("lễ phục") || categoryName.Contains("lễ phục") || productName.Contains("tốt nghiệp"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+                "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+                "https://images.unsplash.com/photo-1525921429624-479b6c294591?w=800",
+                "https://images.unsplash.com/photo-1589156280159-27698a70f29e?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("vest") || productName.Contains("suit"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800",
+                "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800",
+                "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?w=800",
+                "https://images.unsplash.com/photo-1598808503746-f34c53b20ef3?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (categoryName.Contains("trang phục"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800",
+                "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800",
+                "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=800",
+                "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("macbook") || productName.Contains("laptop"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800",
+                "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800",
+                "https://images.unsplash.com/photo-1496181130204-755241544e3f?w=800",
+                "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("ipad") || productName.Contains("tablet"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800",
+                "https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=800",
+                "https://images.unsplash.com/photo-1511385348-a52b4a160dc2?w=800",
+                "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("tai nghe") || productName.Contains("headphone") || productName.Contains("sony") || categoryName.Contains("âm thanh"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800",
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+                "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800",
+                "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("máy ảnh") || productName.Contains("camera") || categoryName.Contains("máy ảnh"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800",
+                "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800",
+                "https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?w=800",
+                "https://images.unsplash.com/photo-1495707902641-75cac588d2e9?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("máy chiếu") || productName.Contains("projector") || categoryName.Contains("trình chiếu"))
+        {
+            var extra = new List<string> {
+                "/images/maychieu_epson1.webp",
+                "/images/maychieu_epson2.webp",
+                "/images/maychieu_epson3.webp",
+                "/images/maychieu_epson4.webp"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("xe đạp") || productName.Contains("giant") || productName.Contains("bike"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800",
+                "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800",
+                "https://images.unsplash.com/photo-1576435468114-7104e373c08d?w=800",
+                "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("guitar") || productName.Contains("đàn") || categoryName.Contains("nhạc cụ"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800",
+                "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800",
+                "https://images.unsplash.com/photo-1525201548942-d8c8b09e5540?w=800",
+                "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else if (productName.Contains("xe máy") || productName.Contains("wave") || categoryName.Contains("xe cộ"))
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800",
+                "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800",
+                "https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?w=800",
+                "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+        else // Default academic/book perspective shots
+        {
+            var extra = new List<string> {
+                "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800",
+                "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800",
+                "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800",
+                "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800"
+            };
+            foreach (var img in extra)
+            {
+                if (!displayImages.Contains(img)) displayImages.Add(img);
+            }
+        }
+    }
 }
 
 <div class="product-details-container">
     <!-- Breadcrumb -->
     <div class="breadcrumb">
-        <a href="/">
+        <a href="/Product">
             <i class="fas fa-arrow-left"></i>
             Quay lại
         </a>
@@ -33,23 +480,27 @@
     <div class="product-details-grid">
         <!-- Left: Images -->
         <div class="product-images-section">
-            <div class="product-badge-top">TÀI LIỆU CHÍNH</div>
+            <div class="product-badge-top">@badgeTop</div>
             
             <div class="product-main-image">
                 <button class="product-favorite-large">
                     <i class="far fa-heart"></i>
                 </button>
-                <img src="@Model?.ImageUrl" alt="@Model?.ProductName" id="mainImage" />
+                <img src="@mainImageUrl" alt="@Model?.ProductName" id="mainImage" />
             </div>
 
             <div class="product-thumbnails">
-                <img src="@Model?.ImageUrl" alt="Thumbnail 1" class="thumbnail active" onclick="changeImage(this.src)" />
+                @for (int i = 0; i < Math.Min(4, displayImages.Count); i++)
+                {
+                    var imgUrl = displayImages[i];
+                    <img src="@imgUrl" alt="Thumbnail @(i + 1)" class="thumbnail @(i == 0 ? "active" : "")" onclick="changeImage(this.src, this)" />
+                }
             </div>
         </div>
 
         <!-- Right: Product Info -->
         <div class="product-info-section">
-            <div class="product-category-badge">HỌC LIỆU</div>
+            <div class="product-category-badge">@categoryBadge</div>
             
             <h1 class="product-title">@Model?.ProductName</h1>
             
@@ -240,10 +691,20 @@
                             </a>
                         }
 
-                        <button type="button" class="btn-add-to-cart" onclick="addToCart()" style="width: 100%; padding: 1.25rem; border-radius: 16px; font-size: 1.1rem; font-weight: 700; background: #ffffff; color: #0f172a; border: 2px solid #e2e8f0; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                            <i class="fas fa-shopping-bag" style="color: #64748b;"></i>
-                            THÊM VÀO GIỎ HÀNG
-                        </button>
+                        @if (ViewBag.IsLoggedIn == true)
+                        {
+                            <button type="button" class="btn-add-to-cart" onclick="addToCart()" style="width: 100%; padding: 1.25rem; border-radius: 16px; font-size: 1.1rem; font-weight: 700; background: #ffffff; color: #0f172a; border: 2px solid #e2e8f0; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                                <i class="fas fa-shopping-bag" style="color: #64748b;"></i>
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="/Account/Login?returnUrl=@Context.Request.Path" style="width: 100%; padding: 1.25rem; border-radius: 16px; font-size: 1rem; font-weight: 700; background: #f8fafc; color: #64748b; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; box-sizing: border-box;">
+                                <i class="fas fa-lock" style="color: #94a3b8;"></i>
+                                ĐĂNG NHẬP ĐỂ THÊM VÀO GIỎ
+                            </a>
+                        }
                     }
                 </div>
             </form>
@@ -297,48 +758,27 @@
         <p class="reviews-subtitle">Phản hồi thực tế từ cộng đồng sinh viên</p>
 
         <div class="reviews-grid">
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" class="review-avatar" />
-                    <div class="review-user-info">
-                        <div class="review-user-name">Minh Anh</div>
-                        <div class="review-user-badge">Verified Rent</div>
+            @foreach (var r in reviews)
+            {
+                <div class="review-card">
+                    <div class="review-header">
+                        <img src="@r.AvatarUrl" alt="@r.UserName" class="review-avatar" />
+                        <div class="review-user-info">
+                            <div class="review-user-name">@r.UserName</div>
+                            <div class="review-user-badge">Verified Rent</div>
+                        </div>
+                        <div class="review-stars">
+                            @for (int s = 0; s < r.Stars; s++)
+                            {
+                                <i class="fas fa-star"></i>
+                            }
+                        </div>
                     </div>
-                    <div class="review-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
+                    <p class="review-text">
+                        "@r.Comment"
+                    </p>
                 </div>
-                <p class="review-text">
-                    "Sách Giải tích nâng cao là tài liệu học tập thiết yếu dành cho sinh viên khối ngành kỹ thuật. 
-                    Nội dung bao gồm các chuyên đề về tích phân, đạo hàm và phương trình vi phân, được trình bày 
-                    rõ ràng và dễ hiểu."
-                </p>
-            </div>
-
-            <div class="review-card">
-                <div class="review-header">
-                    <img src="https://ui-avatars.com/api/?name=Thuy+Trang&background=c084fc&color=fff" alt="Thúy Trang" class="review-avatar" />
-                    <div class="review-user-info">
-                        <div class="review-user-name">Thúy Trang</div>
-                        <div class="review-user-badge">Verified Rent</div>
-                    </div>
-                    <div class="review-stars">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <p class="review-text">
-                    "Đã sách rất tốt, mình thấy chủ nhà rất nhiệt tình. Thủ thuê nhanh gọn, chỉ cần cho vào hồ sơ 
-                    chính ngay đơn vào. Chúng ta đã thống nhất là ngày 1 tháng 11 hoàn toàn ổn, đúng không?"
-                </p>
-            </div>
+            }
         </div>
 
         <a href="#" class="view-all-reviews">
@@ -602,19 +1042,20 @@
         border-radius: 12px;
         overflow: hidden;
         cursor: pointer;
-        border: 3px solid transparent;
+        border: 3px solid #e2e8f0;
         transition: all 0.3s ease;
+        object-fit: contain;
+        background-color: #f8fafc;
+        width: 100%;
+        height: 100%;
+        padding: 6px;
+        box-sizing: border-box;
     }
 
     .thumbnail:hover,
     .thumbnail.active {
         border-color: var(--primary-blue);
-    }
-
-    .thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        background-color: #eff6ff;
     }
 
     .thumbnail-more {
@@ -1023,13 +1464,15 @@
     let selectedStartDate = null;
     let selectedEndDate = null;
 
-    function changeImage(src) {
-        document.getElementById('mainImage').src = src.replace('w=200&h=200', 'w=800&h=600');
+    function changeImage(src, element) {
+        document.getElementById('mainImage').src = src;
         
         document.querySelectorAll('.thumbnail').forEach(thumb => {
             thumb.classList.remove('active');
         });
-        if (window.event) {
+        if (element) {
+            element.classList.add('active');
+        } else if (window.event) {
             window.event.target.classList.add('active');
         }
     }
@@ -1349,7 +1792,15 @@
         renderCalendar();
     }
 
+    const isLoggedIn = @(ViewBag.IsLoggedIn == true ? "true" : "false");
+
     function addToCart() {
+        // Chặn nếu chưa đăng nhập
+        if (!isLoggedIn) {
+            window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+            return;
+        }
+
         const productId = @Model?.ProductId;
         const productName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model?.ProductName));
         const imageUrl = "@(Model?.ImageUrl ?? "/images/default-product.png")";

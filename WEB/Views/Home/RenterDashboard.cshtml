@@ -4,6 +4,76 @@
     var userName = Context.Session.GetString("UserName") ?? "Sinh viên UTE";
 }
 
+@functions {
+    public string GetPerfectCardImage(WEB.Models.ProductViewModel product)
+    {
+        if (product == null) return "/images/placeholder.png";
+        var cardImageUrl = product.ImageUrl;
+        
+        // We only override if it's a seed placeholder (contains unsplash or is null/empty)
+        bool isPlaceholder = string.IsNullOrEmpty(cardImageUrl) || cardImageUrl.Contains("unsplash.com");
+        if (!isPlaceholder)
+        {
+            return cardImageUrl;
+        }
+
+        var pName = product.ProductName?.ToLower() ?? "";
+        var cName = product.Category?.CategoryName?.ToLower() ?? "";
+
+        // Perfect overrides for mock data placeholders
+        if (pName.Contains("áo dài") || cName.Contains("áo dài"))
+        {
+            return "/images/aodai.png";
+        }
+        if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp"))
+        {
+            return "/images/dototnghiep.png";
+        }
+        if (pName.Contains("vest") || pName.Contains("suit"))
+        {
+            return "/images/vestnam.png";
+        }
+        if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4"))
+        {
+            return "/images/tainghe.png";
+        }
+        if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu"))
+        {
+            return "/images/maychieu.png";
+        }
+        if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ"))
+        {
+            return "/images/guitar.png";
+        }
+        if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike"))
+        {
+            return "/images/xedap.png";
+        }
+        if (pName.Contains("ipad") || pName.Contains("tablet"))
+        {
+            return "/images/ipad.png";
+        }
+        if (pName.Contains("macbook") || pName.Contains("laptop"))
+        {
+            return "/images/mac.png";
+        }
+        if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh"))
+        {
+            return "/images/mayanh.png";
+        }
+        if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ"))
+        {
+            return "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
+        }
+        if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách"))
+        {
+            return "/images/giaitich1.png";
+        }
+
+        return cardImageUrl;
+    }
+}
+
 <div class="renter-layout">
     <!-- Sidebar -->
     <aside class="renter-sidebar">
@@ -69,7 +139,7 @@
                             <div class="rpc-img-wrap">
                                 <span class="rpc-hot">Hot Item</span>
                                 <a href="/Product/Details/@featured.ProductId" style="display: block; width: 100%; height: 100%;">
-                                    <img src="@featured.ImageUrl" alt="@featured.ProductName"
+                                    <img src="@GetPerfectCardImage(featured)" alt="@featured.ProductName"
                                          onerror="this.src='https://via.placeholder.com/600x380/dbeafe/2563eb?text=Product'">
                                 </a>
                             </div>
@@ -96,7 +166,7 @@
                                 <div class="rpc rpc--small" data-cat="@(product.Category?.CategoryName ?? "Khác")">
                                     <div class="rpc-small-img">
                                         <a href="/Product/Details/@product.ProductId" style="display: block; width: 100%; height: 100%;">
-                                            <img src="@product.ImageUrl" alt="@product.ProductName"
+                                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName"
                                                  onerror="this.src='https://via.placeholder.com/200x140/e2e8f0/94a3b8?text=No+Image'">
                                         </a>
                                     </div>
@@ -106,9 +176,9 @@
                                             <div class="rpc-name rpc-name--sm">@product.ProductName</div>
                                         </a>
                                         <div class="rpc-footer">
-                                            <div class="rpc-price rpc-price--sm">@product.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
-                                            <a href="/Product/Details/@product.ProductId" class="rpc-save-btn"><i class="far fa-bookmark"></i></a>
-                                        </div>
+                                             <div class="rpc-price rpc-price--sm">@product.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
+                                             <a href="/Product/Details/@product.ProductId" class="rpc-rent-btn-sm">Thuê</a>
+                                         </div>
                                     </div>
                                 </div>
                             }
@@ -135,18 +205,17 @@
 <style>
     .renter-layout {
         display: flex;
-        min-height: calc(100vh - 70px);
-        background: #f1f5f9;
-        font-family: 'Segoe UI',sans-serif;
+        min-height: calc(100vh - 68px);
+        background: var(--bg-page);
+        font-family: 'Inter', sans-serif;
     }
 
-    /* Sidebar - dừng trước footer */
     .renter-sidebar {
-        width: 210px;
-        background: #fff;
-        border-right: 1px solid #e2e8f0;
+        width: 220px;
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
         position: fixed;
-        top: 70px;
+        top: 68px;
         left: 0;
         bottom: 0;
         display: flex;
@@ -161,14 +230,14 @@
         align-items: center;
         gap: .75rem;
         padding: 0 1.25rem 1.25rem;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border);
     }
 
     .sidebar-avatar {
         width: 42px;
         height: 42px;
         border-radius: 50%;
-        background: #2563eb;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: #fff;
         display: flex;
         align-items: center;
@@ -179,13 +248,13 @@
 
     .sidebar-label {
         font-size: .78rem;
-        color: #2563eb;
+        color: var(--primary);
         font-weight: 700;
     }
 
     .sidebar-sub {
         font-size: .72rem;
-        color: #94a3b8;
+        color: var(--text-muted);
         margin-top: .15rem;
     }
 
@@ -199,29 +268,29 @@
         align-items: center;
         gap: .75rem;
         padding: .7rem 1.25rem;
-        color: #64748b;
+        color: var(--text-secondary);
         text-decoration: none;
         font-size: .88rem;
         font-weight: 500;
         transition: all .2s;
     }
 
-        .snav-item i {
-            font-size: .95rem;
-            width: 18px;
-        }
+    .snav-item i {
+        font-size: .95rem;
+        width: 18px;
+    }
 
-        .snav-item:hover {
-            color: #2563eb;
-            background: #eff6ff;
-        }
+    .snav-item:hover {
+        color: var(--primary-dark);
+        background: var(--primary-light);
+    }
 
-        .snav-item.active {
-            color: #2563eb;
-            background: #eff6ff;
-            font-weight: 700;
-            border-left: 3px solid #2563eb;
-        }
+    .snav-item.active {
+        color: var(--primary-dark);
+        background: var(--primary-light);
+        font-weight: 700;
+        border-left: 3px solid var(--primary);
+    }
 
     .sidebar-add-wrap {
         padding: 0 1rem;
@@ -232,30 +301,30 @@
         align-items: center;
         gap: .5rem;
         padding: .7rem 1rem;
-        background: #2563eb;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: #fff;
         border-radius: 10px;
         text-decoration: none;
         font-size: .82rem;
         font-weight: 700;
-        transition: background .2s;
+        transition: opacity .2s;
     }
 
-        .sidebar-add-btn:hover {
-            background: #1d4ed8;
-            color: #fff;
-        }
+    .sidebar-add-btn:hover {
+        opacity: .9;
+        color: #fff;
+    }
 
     /* Main */
     .renter-main {
-        margin-left: 210px;
+        margin-left: 220px;
         flex: 1;
         padding: 0 0 3rem;
     }
 
     /* Hero Banner */
     .renter-hero {
-        background: #2563eb;
+        background: linear-gradient(135deg, var(--primary) 0%, #134e4a 100%);
         padding: 2.5rem 2.5rem 2.25rem;
         color: #fff;
     }
@@ -293,10 +362,10 @@
         color: #fff;
     }
 
-        .hero-btn--outline:hover {
-            background: rgba(255,255,255,.15);
-            color: #fff;
-        }
+    .hero-btn--outline:hover {
+        background: rgba(255,255,255,.15);
+        color: #fff;
+    }
 
     /* Content row */
     .renter-content-row {
@@ -339,26 +408,26 @@
 
     .rpa-tab {
         padding: .4rem .9rem;
-        border: 1.5px solid #e2e8f0;
+        border: 1.5px solid var(--border);
         border-radius: 8px;
-        background: #fff;
-        color: #64748b;
+        background: var(--bg-card);
+        color: var(--text-secondary);
         font-size: .78rem;
         font-weight: 600;
         cursor: pointer;
         transition: all .2s;
     }
 
-        .rpa-tab:hover {
-            border-color: #2563eb;
-            color: #2563eb;
-        }
+    .rpa-tab:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
 
-        .rpa-tab.active {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-        }
+    .rpa-tab.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
 
     /* Products Grid */
     .rpa-grid {
@@ -412,66 +481,34 @@
 
     .rpc-cat {
         font-size: .68rem;
-        color: #2563eb;
+        color: var(--primary);
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .5px;
         margin-bottom: .3rem;
     }
 
-    .rpc-rating {
-        font-size: .78rem;
-        color: #64748b;
-        margin-bottom: .35rem;
-    }
-
-    .rpc-name {
-        font-size: 1rem;
-        font-weight: 800;
-        color: #1e293b;
-        margin-bottom: .5rem;
-        line-height: 1.35;
-    }
-
-    .rpc-name--sm {
-        font-size: .85rem;
-        font-weight: 700;
-    }
-
-    .rpc-desc {
-        font-size: .8rem;
-        color: #64748b;
-        line-height: 1.5;
-        margin-bottom: 1rem;
-    }
-
-    .rpc-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
     .rpc-price {
         font-size: 1.1rem;
         font-weight: 800;
-        color: #2563eb;
+        color: var(--primary);
     }
 
     .rpc-price--sm {
         font-size: .9rem;
         font-weight: 800;
-        color: #2563eb;
+        color: var(--primary);
     }
 
-        .rpc-price span, .rpc-price--sm span {
-            font-size: .72rem;
-            font-weight: 500;
-            color: #94a3b8;
-        }
+    .rpc-price span, .rpc-price--sm span {
+        font-size: .72rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
 
     .rpc-rent-btn {
         padding: .6rem 1.25rem;
-        background: #2563eb;
+        background: var(--primary);
         color: #fff;
         border-radius: 8px;
         text-decoration: none;
@@ -480,30 +517,55 @@
         transition: background .2s;
     }
 
-        .rpc-rent-btn:hover {
-            background: #1d4ed8;
-            color: #fff;
-        }
+    .rpc-rent-btn:hover {
+        background: var(--primary-dark);
+        color: #fff;
+    }
+
+    .rpc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    .rpc-rent-btn-sm {
+        padding: .3rem .6rem;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: .75rem;
+        font-weight: 700;
+        transition: all .2s;
+        white-space: nowrap;
+    }
+
+    .rpc-rent-btn-sm:hover {
+        background: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
 
     .rpc-save-btn {
         width: 32px;
         height: 32px;
         border-radius: 8px;
-        border: 1.5px solid #e2e8f0;
-        background: #fff;
+        border: 1.5px solid var(--border);
+        background: var(--bg-card);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #64748b;
+        color: var(--text-secondary);
         text-decoration: none;
         font-size: .9rem;
         transition: all .2s;
     }
 
-        .rpc-save-btn:hover {
-            border-color: #2563eb;
-            color: #2563eb;
-        }
+    .rpc-save-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
 
     /* Small cards */
     .rpc--small {
@@ -528,7 +590,7 @@
 
     .rpc-small-body {
         flex: 1;
-        padding: .85rem 1rem;
+        padding: .85rem .75rem;
     }
 
     /* More button */
@@ -537,20 +599,20 @@
         align-items: center;
         gap: .5rem;
         padding: .65rem 1.5rem;
-        border: 2px solid #e2e8f0;
+        border: 2px solid var(--border);
         border-radius: 10px;
-        color: #2563eb;
+        color: var(--primary);
         font-size: .85rem;
         font-weight: 700;
         text-decoration: none;
-        background: #fff;
+        background: var(--bg-card);
         transition: all .2s;
     }
 
-        .rpa-more-btn:hover {
-            border-color: #2563eb;
-            background: #eff6ff;
-        }
+    .rpa-more-btn:hover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
 
     /* Empty */
     .rpa-empty {

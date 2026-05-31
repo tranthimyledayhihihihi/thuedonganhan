@@ -58,7 +58,7 @@ namespace THUEDONGANHAN.Controllers
                     .ToListAsync();
 
                 // ✅ FIX: Dùng DTO thay vì raw model
-                var response = orders.Select(MapToSaleOrderResponse).ToList();
+                var response = orders.Select(o => MapToSaleOrderResponse(o)).ToList();
 
                 var result = new
                 {
@@ -123,7 +123,7 @@ namespace THUEDONGANHAN.Controllers
                     .ToListAsync();
 
                 // ✅ FIX: Dùng DTO thay vì raw model
-                var response = orders.Select(MapToSaleOrderResponse).ToList();
+                var response = orders.Select(o => MapToSaleOrderResponse(o)).ToList();
 
                 return Ok(ApiResponse<List<SaleOrderResponse>>.SuccessResponse(response, "Lấy lịch sử mua hàng thành công"));
             }
@@ -148,7 +148,7 @@ namespace THUEDONGANHAN.Controllers
                     .ToListAsync();
 
                 // ✅ FIX: Dùng DTO thay vì raw model
-                var response = orders.Select(MapToSaleOrderResponse).ToList();
+                var response = orders.Select(o => MapToSaleOrderResponse(o)).ToList();
 
                 return Ok(ApiResponse<List<SaleOrderResponse>>.SuccessResponse(response, "Lấy lịch sử bán hàng thành công"));
             }
@@ -403,7 +403,7 @@ namespace THUEDONGANHAN.Controllers
         }
 
         // Helper method để map SaleOrder sang SaleOrderResponse
-        private static SaleOrderResponse MapToSaleOrderResponse(SaleOrder order)
+        private SaleOrderResponse MapToSaleOrderResponse(SaleOrder order)
         {
             return new SaleOrderResponse
             {
@@ -420,7 +420,9 @@ namespace THUEDONGANHAN.Controllers
                 {
                     ProductId = order.Product.ProductId,
                     ProductName = order.Product.ProductName,
-                    ImageUrl = order.Product.ImageUrl,
+                    ImageUrl = (!string.IsNullOrEmpty(order.Product.ImageUrl) && order.Product.ImageUrl.StartsWith("/uploads/"))
+                        ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{order.Product.ImageUrl}"
+                        : order.Product.ImageUrl,
                     Location = order.Product.Location,
                     OwnerId = order.Product.OwnerId
                 } : null,

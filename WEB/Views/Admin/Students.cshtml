@@ -27,10 +27,10 @@
                             <div class="col-md-3">
                                 <select name="status" class="form-select">
                                     <option value="">-- Tất cả trạng thái --</option>
-                                    <option value="Active" selected="@(status == "Active")">Active</option>
-                                    <option value="Graduated" selected="@(status == "Graduated")">Graduated</option>
-                                    <option value="Suspended" selected="@(status == "Suspended")">Suspended</option>
-                                    <option value="LeaveOfAbsence" selected="@(status == "LeaveOfAbsence")">Leave Of Absence</option>
+                                    @if (status == "Active") { <option value="Active" selected>Active</option> } else { <option value="Active">Active</option> }
+                                    @if (status == "Graduated") { <option value="Graduated" selected>Graduated</option> } else { <option value="Graduated">Graduated</option> }
+                                    @if (status == "Suspended") { <option value="Suspended" selected>Suspended</option> } else { <option value="Suspended">Suspended</option> }
+                                    @if (status == "LeaveOfAbsence") { <option value="LeaveOfAbsence" selected>Leave Of Absence</option> } else { <option value="LeaveOfAbsence">Leave Of Absence</option> }
                                 </select>
                             </div>
                             <div class="col-md-2">

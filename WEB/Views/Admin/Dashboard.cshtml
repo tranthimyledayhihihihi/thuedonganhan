@@ -1,368 +1,391 @@
 @model WEB.Models.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var userName = Context.Session.GetString("UserName") ?? "Admin";
+    var hour     = DateTime.Now.Hour;
+    var greeting = hour < 12 ? "Chào buổi sáng" : hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
 }
 
 <style>
-    .stat-card {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    }
-    
-    .stat-card .card-body {
-        padding: 1.5rem;
-    }
-    
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.75rem;
-    }
-    
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        margin: 0.5rem 0;
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6b7280;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .revenue-card {
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-    }
-    
-    .commission-card {
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        box-shadow: 0 4px 16px rgba(245, 87, 108, 0.3);
-    }
-    
-    .balance-card {
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.3);
-    }
-    
-    .quick-link-card {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .quick-link-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-    
-    .quick-link-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 2rem;
-    }
-    
-    .table-card {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-    
-    .table-card .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px 12px 0 0;
-        padding: 1.25rem 1.5rem;
-    }
-    
-    .badge-custom {
-        padding: 0.375rem 0.75rem;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.75rem;
-    }
+/* ── Greeting ────────────────────────────────────────── */
+.dg-greeting {
+    background: var(--brown);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; overflow: hidden;
+}
+.dg-greeting::before {
+    content: '';
+    position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,.04);
+}
+.dg-greeting::after {
+    content: '';
+    position: absolute; right: 60px; bottom: -50px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(245,200,66,.06);
+}
+.dg-greeting-text h2 {
+    font-size: 1.4rem; font-weight: 800; color: var(--white);
+    margin-bottom: .25rem;
+}
+.dg-greeting-text p { font-size: .875rem; color: rgba(255,255,255,.6); }
+.dg-greeting-tag {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: var(--yellow); color: var(--brown);
+    padding: .25rem .75rem; border-radius: 20px;
+    font-size: .7rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: .6rem;
+}
+.dg-greeting-actions { display: flex; gap: .6rem; position: relative; z-index: 1; }
+.dg-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .55rem 1.1rem; border-radius: 20px;
+    font-size: .82rem; font-weight: 700; text-decoration: none;
+    transition: all .15s; border: none; cursor: pointer; font-family: inherit;
+}
+.dg-btn-yellow { background: var(--yellow); color: var(--brown); }
+.dg-btn-yellow:hover { background: var(--yellow2); color: var(--brown); }
+.dg-btn-ghost  { background: rgba(255,255,255,.1); color: var(--white); border: 1.5px solid rgba(255,255,255,.2); }
+.dg-btn-ghost:hover { background: rgba(255,255,255,.18); color: var(--white); }
+
+/* ── Stat grid ───────────────────────────────────────── */
+.dg-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.dg-stat {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    border: 1.5px solid var(--cream3);
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s, box-shadow .15s;
+}
+.dg-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.dg-stat-top {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: .875rem;
+}
+.dg-stat-icon {
+    width: 42px; height: 42px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+}
+.dg-stat-badge {
+    font-size: .68rem; font-weight: 700;
+    padding: .18rem .5rem; border-radius: 20px;
+}
+.badge-up   { background: var(--green3); color: var(--green); }
+.badge-warn { background: var(--yellow3); color: #d97706; }
+.badge-red  { background: #fee2e2; color: #dc2626; }
+.dg-stat-label { font-size: .72rem; font-weight: 600; color: var(--brown3); margin-bottom: .2rem; }
+.dg-stat-value { font-size: 1.9rem; font-weight: 900; color: var(--brown); line-height: 1; }
+
+/* Accent bottom bar */
+.dg-stat::after {
+    content: ''; display: block;
+    height: 3px; border-radius: 0 0 14px 14px;
+    margin: .875rem -1.4rem -1.25rem;
+}
+.dg-stat.s1::after { background: #6366f1; }
+.dg-stat.s2::after { background: var(--yellow); }
+.dg-stat.s3::after { background: var(--green); }
+.dg-stat.s4::after { background: #ef4444; }
+
+/* ── Revenue row ─────────────────────────────────────── */
+.dg-rev-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.dg-rev-card {
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    border: 1.5px solid var(--cream3);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+}
+.dg-rev-label {
+    font-size: .7rem; font-weight: 700; color: var(--brown3);
+    text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center; gap: .35rem;
+    margin-bottom: .5rem;
+}
+.dg-rev-label i { font-size: .8rem; }
+.dg-rev-value { font-size: 1.5rem; font-weight: 900; color: var(--brown); margin-bottom: .25rem; }
+.dg-rev-note  { font-size: .75rem; color: var(--brown3); }
+.dg-rev-bar   { height: 5px; background: var(--cream3); border-radius: 3px; margin-top: .875rem; overflow: hidden; }
+.dg-rev-fill  { height: 100%; border-radius: 3px; }
+
+/* ── Two-col layout ──────────────────────────────────── */
+.dg-two-col {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 1rem;
+}
+
+/* ── Panel ───────────────────────────────────────────── */
+.dg-panel {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1.5px solid var(--cream3);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.dg-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--cream3);
+}
+.dg-panel-title {
+    font-size: .875rem; font-weight: 700; color: var(--brown);
+    display: flex; align-items: center; gap: .4rem;
+}
+.dg-panel-title i { color: var(--green); }
+.dg-panel-link {
+    font-size: .75rem; font-weight: 700; color: var(--green);
+    text-decoration: none;
+}
+.dg-panel-link:hover { text-decoration: underline; }
+
+/* Commission table */
+.dg-table { width: 100%; border-collapse: collapse; }
+.dg-table th {
+    font-size: .65rem; font-weight: 700; color: var(--brown3);
+    text-transform: uppercase; letter-spacing: .5px;
+    padding: .6rem 1.25rem; text-align: left;
+    border-bottom: 1px solid var(--cream3);
+    background: var(--cream2); white-space: nowrap;
+}
+.dg-table td {
+    padding: .75rem 1.25rem; border-bottom: 1px solid var(--cream3);
+    font-size: .82rem; color: var(--brown2); vertical-align: middle;
+}
+.dg-table tr:last-child td { border-bottom: none; }
+.dg-table tr:hover td { background: var(--cream2); }
+.dg-badge {
+    display: inline-block; padding: .18rem .55rem;
+    border-radius: 20px; font-size: .68rem; font-weight: 700;
+}
+.dg-badge-green  { background: var(--green3); color: var(--green); }
+.dg-badge-cream  { background: var(--cream2); color: var(--brown2); }
+
+/* Users panel */
+.dg-user-list { padding: .5rem 0; }
+.dg-user-row {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .65rem 1.25rem;
+    transition: background .12s;
+}
+.dg-user-row:hover { background: var(--cream2); }
+.dg-user-av {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--brown2));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white); font-size: .78rem; font-weight: 700;
+    flex-shrink: 0;
+}
+.dg-user-name { font-size: .875rem; font-weight: 600; color: var(--brown); }
+.dg-user-role { font-size: .72rem; color: var(--brown3); }
+.dg-lock-btn {
+    margin-left: auto;
+    padding: .2rem .6rem;
+    background: #fee2e2; color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 6px; font-size: .68rem; font-weight: 700;
+    cursor: pointer; text-transform: uppercase;
+    transition: all .15s;
+}
+.dg-lock-btn:hover { background: #dc2626; color: var(--white); }
+.dg-panel-footer {
+    padding: .75rem 1.25rem;
+    border-top: 1px solid var(--cream3);
+    text-align: center;
+}
+.dg-panel-footer a { font-size: .78rem; color: var(--brown3); font-weight: 500; }
+.dg-panel-footer a:hover { color: var(--green); }
+
+/* Empty */
+.dg-empty { text-align: center; padding: 2.5rem 1rem; color: var(--brown3); }
+.dg-empty i { font-size: 2rem; margin-bottom: .75rem; display: block; }
+
+/* Responsive */
+@@media (max-width: 1100px) {
+    .dg-stats { grid-template-columns: repeat(2, 1fr); }
+    .dg-rev-row { grid-template-columns: 1fr 1fr; }
+    .dg-two-col { grid-template-columns: 1fr; }
+}
+@@media (max-width: 640px) {
+    .dg-stats { grid-template-columns: 1fr 1fr; }
+    .dg-rev-row { grid-template-columns: 1fr; }
+    .dg-greeting { flex-direction: column; gap: 1rem; align-items: flex-start; }
+}
 </style>
 
-<div class="container-fluid">
-    <!-- Welcome Section -->
-    <div class="mb-4">
-        <h2 class="fw-bold mb-1">Chào buổi sáng, Admin! 👋</h2>
-        <p class="text-muted">Đây là tổng quan hệ thống của bạn hôm nay</p>
+<!-- Greeting -->
+<div class="dg-greeting">
+    <div class="dg-greeting-text" style="position:relative;z-index:1;">
+        <div class="dg-greeting-tag">
+            <i class="fas fa-calendar-day"></i>
+            @DateTime.Now.ToString("dd/MM/yyyy")
+        </div>
+        <h2>@greeting, @userName!</h2>
+        <p>Hệ thống UTE Rent đang hoạt động ổn định.</p>
+    </div>
+    <div class="dg-greeting-actions">
+        <a href="@Url.Action("Products","Admin")" class="dg-btn dg-btn-yellow">
+            <i class="fas fa-box"></i> Sản phẩm
+        </a>
+        <a href="@Url.Action("Rentals","Admin")" class="dg-btn dg-btn-ghost">
+            <i class="fas fa-handshake"></i> Đơn thuê
+        </a>
+    </div>
+</div>
+
+<!-- Stat cards -->
+<div class="dg-stats">
+    <div class="dg-stat s1">
+        <div class="dg-stat-top">
+            <div class="dg-stat-icon" style="background:#eef2ff;color:#6366f1;"><i class="fas fa-users"></i></div>
+            <span class="dg-stat-badge badge-up">+12%</span>
+        </div>
+        <div class="dg-stat-label">Tổng người dùng</div>
+        <div class="dg-stat-value">@Model.Stats.TotalUsers.ToString("N0")</div>
+    </div>
+    <div class="dg-stat s2">
+        <div class="dg-stat-top">
+            <div class="dg-stat-icon" style="background:var(--yellow3);color:#d97706;"><i class="fas fa-box"></i></div>
+            <span class="dg-stat-badge badge-warn">Kho</span>
+        </div>
+        <div class="dg-stat-label">Tổng sản phẩm</div>
+        <div class="dg-stat-value">@Model.Stats.TotalProducts.ToString("N0")</div>
+    </div>
+    <div class="dg-stat s3">
+        <div class="dg-stat-top">
+            <div class="dg-stat-icon" style="background:var(--green3);color:var(--green);"><i class="fas fa-handshake"></i></div>
+            <span class="dg-stat-badge badge-up">Active</span>
+        </div>
+        <div class="dg-stat-label">Đang cho thuê</div>
+        <div class="dg-stat-value">@Model.Stats.ActiveRentals</div>
+    </div>
+    <div class="dg-stat s4">
+        <div class="dg-stat-top">
+            <div class="dg-stat-icon" style="background:#fee2e2;color:#ef4444;"><i class="fas fa-clock"></i></div>
+            <span class="dg-stat-badge badge-red">Cần xử lý</span>
+        </div>
+        <div class="dg-stat-label">Chờ xác nhận</div>
+        <div class="dg-stat-value">@Model.Stats.PendingRentals</div>
+    </div>
+</div>
+
+<!-- Revenue row -->
+<div class="dg-rev-row">
+    <div class="dg-rev-card">
+        <div class="dg-rev-label"><i class="fas fa-chart-line" style="color:var(--green);"></i>Tổng doanh thu</div>
+        <div class="dg-rev-value">@Model.Stats.TotalRevenue.ToString("N0")đ</div>
+        <div class="dg-rev-note"><i class="fas fa-check-circle" style="color:var(--green);margin-right:.3rem;"></i>@Model.Stats.CompletedRentals đơn hoàn thành</div>
+        <div class="dg-rev-bar"><div class="dg-rev-fill" style="width:72%;background:var(--green);"></div></div>
+    </div>
+    <div class="dg-rev-card">
+        <div class="dg-rev-label"><i class="fas fa-percentage" style="color:#be185d;"></i>Hoa hồng (5%)</div>
+        <div class="dg-rev-value">@Model.Stats.TotalCommission.ToString("N0")đ</div>
+        <div class="dg-rev-note"><i class="fas fa-coins" style="color:#be185d;margin-right:.3rem;"></i>Từ các đơn thuê</div>
+        <div class="dg-rev-bar"><div class="dg-rev-fill" style="width:55%;background:#ec4899;"></div></div>
+    </div>
+    <div class="dg-rev-card" style="background:var(--brown);border-color:var(--brown);">
+        <div class="dg-rev-label" style="color:rgba(255,255,255,.55);"><i class="fas fa-wallet" style="color:var(--yellow);"></i>Số dư ví Admin</div>
+        <div class="dg-rev-value" style="color:var(--white);">@Model.Stats.AdminBalance.ToString("N0")đ</div>
+        <div class="dg-rev-note" style="color:rgba(255,255,255,.5);"><i class="fas fa-arrow-up" style="margin-right:.3rem;color:var(--yellow);"></i>Số dư hiện tại</div>
+        <div class="dg-rev-bar" style="background:rgba(255,255,255,.1);"><div class="dg-rev-fill" style="width:88%;background:var(--yellow);"></div></div>
+    </div>
+</div>
+
+<!-- Commission table + Users panel -->
+<div class="dg-two-col">
+
+    <!-- Commission table -->
+    <div class="dg-panel">
+        <div class="dg-panel-header">
+            <span class="dg-panel-title"><i class="fas fa-history"></i>Hoa hồng gần đây</span>
+            <a href="@Url.Action("Commissions","Admin")" class="dg-panel-link">Xem tất cả →</a>
+        </div>
+        @if (Model.RecentCommissions.Any())
+        {
+            <table class="dg-table">
+                <thead>
+                    <tr>
+                        <th>Mã GD</th>
+                        <th>Mô tả</th>
+                        <th>Số tiền</th>
+                        <th>Đơn thuê</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.RecentCommissions.Take(6))
+                    {
+                        <tr>
+                            <td><span class="dg-badge dg-badge-cream">#@c.TransactionId</span></td>
+                            <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@c.Description</td>
+                            <td style="font-weight:700;color:var(--green);">+@c.Amount.ToString("N0")đ</td>
+                            <td>
+                                @if (c.ReferenceId.HasValue)
+                                { <span class="dg-badge dg-badge-green">#@c.ReferenceId</span> }
+                                else { <span style="color:var(--cream3);">—</span> }
+                            </td>
+                            <td style="color:var(--brown3);font-size:.75rem;">@c.CreatedAt.ToString("dd/MM HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="dg-empty">
+                <i class="fas fa-inbox"></i>
+                <p>Chưa có giao dịch hoa hồng</p>
+            </div>
+        }
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="stat-label">Người dùng</div>
-                            <div class="stat-value">@Model.Stats.TotalUsers</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- New users -->
+    <div class="dg-panel">
+        <div class="dg-panel-header">
+            <span class="dg-panel-title"><i class="fas fa-user-plus"></i>Người dùng mới</span>
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="stat-label">Sản phẩm</div>
-                            <div class="stat-value">@Model.Stats.TotalProducts</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="stat-label">Đang thuê</div>
-                            <div class="stat-value">@Model.Stats.ActiveRentals</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="ms-3 flex-grow-1">
-                            <div class="stat-label">Chờ xác nhận</div>
-                            <div class="stat-value">@Model.Stats.PendingRentals</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Revenue Stats -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="revenue-card card">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
-                        <h6 class="ms-2 mb-0 opacity-75">Tổng doanh thu</h6>
-                    </div>
-                    <h2 class="fw-bold mb-2">@Model.Stats.TotalRevenue.ToString("N0")đ</h2>
-                    <p class="mb-0 opacity-75">
-                        <i class="fas fa-check-circle me-1"></i>
-                        @Model.Stats.CompletedRentals đơn hoàn thành
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="commission-card card">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-percentage fa-2x opacity-75"></i>
-                        <h6 class="ms-2 mb-0 opacity-75">Hoa hồng (5%)</h6>
-                    </div>
-                    <h2 class="fw-bold mb-2">@Model.Stats.TotalCommission.ToString("N0")đ</h2>
-                    <p class="mb-0 opacity-75">
-                        <i class="fas fa-coins me-1"></i>
-                        Từ các đơn thuê
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="balance-card card">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-wallet fa-2x opacity-75"></i>
-                        <h6 class="ms-2 mb-0 opacity-75">Số dư ví Admin</h6>
-                    </div>
-                    <h2 class="fw-bold mb-2">@Model.Stats.AdminBalance.ToString("N0")đ</h2>
-                    <p class="mb-0 opacity-75">
-                        <i class="fas fa-arrow-up me-1"></i>
-                        Số dư hiện tại
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Links -->
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <a href="@Url.Action("Users", "Admin")" class="quick-link-card card">
-                <div class="card-body text-center p-4">
-                    <div class="quick-link-icon" style="background: rgba(102, 126, 234, 0.1);">
-                        <i class="fas fa-users" style="color: #667eea;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Người dùng</h5>
-                    <p class="text-muted mb-0 small">Quản lý tài khoản</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <a href="@Url.Action("Products", "Admin")" class="quick-link-card card">
-                <div class="card-body text-center p-4">
-                    <div class="quick-link-icon" style="background: rgba(16, 185, 129, 0.1);">
-                        <i class="fas fa-box" style="color: #10b981;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Sản phẩm</h5>
-                    <p class="text-muted mb-0 small">Quản lý kho hàng</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <a href="@Url.Action("Rentals", "Admin")" class="quick-link-card card">
-                <div class="card-body text-center p-4">
-                    <div class="quick-link-icon" style="background: rgba(245, 158, 11, 0.1);">
-                        <i class="fas fa-handshake" style="color: #f59e0b;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Đơn thuê</h5>
-                    <p class="text-muted mb-0 small">Theo dõi giao dịch</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-            <a href="@Url.Action("Commissions", "Admin")" class="quick-link-card card">
-                <div class="card-body text-center p-4">
-                    <div class="quick-link-icon" style="background: rgba(59, 130, 246, 0.1);">
-                        <i class="fas fa-dollar-sign" style="color: #3b82f6;"></i>
-                    </div>
-                    <h5 class="fw-bold mb-2">Hoa hồng</h5>
-                    <p class="text-muted mb-0 small">Lịch sử thu nhập</p>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- Recent Commissions -->
-    <div class="table-card card">
-        <div class="card-header text-white">
-            <div class="d-flex align-items-center justify-content-between">
-                <h5 class="mb-0">
-                    <i class="fas fa-history me-2"></i>
-                    Hoa hồng gần đây
-                </h5>
-                <a href="@Url.Action("Commissions", "Admin")" class="btn btn-sm btn-light">
-                    Xem tất cả
-                </a>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            @if (Model.RecentCommissions.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="px-4 py-3">ID</th>
-                                <th class="py-3">Mô tả</th>
-                                <th class="py-3">Số tiền</th>
-                                <th class="py-3">Đơn thuê</th>
-                                <th class="py-3">Thời gian</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var commission in Model.RecentCommissions)
-                            {
-                                <tr>
-                                    <td class="px-4 py-3">
-                                        <span class="badge badge-custom" style="background: #f3f4f6; color: #1f2937;">
-                                            #@commission.TransactionId
-                                        </span>
-                                    </td>
-                                    <td class="py-3">@commission.Description</td>
-                                    <td class="py-3">
-                                        <span class="fw-bold" style="color: #10b981;">
-                                            <i class="fas fa-arrow-up me-1"></i>
-                                            @commission.Amount.ToString("N0")đ
-                                        </span>
-                                    </td>
-                                    <td class="py-3">
-                                        @if (commission.ReferenceId.HasValue)
-                                        {
-                                            <span class="badge badge-custom" style="background: #dbeafe; color: #1e40af;">
-                                                #@commission.ReferenceId
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                    <td class="py-3 text-muted">
-                                        <i class="far fa-clock me-1"></i>
-                                        @commission.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+        <div class="dg-user-list">
+            @{
+                var sampleUsers = new[] {
+                    new { Name="Hoàng Nam",     Role="Student",  Init="HN" },
+                    new { Name="Nguyễn Thu Hà", Role="Landlord", Init="NH" },
+                    new { Name="Đặng Mỹ Linh",  Role="Student",  Init="DL" },
+                    new { Name="Trần Văn B",    Role="Student",  Init="TB" },
+                };
             }
-            else
+            @foreach (var u in sampleUsers)
             {
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">Chưa có giao dịch hoa hồng nào</p>
+                <div class="dg-user-row">
+                    <div class="dg-user-av">@u.Init</div>
+                    <div>
+                        <div class="dg-user-name">@u.Name</div>
+                        <div class="dg-user-role">@u.Role</div>
+                    </div>
+                    <button class="dg-lock-btn">Khoá</button>
                 </div>
             }
         </div>
+        <div class="dg-panel-footer">
+            <a href="@Url.Action("Users","Admin")">Quản lý tất cả người dùng →</a>
+        </div>
     </div>
+
 </div>

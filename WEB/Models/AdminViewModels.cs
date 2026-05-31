@@ -60,6 +60,7 @@ namespace WEB.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string ProductName { get; set; } = string.Empty;
+        public string? ProductImageUrl { get; set; }
         public string RenterName { get; set; } = string.Empty;
         public string RenterEmail { get; set; } = string.Empty;
         public string OwnerName { get; set; } = string.Empty;
@@ -78,6 +79,8 @@ namespace WEB.Models
     {
         public int ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
         public decimal PricePerDay { get; set; }
         public decimal Deposit { get; set; }
         public int Quantity { get; set; }

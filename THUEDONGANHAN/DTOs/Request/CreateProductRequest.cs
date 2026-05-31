@@ -20,5 +20,7 @@ namespace THUEDONGANHAN.DTOs.Request
         public string ProductType { get; set; } = "Rent"; // Rent | Sale | Both
         public bool IsForSale { get; set; } = false;
         public decimal? SalePrice { get; set; }
+        
+        public List<string> ProductImages { get; set; } = new List<string>();
     }
 }

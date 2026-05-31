@@ -23,22 +23,22 @@
                             <div class="col-md-3">
                                 <select name="paymentType" class="form-select">
                                     <option value="">-- Loại thanh toán --</option>
-                                    <option value="RentalFee" selected="@(paymentType == "RentalFee")">Rental Fee</option>
-                                    <option value="Deposit" selected="@(paymentType == "Deposit")">Deposit</option>
-                                    <option value="LateFee" selected="@(paymentType == "LateFee")">Late Fee</option>
-                                    <option value="DamageFee" selected="@(paymentType == "DamageFee")">Damage Fee</option>
-                                    <option value="DepositRefund" selected="@(paymentType == "DepositRefund")">Deposit Refund</option>
-                                    <option value="SalePayment" selected="@(paymentType == "SalePayment")">Sale Payment</option>
+                                    @if (paymentType == "RentalFee")     { <option value="RentalFee"     selected>Rental Fee</option>     } else { <option value="RentalFee">Rental Fee</option>     }
+                                    @if (paymentType == "Deposit")       { <option value="Deposit"       selected>Deposit</option>       } else { <option value="Deposit">Deposit</option>       }
+                                    @if (paymentType == "LateFee")       { <option value="LateFee"       selected>Late Fee</option>       } else { <option value="LateFee">Late Fee</option>       }
+                                    @if (paymentType == "DamageFee")     { <option value="DamageFee"     selected>Damage Fee</option>     } else { <option value="DamageFee">Damage Fee</option>     }
+                                    @if (paymentType == "DepositRefund") { <option value="DepositRefund" selected>Deposit Refund</option> } else { <option value="DepositRefund">Deposit Refund</option> }
+                                    @if (paymentType == "SalePayment")   { <option value="SalePayment"   selected>Sale Payment</option>   } else { <option value="SalePayment">Sale Payment</option>   }
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <select name="paymentStatus" class="form-select">
                                     <option value="">-- Trạng thái --</option>
-                                    <option value="Pending" selected="@(paymentStatus == "Pending")">Pending</option>
-                                    <option value="Completed" selected="@(paymentStatus == "Completed")">Completed</option>
-                                    <option value="Failed" selected="@(paymentStatus == "Failed")">Failed</option>
-                                    <option value="Refunded" selected="@(paymentStatus == "Refunded")">Refunded</option>
-                                    <option value="Cancelled" selected="@(paymentStatus == "Cancelled")">Cancelled</option>
+                                    @if (paymentStatus == "Pending")   { <option value="Pending"   selected>Pending</option>   } else { <option value="Pending">Pending</option>   }
+                                    @if (paymentStatus == "Completed") { <option value="Completed" selected>Completed</option> } else { <option value="Completed">Completed</option> }
+                                    @if (paymentStatus == "Failed")    { <option value="Failed"    selected>Failed</option>    } else { <option value="Failed">Failed</option>    }
+                                    @if (paymentStatus == "Refunded")  { <option value="Refunded"  selected>Refunded</option>  } else { <option value="Refunded">Refunded</option>  }
+                                    @if (paymentStatus == "Cancelled") { <option value="Cancelled" selected>Cancelled</option> } else { <option value="Cancelled">Cancelled</option> }
                                 </select>
                             </div>
                             <div class="col-md-2">

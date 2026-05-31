@@ -22,6 +22,8 @@ namespace WEB.Models
         // Navigation properties
         public CategoryViewModel? Category { get; set; }
         public UserViewModel? Owner { get; set; }
+
+        public List<string> ProductImages { get; set; } = new List<string>();
     }
 
     public class UserViewModel

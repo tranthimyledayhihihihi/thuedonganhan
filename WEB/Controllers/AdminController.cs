@@ -86,7 +86,7 @@ namespace WEB.Controllers
         }
 
         // GET: /Admin/Users
-        public async Task<IActionResult> Users(int page = 1, string? search = null)
+        public async Task<IActionResult> Users(int page = 1, string? search = null, string? filterType = "all")
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -97,20 +97,43 @@ namespace WEB.Controllers
                 if (!string.IsNullOrWhiteSpace(search))
                     endpoint += $"&search={Uri.EscapeDataString(search)}";
 
+                // Truyền filterType xuống API nếu API hỗ trợ, hoặc lọc client-side
+                if (!string.IsNullOrWhiteSpace(filterType) && filterType != "all")
+                    endpoint += $"&userType={Uri.EscapeDataString(filterType)}";
+
                 var response = await _apiService.GetAsync<ApiResponse<JsonElement>>(endpoint);
-                
+
                 if (response?.Success == true && response.Data.ValueKind != JsonValueKind.Undefined)
                 {
                     var data = response.Data;
-                    var result = new AdminPagedResult<AdminUserViewModel>
+                    var allItems = JsonSerializer.Deserialize<List<AdminUserViewModel>>(
+                        data.GetProperty("items").GetRawText(), _jsonOptions) ?? new();
+                    var pagination = JsonSerializer.Deserialize<AdminPagination>(
+                        data.GetProperty("pagination").GetRawText(), _jsonOptions) ?? new();
+
+                    // Client-side filter nếu API chưa hỗ trợ filterType
+                    var filtered = filterType switch
                     {
-                        Items = JsonSerializer.Deserialize<List<AdminUserViewModel>>(
-                            data.GetProperty("items").GetRawText(), _jsonOptions) ?? new(),
-                        Pagination = JsonSerializer.Deserialize<AdminPagination>(
-                            data.GetProperty("pagination").GetRawText(), _jsonOptions) ?? new()
+                        "student" => allItems.Where(u => u.UserType == "Student").ToList(),
+                        "lender"  => allItems.Where(u => u.UserType == "Lender" || u.UserType == "Owner").ToList(),
+                        "locked"  => allItems.Where(u => !u.IsActive).ToList(),
+                        _         => allItems
                     };
 
-                    ViewBag.Search = search;
+                    var result = new AdminPagedResult<AdminUserViewModel>
+                    {
+                        Items      = filtered,
+                        Pagination = pagination
+                    };
+
+                    ViewBag.Search     = search;
+                    ViewBag.FilterType = filterType ?? "all";
+
+                    // Stats cho stat cards (tính từ toàn bộ danh sách trang hiện tại)
+                    ViewBag.TotalStudents = allItems.Count(u => u.UserType == "Student");
+                    ViewBag.TotalLenders  = allItems.Count(u => u.UserType == "Lender" || u.UserType == "Owner");
+                    ViewBag.TotalLocked   = allItems.Count(u => !u.IsActive);
+
                     return View(result);
                 }
             }
@@ -120,11 +143,14 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể tải danh sách người dùng";
             }
 
+            ViewBag.Search     = search;
+            ViewBag.FilterType = filterType ?? "all";
             return View(new AdminPagedResult<AdminUserViewModel>());
         }
 
         // GET: /Admin/Rentals
-        public async Task<IActionResult> Rentals(int page = 1, string? status = null)
+        public async Task<IActionResult> Rentals(int page = 1, string? status = null,
+            string? fromDate = null, string? toDate = null)
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -134,9 +160,13 @@ namespace WEB.Controllers
                 var endpoint = $"Admin/rentals?page={page}&pageSize=20";
                 if (!string.IsNullOrWhiteSpace(status))
                     endpoint += $"&status={Uri.EscapeDataString(status)}";
+                if (!string.IsNullOrWhiteSpace(fromDate))
+                    endpoint += $"&fromDate={Uri.EscapeDataString(fromDate)}";
+                if (!string.IsNullOrWhiteSpace(toDate))
+                    endpoint += $"&toDate={Uri.EscapeDataString(toDate)}";
 
                 var response = await _apiService.GetAsync<ApiResponse<JsonElement>>(endpoint);
-                
+
                 if (response?.Success == true && response.Data.ValueKind != JsonValueKind.Undefined)
                 {
                     var data = response.Data;
@@ -148,7 +178,9 @@ namespace WEB.Controllers
                             data.GetProperty("pagination").GetRawText(), _jsonOptions) ?? new()
                     };
 
-                    ViewBag.Status = status;
+                    ViewBag.Status   = status ?? "";
+                    ViewBag.FromDate = fromDate ?? "";
+                    ViewBag.ToDate   = toDate ?? "";
                     return View(result);
                 }
             }
@@ -158,6 +190,9 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể tải danh sách đơn thuê";
             }
 
+            ViewBag.Status   = status ?? "";
+            ViewBag.FromDate = fromDate ?? "";
+            ViewBag.ToDate   = toDate ?? "";
             return View(new AdminPagedResult<AdminRentalViewModel>());
         }
 
@@ -196,7 +231,7 @@ namespace WEB.Controllers
         }
 
         // GET: /Admin/Products
-        public async Task<IActionResult> Products(int page = 1, string? search = null)
+        public async Task<IActionResult> Products(int page = 1, string? search = null, string? filterCat = "all")
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -220,7 +255,8 @@ namespace WEB.Controllers
                             data.GetProperty("pagination").GetRawText(), _jsonOptions) ?? new()
                     };
 
-                    ViewBag.Search = search;
+                    ViewBag.Search    = search;
+                    ViewBag.FilterCat = filterCat ?? "all";
                     return View(result);
                 }
             }
@@ -230,13 +266,15 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể tải danh sách sản phẩm";
             }
 
+            ViewBag.Search    = search;
+            ViewBag.FilterCat = filterCat ?? "all";
             return View(new AdminPagedResult<AdminProductViewModel>());
         }
 
         // POST: /Admin/ToggleUserActive
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleUserActive(int userId)
+        public async Task<IActionResult> ToggleUserActive(int userId, string? search = null, string? filterType = "all")
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -257,13 +295,13 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể thực hiện thao tác";
             }
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(Users), new { search, filterType });
         }
 
         // POST: /Admin/DeleteProduct
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteProduct(int productId)
+        public async Task<IActionResult> DeleteProduct(int productId, string? search = null, string? filterCat = "all")
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -283,7 +321,119 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể xóa sản phẩm";
             }
 
-            return RedirectToAction(nameof(Products));
+            return RedirectToAction(nameof(Products), new { search, filterCat });
+        }
+
+        // POST: /Admin/DeleteBulkProducts
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBulkProducts(string productIds, string? search = null, string? filterCat = "all")
+        {
+            if (!IsAdmin())
+                return RedirectToAction("Index", "Home");
+
+            if (string.IsNullOrWhiteSpace(productIds))
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn ít nhất một sản phẩm";
+                return RedirectToAction(nameof(Products), new { search, filterCat });
+            }
+
+            var ids = productIds.Split(',')
+                .Select(s => int.TryParse(s.Trim(), out var id) ? id : 0)
+                .Where(id => id > 0)
+                .ToList();
+
+            int successCount = 0;
+            int failCount = 0;
+
+            foreach (var id in ids)
+            {
+                try
+                {
+                    var response = await _apiService.DeleteAsync<ApiResponse<bool>>($"Admin/products/{id}");
+                    if (response?.Success == true) successCount++;
+                    else failCount++;
+                }
+                catch
+                {
+                    failCount++;
+                }
+            }
+
+            if (successCount > 0)
+                TempData["SuccessMessage"] = $"Đã xóa thành công {successCount} sản phẩm" +
+                    (failCount > 0 ? $", {failCount} sản phẩm thất bại" : "");
+            else
+                TempData["ErrorMessage"] = "Không thể xóa các sản phẩm đã chọn";
+
+            return RedirectToAction(nameof(Products), new { search, filterCat });
+        }
+
+        // GET: /Admin/EditProduct
+        public async Task<IActionResult> EditProduct(int productId, string? search = null, string? filterCat = "all")
+        {
+            if (!IsAdmin())
+                return RedirectToAction("Index", "Home");
+
+            try
+            {
+                var response = await _apiService.GetAsync<ApiResponse<JsonElement>>($"Admin/products/{productId}");
+                if (response?.Success == true && response.Data.ValueKind != JsonValueKind.Undefined)
+                {
+                    var product = JsonSerializer.Deserialize<AdminProductViewModel>(
+                        response.Data.GetRawText(), _jsonOptions);
+                    ViewBag.Search    = search;
+                    ViewBag.FilterCat = filterCat;
+                    return View(product);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading product for edit");
+            }
+
+            TempData["ErrorMessage"] = "Không thể tải thông tin sản phẩm";
+            return RedirectToAction(nameof(Products), new { search, filterCat });
+        }
+
+        // POST: /Admin/EditProduct
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProduct(int productId, string productName,
+            decimal pricePerDay, decimal deposit, int quantity,
+            string? location, string? description,
+            string? search = null, string? filterCat = "all")
+        {
+            if (!IsAdmin())
+                return RedirectToAction("Index", "Home");
+
+            try
+            {
+                var payload = new
+                {
+                    productName,
+                    pricePerDay,
+                    deposit,
+                    quantity,
+                    location,
+                    description
+                };
+
+                var response = await _apiService.PutAsync<object, ApiResponse<bool>>(
+                    $"Admin/products/{productId}", payload);
+
+                if (response?.Success == true)
+                    TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công";
+                else
+                    TempData["ErrorMessage"] = response?.Message ?? "Cập nhật thất bại";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating product");
+                TempData["ErrorMessage"] = "Không thể cập nhật sản phẩm";
+            }
+
+            return RedirectToAction(nameof(Products), new { search, filterCat });
         }
 
         // GET: /Admin/Students
@@ -539,7 +689,7 @@ namespace WEB.Controllers
         // POST: /Admin/ApproveProduct
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApproveProduct(int productId)
+        public async Task<IActionResult> ApproveProduct(int productId, string? search = null, string? filterCat = "all")
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -560,7 +710,7 @@ namespace WEB.Controllers
                 TempData["ErrorMessage"] = "Không thể thực hiện thao tác";
             }
 
-            return RedirectToAction(nameof(Products));
+            return RedirectToAction(nameof(Products), new { search, filterCat });
         }
 
         // POST: /Admin/ApproveAllProducts

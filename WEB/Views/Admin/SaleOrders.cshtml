@@ -22,10 +22,10 @@
                             <div class="col-md-4">
                                 <select name="status" class="form-select">
                                     <option value="">-- Tất cả trạng thái --</option>
-                                    <option value="Pending" selected="@(status == "Pending")">Pending</option>
-                                    <option value="Confirmed" selected="@(status == "Confirmed")">Confirmed</option>
-                                    <option value="Completed" selected="@(status == "Completed")">Completed</option>
-                                    <option value="Cancelled" selected="@(status == "Cancelled")">Cancelled</option>
+                                    @if (status == "Pending")   { <option value="Pending"   selected>Pending</option>   } else { <option value="Pending">Pending</option>   }
+                                    @if (status == "Confirmed") { <option value="Confirmed" selected>Confirmed</option> } else { <option value="Confirmed">Confirmed</option> }
+                                    @if (status == "Completed") { <option value="Completed" selected>Completed</option> } else { <option value="Completed">Completed</option> }
+                                    @if (status == "Cancelled") { <option value="Cancelled" selected>Cancelled</option> } else { <option value="Cancelled">Cancelled</option> }
                                 </select>
                             </div>
                             <div class="col-md-2">

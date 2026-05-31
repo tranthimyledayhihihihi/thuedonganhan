@@ -1,132 +1,160 @@
 @model WEB.Models.AdminCommissionsViewModel
 @{
-    ViewData["Title"] = "Quản lý hoa hồng";
+    ViewData["Title"] = "Hoa hồng";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid py-4">
-    <!-- Admin Balance Card -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card bg-gradient-primary text-white">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h4 class="mb-2"><i class="fas fa-wallet"></i> Số dư ví Admin</h4>
-                            <h2 class="mb-0 fw-bold">@Model.AdminBalance.ToString("N0")đ</h2>
-                            <p class="mb-0 mt-2 opacity-75">Tổng hoa hồng 5% từ các đơn thuê đã giao hàng</p>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <i class="fas fa-chart-line fa-5x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<style>
+.adm-page-header { margin-bottom: 1.5rem; }
+.adm-page-header h1 { font-size: 1.45rem; font-weight: 800; color: #111827; margin-bottom: .25rem; }
+.adm-page-header p  { font-size: .875rem; color: #6b7280; }
 
-    <!-- Commissions Table -->
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Lịch sử hoa hồng (@Model.Pagination.TotalItems giao dịch)</h5>
-        </div>
-        <div class="card-body">
-            @if (Model.Items.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Mô tả</th>
-                                <th>Số tiền</th>
-                                <th>Loại</th>
-                                <th>Đơn thuê</th>
-                                <th>Thời gian</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var commission in Model.Items)
-                            {
-                                <tr>
-                                    <td><strong>#@commission.TransactionId</strong></td>
-                                    <td>@commission.Description</td>
-                                    <td class="text-success fw-bold">
-                                        <i class="fas fa-arrow-up"></i> +@commission.Amount.ToString("N0")đ
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">@commission.Type</span>
-                                    </td>
-                                    <td>
-                                        @if (commission.ReferenceId.HasValue)
-                                        {
-                                            <span class="badge bg-secondary">#@commission.ReferenceId</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                    <td>@commission.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+/* Balance hero card */
+.balance-hero {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-radius: 16px; padding: 2rem 2.5rem;
+    color: #fff; margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(13,148,136,.25);
+}
+.balance-hero-left {}
+.balance-hero-label { font-size: .82rem; font-weight: 600; opacity: .8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: .5rem; }
+.balance-hero-value { font-size: 2.5rem; font-weight: 800; margin-bottom: .4rem; }
+.balance-hero-note  { font-size: .85rem; opacity: .8; }
+.balance-hero-icon  { font-size: 5rem; opacity: .2; }
 
-                <!-- Pagination -->
-                @if (Model.Pagination.TotalPages > 1)
-                {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage - 1 })">
-                                    Trước
-                                </a>
-                            </li>
+/* Info box */
+.info-box {
+    background: #f0fdfa; border: 1px solid #99f6e4;
+    border-radius: 12px; padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.info-box h4 { font-size: .95rem; font-weight: 700; color: #0f766e; margin-bottom: .75rem; }
+.info-box ul { margin: 0; padding-left: 1.25rem; }
+.info-box li { font-size: .875rem; color: #134e4a; margin-bottom: .35rem; line-height: 1.5; }
 
-                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Commissions", new { page = i })">@i</a>
-                                </li>
-                            }
+.adm-panel { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; margin-bottom: 1.25rem; }
+.adm-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-bottom: 1px solid #f3f4f6; }
+.adm-panel-title { font-size: 1rem; font-weight: 700; color: #111827; }
+.adm-table { width: 100%; border-collapse: collapse; }
+.adm-table th { font-size: .7rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; padding: .75rem 1.2rem; text-align: left; border-bottom: 1px solid #f3f4f6; background: #fafafa; white-space: nowrap; }
+.adm-table td { padding: .9rem 1.2rem; border-bottom: 1px solid #f9fafb; font-size: .875rem; color: #374151; vertical-align: middle; }
+.adm-table tr:last-child td { border-bottom: none; }
+.adm-table tr:hover td { background: #fafafa; }
+.badge-pill { display: inline-block; padding: .25rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+.badge-commission { background: #ede9fe; color: #7c3aed; }
+.adm-pagination { display: flex; justify-content: center; align-items: center; gap: .4rem; padding: 1.1rem 1.4rem; border-top: 1px solid #f3f4f6; }
+.adm-page-btn { min-width: 36px; height: 36px; padding: 0 .6rem; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #374151; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .18s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.adm-page-btn:hover { border-color: #0d9488; color: #0d9488; }
+.adm-page-btn.active { background: #0d9488; border-color: #0d9488; color: #fff; }
+.adm-page-btn.disabled { opacity: .4; pointer-events: none; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; }
+.empty-state i { font-size: 2.5rem; margin-bottom: .75rem; display: block; }
+</style>
 
-                            <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage + 1 })">
-                                    Sau
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                }
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-                    <p class="text-muted">Chưa có giao dịch hoa hồng nào</p>
-                </div>
-            }
-        </div>
-    </div>
-
-    <!-- Info Box -->
-    <div class="card mt-4 border-info">
-        <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-info-circle text-info"></i> Thông tin về hoa hồng</h5>
-            <ul class="mb-0">
-                <li>Hệ thống tự động thu <strong>5% hoa hồng</strong> từ mỗi đơn thuê</li>
-                <li>Hoa hồng được tính khi <strong>người cho thuê xác nhận giao hàng</strong></li>
-                <li>Người cho thuê nhận <strong>95% giá trị đơn thuê</strong>, Admin nhận <strong>5%</strong></li>
-                <li>Tiền cọc không tính hoa hồng, sẽ được hoàn trả khi trả đồ</li>
-            </ul>
-        </div>
-    </div>
+<div class="adm-page-header">
+    <h1><i class="fas fa-coins" style="color:#0d9488;margin-right:.5rem;"></i>Hoa hồng hệ thống</h1>
+    <p>Lịch sử thu hoa hồng 5% từ các đơn thuê hoàn thành</p>
 </div>
 
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+<!-- Balance hero -->
+<div class="balance-hero">
+    <div class="balance-hero-left">
+        <div class="balance-hero-label"><i class="fas fa-wallet" style="margin-right:.4rem;"></i>Số dư ví Admin</div>
+        <div class="balance-hero-value">@Model.AdminBalance.ToString("N0")đ</div>
+        <div class="balance-hero-note">Tổng hoa hồng 5% từ @Model.Pagination.TotalItems giao dịch</div>
+    </div>
+    <div class="balance-hero-icon"><i class="fas fa-chart-line"></i></div>
+</div>
+
+<!-- Info -->
+<div class="info-box">
+    <h4><i class="fas fa-info-circle" style="margin-right:.4rem;"></i>Cơ chế hoa hồng</h4>
+    <ul>
+        <li>Hệ thống tự động thu <strong>5% hoa hồng</strong> từ mỗi đơn thuê</li>
+        <li>Hoa hồng được tính khi <strong>người cho thuê xác nhận giao hàng</strong></li>
+        <li>Người cho thuê nhận <strong>95% giá trị đơn thuê</strong>, Admin nhận <strong>5%</strong></li>
+        <li>Tiền cọc không tính hoa hồng và sẽ được hoàn trả khi trả đồ nguyên vẹn</li>
+    </ul>
+</div>
+
+<!-- Table -->
+<div class="adm-panel">
+    <div class="adm-panel-header">
+        <span class="adm-panel-title">Lịch sử giao dịch hoa hồng</span>
+        <span style="font-size:.82rem;color:#6b7280;">@Model.Pagination.TotalItems giao dịch</span>
+    </div>
+
+    @if (Model.Items.Any())
+    {
+        <div style="overflow-x:auto;">
+            <table class="adm-table">
+                <thead>
+                    <tr>
+                        <th>Mã GD</th>
+                        <th>Mô tả</th>
+                        <th>Số tiền</th>
+                        <th>Loại</th>
+                        <th>Đơn thuê</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <span style="background:#f3f4f6;color:#374151;padding:.2rem .6rem;border-radius:6px;font-size:.78rem;font-weight:700;">
+                                    #@c.TransactionId
+                                </span>
+                            </td>
+                            <td style="color:#374151;">@c.Description</td>
+                            <td style="font-weight:700;color:#10b981;">
+                                <i class="fas fa-arrow-up" style="font-size:.7rem;"></i> +@c.Amount.ToString("N0")đ
+                            </td>
+                            <td><span class="badge-pill badge-commission">@c.Type</span></td>
+                            <td>
+                                @if (c.ReferenceId.HasValue)
+                                {
+                                    <span style="background:#dbeafe;color:#1e40af;padding:.2rem .6rem;border-radius:6px;font-size:.78rem;font-weight:700;">
+                                        #@c.ReferenceId
+                                    </span>
+                                }
+                                else { <span style="color:#9ca3af;">—</span> }
+                            </td>
+                            <td style="color:#9ca3af;font-size:.82rem;">
+                                <i class="far fa-clock" style="margin-right:.3rem;"></i>@c.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.Pagination.TotalPages > 1)
+        {
+            <div class="adm-pagination">
+                <a class="adm-page-btn @(!Model.Pagination.HasPreviousPage ? "disabled" : "")"
+                   href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage - 1 })">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                {
+                    <a class="adm-page-btn @(i == Model.Pagination.CurrentPage ? "active" : "")"
+                       href="@Url.Action("Commissions", new { page = i })">@i</a>
+                }
+                <a class="adm-page-btn @(!Model.Pagination.HasNextPage ? "disabled" : "")"
+                   href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage + 1 })">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        }
     }
-</style>
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Chưa có giao dịch hoa hồng nào</p>
+        </div>
+    }
+</div>

@@ -162,10 +162,68 @@
                 <div class="products-grid">
                     @foreach (var product in Model)
                     {
+                        var cardImageUrl = product.ImageUrl;
+                        var pName = product.ProductName?.ToLower() ?? "";
+                        var cName = product.Category?.CategoryName?.ToLower() ?? "";
+
+                        // Perfect overrides for mock data placeholders
+                        bool isPlaceholder = string.IsNullOrEmpty(cardImageUrl) || cardImageUrl.Contains("unsplash.com");
+                        if (isPlaceholder)
+                        {
+                            if (pName.Contains("áo dài") || cName.Contains("áo dài"))
+                            {
+                                cardImageUrl = "/images/aodai.png";
+                            }
+                            else if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp"))
+                            {
+                                cardImageUrl = "/images/dototnghiep.png";
+                            }
+                            else if (pName.Contains("vest") || pName.Contains("suit"))
+                            {
+                                cardImageUrl = "/images/vestnam.png";
+                            }
+                            else if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4"))
+                            {
+                                cardImageUrl = "/images/tainghe.png";
+                            }
+                            else if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu"))
+                            {
+                                cardImageUrl = "/images/maychieu.png";
+                            }
+                            else if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ"))
+                            {
+                                cardImageUrl = "/images/guitar.png";
+                            }
+                            else if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike"))
+                            {
+                                cardImageUrl = "/images/xedap.png";
+                            }
+                            else if (pName.Contains("ipad") || pName.Contains("tablet"))
+                            {
+                                cardImageUrl = "/images/ipad.png";
+                            }
+                            else if (pName.Contains("macbook") || pName.Contains("laptop"))
+                            {
+                                cardImageUrl = "/images/mac.png";
+                            }
+                            else if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh"))
+                            {
+                                cardImageUrl = "/images/mayanh.png";
+                            }
+                            else if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ"))
+                            {
+                                cardImageUrl = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
+                            }
+                            else if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách"))
+                            {
+                                cardImageUrl = "/images/giaitich1.png";
+                            }
+                        }
+
                         <div class="product-card">
                             <div class="product-card-image">
                                 <a asp-action="Details" asp-route-id="@product.ProductId">
-                                    <img src="@product.ImageUrl" alt="@product.ProductName" />
+                                    <img src="@cardImageUrl" alt="@product.ProductName" />
                                 </a>
                                 <button class="product-favorite">
                                     <i class="far fa-heart"></i>

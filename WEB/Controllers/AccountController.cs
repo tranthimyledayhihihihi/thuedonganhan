@@ -46,7 +46,6 @@ namespace WEB.Controllers
                     HttpContext.Session.SetString("UserRole", response.Data.Role);
                     HttpContext.Session.SetInt32("UserId", response.Data.UserId);
 
-                    TempData["SuccessMessage"] = "Đăng nhập thành công!";
 
                     // ✅ Nếu là Admin → chuyển đến Admin Dashboard
                     if (response.Data.Role == "Admin")
@@ -161,7 +160,6 @@ namespace WEB.Controllers
                     HttpContext.Session.SetString("UserRole", response.Data.Role);
                     HttpContext.Session.SetInt32("UserId", response.Data.UserId);
 
-                    TempData["SuccessMessage"] = "Xác thực thành công! Đăng nhập tự động.";
 
                     // ✅ Nếu là Admin → chuyển đến Admin Dashboard
                     if (response.Data.Role == "Admin")
@@ -188,7 +186,6 @@ namespace WEB.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            TempData["SuccessMessage"] = "Đăng xuất thành công!";
             return RedirectToAction("Index", "Home");
         }
     }

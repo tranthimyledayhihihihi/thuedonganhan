@@ -170,6 +170,7 @@
                             </div>
                             <input type="file" id="imageUpload" name="images" multiple accept="image/*" style="display: none;" />
                             <input type="hidden" id="imageUrlInput" name="ImageUrl" />
+                            <input type="hidden" id="productImagesInput" name="ProductImagesJson" />
                         </div>
 
                         <div class="image-preview-grid" id="imagePreviewGrid">
@@ -803,6 +804,7 @@
                 if (uploadedImages.length === 1) {
                     imageUrlInput.value = imageData;
                 }
+                document.getElementById('productImagesInput').value = JSON.stringify(uploadedImages);
             };
             reader.readAsDataURL(file);
         });
@@ -841,6 +843,7 @@
         } else {
             imageUrlInput.value = '';
         }
+        document.getElementById('productImagesInput').value = JSON.stringify(uploadedImages);
     }
 
     // ========== CALENDAR FOR UNAVAILABLE DATES ==========

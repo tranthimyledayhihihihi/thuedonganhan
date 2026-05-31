@@ -21,5 +21,8 @@ namespace WEB.Models
         public string ProductType { get; set; } = "Rent";
         public bool IsForSale { get; set; } = false;
         public decimal? SalePrice { get; set; }
+
+        public List<string> ProductImages { get; set; } = new List<string>();
+        public string? ProductImagesJson { get; set; }
     }
 }

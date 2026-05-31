@@ -146,6 +146,7 @@ namespace THUEDONGANHAN.Controllers
                 var product = await _context.Products
                     .Include(p => p.Category)
                     .Include(p => p.Owner)
+                    .Include(p => p.ProductImages)
                     .FirstOrDefaultAsync(p => p.ProductId == id);
 
                 if (product == null)
@@ -418,6 +419,27 @@ namespace THUEDONGANHAN.Controllers
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
 
+                if (request.ProductImages != null && request.ProductImages.Any())
+                {
+                    int sortOrder = 0;
+                    foreach (var base64Img in request.ProductImages)
+                    {
+                        var imgPath = await SaveBase64ImageAsync(base64Img);
+                        if (!string.IsNullOrEmpty(imgPath))
+                        {
+                            var productImage = new ProductImage
+                            {
+                                ProductId = product.ProductId,
+                                ImageUrl = imgPath,
+                                SortOrder = sortOrder++,
+                                CreatedAt = DateTime.Now
+                            };
+                            _context.ProductImages.Add(productImage);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
                 Console.WriteLine($"[ProductController] Product created successfully with ID: {product.ProductId}");
 
                 var createdProduct = await _context.Products
@@ -575,7 +597,14 @@ namespace THUEDONGANHAN.Controllers
                     FullName = p.Owner.FullName,
                     Email = p.Owner.Email,
                     PhoneNumber = p.Owner.PhoneNumber
-                } : null
+                } : null,
+                ProductImages = p.ProductImages != null
+                    ? p.ProductImages.OrderBy(pi => pi.SortOrder).Select(pi =>
+                        (!string.IsNullOrEmpty(pi.ImageUrl) && pi.ImageUrl.StartsWith("/uploads/"))
+                            ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{pi.ImageUrl}"
+                            : pi.ImageUrl
+                    ).ToList()
+                    : new List<string>()
             };
         }
     }

@@ -324,6 +324,10 @@ namespace THUEDONGANHAN.Controllers
                     {
                         p.ProductId,
                         p.ProductName,
+                        Description = p.Description,
+                        ImageUrl = (!string.IsNullOrEmpty(p.ImageUrl) && p.ImageUrl.StartsWith("/uploads/"))
+                            ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{p.ImageUrl}"
+                            : p.ImageUrl,
                         p.PricePerDay,
                         p.Deposit,
                         p.Quantity,
@@ -410,6 +414,34 @@ namespace THUEDONGANHAN.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting product");
+                return StatusCode(500, ApiResponse<bool>.ErrorResponse($"Lỗi server: {ex.Message}"));
+            }
+        }
+
+        // PUT: api/Admin/products/{id}
+        [HttpPut("products/{id}")]
+        public async Task<ActionResult<ApiResponse<bool>>> EditProduct(int id, [FromBody] EditProductAdminRequest request)
+        {
+            try
+            {
+                var product = await _context.Products.FindAsync(id);
+                if (product == null)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Sản phẩm không tồn tại"));
+
+                product.ProductName = request.ProductName;
+                product.PricePerDay = request.PricePerDay;
+                product.Deposit = request.Deposit;
+                product.Quantity = request.Quantity;
+                product.Location = request.Location;
+                product.Description = request.Description;
+                product.UpdatedAt = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<bool>.SuccessResponse(true, "Cập nhật sản phẩm thành công"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error editing product by admin");
                 return StatusCode(500, ApiResponse<bool>.ErrorResponse($"Lỗi server: {ex.Message}"));
             }
         }
@@ -539,7 +571,9 @@ namespace THUEDONGANHAN.Controllers
                         so.CreatedAt,
                         so.UpdatedAt,
                         ProductName = so.Product.ProductName,
-                        ProductImage = so.Product.ImageUrl,
+                        ProductImage = (!string.IsNullOrEmpty(so.Product.ImageUrl) && so.Product.ImageUrl.StartsWith("/uploads/"))
+                            ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{so.Product.ImageUrl}"
+                            : so.Product.ImageUrl,
                         BuyerName = so.Buyer.FullName,
                         BuyerEmail = so.Buyer.Email,
                         PreviousOwnerId = so.PreviousOwnerId,
@@ -1027,7 +1061,9 @@ namespace THUEDONGANHAN.Controllers
                         p.PricePerMonth,
                         p.Deposit,
                         p.ProductType,
-                        p.ImageUrl,
+                        ImageUrl = (!string.IsNullOrEmpty(p.ImageUrl) && p.ImageUrl.StartsWith("/uploads/"))
+                            ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{p.ImageUrl}"
+                            : p.ImageUrl,
                         p.Location,
                         p.CreatedAt,
                         OwnerName = p.Owner != null ? p.Owner.FullName : "N/A",
@@ -1110,5 +1146,15 @@ namespace THUEDONGANHAN.Controllers
                 return StatusCode(500, ApiResponse<bool>.ErrorResponse($"Lỗi server: {ex.Message}"));
             }
         }
+    }
+
+    public class EditProductAdminRequest
+    {
+        public string ProductName { get; set; } = string.Empty;
+        public decimal PricePerDay { get; set; }
+        public decimal Deposit { get; set; }
+        public int Quantity { get; set; }
+        public string? Location { get; set; }
+        public string? Description { get; set; }
     }
 }

@@ -2,135 +2,471 @@
 @{
     ViewData["Title"] = "Quản lý người dùng";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var search      = ViewBag.Search as string ?? "";
+    var filterType  = ViewBag.FilterType as string ?? "all";
+    var currentPage = Model.Pagination.CurrentPage;
+
+    var totalUsers    = Model.Pagination.TotalItems;
+    var totalStudents = Model.Items.Count(u => u.UserType == "Student");
+    var totalLenders  = Model.Items.Count(u => u.UserType == "Lender" || u.UserType == "Owner");
+    var totalLocked   = Model.Items.Count(u => !u.IsActive);
 }
 
-<div class="container-fluid py-4">
-    <!-- Search -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" asp-action="Users" class="row g-3">
-                <div class="col-md-10">
-                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên, email, số điện thoại..." value="@ViewBag.Search">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search"></i> Tìm kiếm
-                    </button>
-                </div>
-            </form>
+<style>
+/* ── Page header ─────────────────────────────────────── */
+.um-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; flex-wrap: wrap;
+    gap: 1rem; margin-bottom: 1.75rem;
+}
+.um-header-left h1 {
+    font-size: 1.75rem; font-weight: 800;
+    color: #111827; margin-bottom: .2rem;
+}
+.um-header-left p { font-size: .875rem; color: #6b7280; }
+
+.um-search-wrap {
+    display: flex; align-items: center; gap: .6rem;
+}
+.um-search-box {
+    position: relative;
+}
+.um-search-box i {
+    position: absolute; left: .9rem; top: 50%;
+    transform: translateY(-50%); color: #9ca3af; font-size: .875rem;
+}
+.um-search-box input {
+    padding: .6rem 1rem .6rem 2.4rem;
+    border: 1.5px solid #e5e7eb; border-radius: 10px;
+    width: 260px; font-size: .875rem; font-family: inherit;
+    background: #f9fafb; transition: all .2s;
+}
+.um-search-box input:focus {
+    outline: none; border-color: #4f46e5;
+    background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    width: 300px;
+}
+.um-search-box input::placeholder { color: #9ca3af; }
+
+.um-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .6rem 1.1rem; border: none; border-radius: 10px;
+    font-size: .875rem; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: all .18s; text-decoration: none;
+}
+.um-btn-primary {
+    background: #4f46e5; color: #fff;
+    box-shadow: 0 2px 8px rgba(79,70,229,.3);
+}
+.um-btn-primary:hover { background: #4338ca; color: #fff; }
+.um-btn-sm { padding: .4rem .85rem; font-size: .8rem; }
+.um-btn-lock   { background: #fee2e2; color: #dc2626; }
+.um-btn-lock:hover   { background: #dc2626; color: #fff; }
+.um-btn-unlock { background: #dcfce7; color: #16a34a; }
+.um-btn-unlock:hover { background: #16a34a; color: #fff; }
+
+/* ── Stat cards ──────────────────────────────────────── */
+.um-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem; margin-bottom: 1.75rem;
+}
+.um-stat {
+    background: #fff; border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem 1.4rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    transition: box-shadow .2s, transform .2s;
+    position: relative; overflow: hidden;
+}
+.um-stat:hover { box-shadow: 0 6px 18px rgba(0,0,0,.08); transform: translateY(-2px); }
+.um-stat-top {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: .75rem;
+}
+.um-stat-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+}
+.um-stat-badge {
+    font-size: .72rem; font-weight: 700; padding: .2rem .55rem;
+    border-radius: 20px; background: #dcfce7; color: #16a34a;
+}
+.um-stat-label { font-size: .78rem; color: #6b7280; margin-bottom: .3rem; }
+.um-stat-value { font-size: 2rem; font-weight: 800; color: #111827; line-height: 1; }
+/* accent bar bottom */
+.um-stat::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 0; right: 0; height: 3px;
+    border-radius: 0 0 14px 14px;
+}
+.um-stat.s-total::after  { background: #4f46e5; }
+.um-stat.s-student::after{ background: #0ea5e9; }
+.um-stat.s-lender::after { background: #ec4899; }
+.um-stat.s-locked::after { background: #ef4444; }
+
+/* ── Main panel ──────────────────────────────────────── */
+.um-panel {
+    background: #fff; border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    overflow: hidden;
+}
+
+/* ── Filter tabs ─────────────────────────────────────── */
+.um-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1.5px solid #f3f4f6;
+    padding: 0 1.4rem;
+}
+.um-tab {
+    padding: .875rem 1.1rem;
+    font-size: .875rem; font-weight: 600;
+    color: #6b7280; cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px; transition: all .18s;
+    text-decoration: none; white-space: nowrap;
+}
+.um-tab:hover { color: #4f46e5; }
+.um-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+
+/* ── Table ───────────────────────────────────────────── */
+.um-table { width: 100%; border-collapse: collapse; }
+.um-table th {
+    font-size: .68rem; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: .6px;
+    padding: .75rem 1.4rem; text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafafa; white-space: nowrap;
+}
+.um-table td {
+    padding: 1rem 1.4rem; border-bottom: 1px solid #f9fafb;
+    font-size: .875rem; color: #374151; vertical-align: middle;
+}
+.um-table tr:last-child td { border-bottom: none; }
+.um-table tr:hover td { background: #fafafa; }
+
+/* User cell */
+.um-user-cell { display: flex; align-items: center; gap: .875rem; }
+.um-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; font-weight: 700; color: #fff;
+    flex-shrink: 0; background: #4f46e5;
+}
+.um-avatar img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+.um-name { font-weight: 600; color: #111827; font-size: .9rem; }
+.um-email { font-size: .78rem; color: #9ca3af; margin-top: .1rem; }
+
+/* ID cell */
+.um-id { font-size: .75rem; color: #9ca3af; font-family: monospace; }
+
+/* Role badge */
+.role-badge {
+    display: inline-block; padding: .25rem .75rem;
+    border-radius: 20px; font-size: .75rem; font-weight: 700;
+}
+.role-student { background: #ede9fe; color: #6d28d9; }
+.role-lender  { background: #fce7f3; color: #be185d; }
+.role-admin   { background: #fee2e2; color: #dc2626; }
+.role-user    { background: #f3f4f6; color: #374151; }
+
+/* Status dot */
+.status-cell { display: flex; align-items: center; gap: .5rem; font-size: .875rem; }
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-active   { background: #10b981; }
+.dot-inactive { background: #ef4444; }
+
+/* ── Pagination ──────────────────────────────────────── */
+.um-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .875rem 1.4rem; border-top: 1px solid #f3f4f6;
+    flex-wrap: wrap; gap: .75rem;
+}
+.um-footer-info { font-size: .82rem; color: #6b7280; }
+.um-pages { display: flex; gap: .35rem; align-items: center; }
+.um-page-btn {
+    min-width: 34px; height: 34px; padding: 0 .5rem;
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    background: #fff; color: #374151; font-size: .82rem; font-weight: 600;
+    cursor: pointer; transition: all .18s; text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.um-page-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+.um-page-btn.active { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+.um-page-btn.disabled { opacity: .35; pointer-events: none; }
+
+/* ── Empty ───────────────────────────────────────────── */
+.um-empty { text-align: center; padding: 4rem 1rem; color: #9ca3af; }
+.um-empty i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.um-empty p { font-size: .9rem; }
+
+/* ── Responsive ──────────────────────────────────────── */
+@@media (max-width: 1100px) {
+    .um-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@@media (max-width: 640px) {
+    .um-stats { grid-template-columns: 1fr 1fr; }
+    .um-header { flex-direction: column; }
+    .um-search-box input { width: 100%; }
+}
+</style>
+
+@{
+    // Tính stats từ toàn bộ dữ liệu (dùng TotalItems từ server nếu có ViewBag)
+    int statTotal    = Model.Pagination.TotalItems;
+    int statStudent  = (int)(ViewBag.TotalStudents  ?? totalStudents);
+    int statLender   = (int)(ViewBag.TotalLenders   ?? totalLenders);
+    int statLocked   = (int)(ViewBag.TotalLocked    ?? totalLocked);
+}
+
+<!-- Page header -->
+<div class="um-header">
+    <div class="um-header-left">
+        <h1>Quản lý người dùng</h1>
+        <p>Quản lý và điều hành hệ thống tài khoản Academic Atrium</p>
+    </div>
+    <div class="um-search-wrap">
+        <form method="get" asp-action="Users" style="display:flex;gap:.6rem;align-items:center;">
+            <div class="um-search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="@search"
+                       placeholder="Tìm kiếm tên, email, ID..." />
+                <input type="hidden" name="filterType" value="@filterType" />
+            </div>
+            <button type="submit" class="um-btn um-btn-primary">
+                <i class="fas fa-user-plus"></i> Tìm
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Stat cards -->
+<div class="um-stats">
+    <div class="um-stat s-total">
+        <div class="um-stat-top">
+            <div class="um-stat-icon" style="background:#eef2ff;color:#4f46e5;">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="um-stat-badge">+12%</span>
         </div>
+        <div class="um-stat-label">Tổng người dùng</div>
+        <div class="um-stat-value">@statTotal.ToString("N0")</div>
     </div>
 
-    <!-- Users Table -->
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Danh sách người dùng (@Model.Pagination.TotalItems)</h5>
+    <div class="um-stat s-student">
+        <div class="um-stat-top">
+            <div class="um-stat-icon" style="background:#e0f2fe;color:#0284c7;">
+                <i class="fas fa-user-graduate"></i>
+            </div>
         </div>
-        <div class="card-body">
-            @if (Model.Items.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Họ tên</th>
-                                <th>Email</th>
-                                <th>SĐT</th>
-                                <th>Vai trò</th>
-                                <th>Loại</th>
-                                <th>Số dư</th>
-                                <th>Đơn thuê</th>
-                                <th>Sản phẩm</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var user in Model.Items)
-                            {
-                                <tr>
-                                    <td>#@user.UserId</td>
-                                    <td>
-                                        <strong>@user.FullName</strong>
-                                        @if (user.IsVerified)
+        <div class="um-stat-label">Sinh viên</div>
+        <div class="um-stat-value">@statStudent.ToString("N0")</div>
+    </div>
+
+    <div class="um-stat s-lender">
+        <div class="um-stat-top">
+            <div class="um-stat-icon" style="background:#fce7f3;color:#be185d;">
+                <i class="fas fa-store"></i>
+            </div>
+        </div>
+        <div class="um-stat-label">Người cho thuê</div>
+        <div class="um-stat-value">@statLender.ToString("N0")</div>
+    </div>
+
+    <div class="um-stat s-locked">
+        <div class="um-stat-top">
+            <div class="um-stat-icon" style="background:#fee2e2;color:#dc2626;">
+                <i class="fas fa-ban"></i>
+            </div>
+        </div>
+        <div class="um-stat-label">Đang bị khóa</div>
+        <div class="um-stat-value">@statLocked.ToString("N0")</div>
+    </div>
+</div>
+
+<!-- Main panel -->
+<div class="um-panel">
+
+    <!-- Filter tabs -->
+    <div class="um-tabs">
+        <a class="um-tab @(filterType == "all"     ? "active" : "")"
+           href="@Url.Action("Users", new { search, filterType = "all",     page = 1 })">Tất cả</a>
+        <a class="um-tab @(filterType == "student" ? "active" : "")"
+           href="@Url.Action("Users", new { search, filterType = "student", page = 1 })">Sinh viên</a>
+        <a class="um-tab @(filterType == "lender"  ? "active" : "")"
+           href="@Url.Action("Users", new { search, filterType = "lender",  page = 1 })">Người cho thuê</a>
+        <a class="um-tab @(filterType == "locked"  ? "active" : "")"
+           href="@Url.Action("Users", new { search, filterType = "locked",  page = 1 })">Đang bị khóa</a>
+    </div>
+
+    @if (Model.Items.Any())
+    {
+        <!-- Table -->
+        <div style="overflow-x:auto;">
+            <table class="um-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Họ và tên</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Số dư</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tham gia</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Items)
+                    {
+                        // Avatar color based on name
+                        var colors = new[] { "#4f46e5","#0ea5e9","#ec4899","#10b981","#f59e0b","#8b5cf6" };
+                        var colorIdx = Math.Abs(user.FullName.GetHashCode()) % colors.Length;
+                        var avatarColor = colors[colorIdx];
+                        var initials = string.Join("", user.FullName.Split(' ')
+                                            .Where(w => w.Length > 0)
+                                            .Take(2)
+                                            .Select(w => w[0].ToString().ToUpper()));
+
+                        var roleClass = user.Role == "Admin" ? "role-admin"
+                                      : user.UserType == "Student" ? "role-student"
+                                      : (user.UserType == "Lender" || user.UserType == "Owner") ? "role-lender"
+                                      : "role-user";
+                        var roleLabel = user.Role == "Admin" ? "Admin"
+                                      : user.UserType == "Student" ? "Student"
+                                      : (user.UserType == "Lender" || user.UserType == "Owner") ? "Lender"
+                                      : user.UserType;
+
+                        <tr>
+                            <td>
+                                <span class="um-id">#UTE-@user.UserId.ToString("D4")</span>
+                            </td>
+                            <td>
+                                <div class="um-user-cell">
+                                    <div class="um-avatar" style="background:@avatarColor;">
+                                        @initials
+                                    </div>
+                                    <div>
+                                        <div class="um-name">
+                                            @user.FullName
+                                            @if (user.IsVerified)
+                                            {
+                                                <i class="fas fa-check-circle"
+                                                   style="color:#10b981;font-size:.75rem;margin-left:.25rem;"
+                                                   title="Đã xác thực"></i>
+                                            }
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(user.PhoneNumber))
                                         {
-                                            <i class="fas fa-check-circle text-success" title="Đã xác thực"></i>
+                                            <div class="um-email">@user.PhoneNumber</div>
                                         }
-                                    </td>
-                                    <td>@user.Email</td>
-                                    <td>@user.PhoneNumber</td>
-                                    <td>
-                                        <span class="badge @(user.Role == "Admin" ? "bg-danger" : "bg-secondary")">
-                                            @user.Role
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">@user.UserType</span>
-                                    </td>
-                                    <td class="fw-bold">@user.Balance.ToString("N0")đ</td>
-                                    <td>@user.RentalCount</td>
-                                    <td>@user.ProductCount</td>
-                                    <td>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="color:#374151;">@user.Email</td>
+                            <td>
+                                <span class="role-badge @roleClass">@roleLabel</span>
+                            </td>
+                            <td style="font-weight:700;color:#4f46e5;">
+                                @user.Balance.ToString("N0")đ
+                            </td>
+                            <td>
+                                <div class="status-cell">
+                                    <span class="status-dot @(user.IsActive ? "dot-active" : "dot-inactive")"></span>
+                                    @(user.IsActive ? "Đang hoạt động" : "Bị khóa")
+                                </div>
+                            </td>
+                            <td style="color:#6b7280;font-size:.82rem;">
+                                —
+                            </td>
+                            <td>
+                                @if (user.Role != "Admin")
+                                {
+                                    <form method="post" asp-action="ToggleUserActive"
+                                          asp-route-userId="@user.UserId"
+                                          asp-route-search="@search"
+                                          asp-route-filterType="@filterType"
+                                          style="display:inline;">
+                                        @Html.AntiForgeryToken()
                                         @if (user.IsActive)
                                         {
-                                            <span class="badge bg-success">Hoạt động</span>
+                                            <button type="submit"
+                                                    class="um-btn um-btn-sm um-btn-lock"
+                                                    onclick="return confirm('Khóa tài khoản @user.FullName?')">
+                                                <i class="fas fa-lock"></i> Khóa
+                                            </button>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">Vô hiệu</span>
+                                            <button type="submit"
+                                                    class="um-btn um-btn-sm um-btn-unlock"
+                                                    onclick="return confirm('Mở khóa tài khoản @user.FullName?')">
+                                                <i class="fas fa-lock-open"></i> Mở khóa
+                                            </button>
                                         }
-                                    </td>
-                                    <td>
-                                        @if (user.Role != "Admin")
-                                        {
-                                            <form method="post" asp-action="ToggleUserActive" asp-route-userId="@user.UserId" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-warning" : "btn-success")"
-                                                        onclick="return confirm('@(user.IsActive ? "Vô hiệu hóa" : "Kích hoạt") tài khoản này?')">
-                                                    <i class="fas @(user.IsActive ? "fa-ban" : "fa-check")"></i>
-                                                    @(user.IsActive ? "Vô hiệu" : "Kích hoạt")
-                                                </button>
-                                            </form>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-                <!-- Pagination -->
-                @if (Model.Pagination.TotalPages > 1)
-                {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item @(!Model.Pagination.HasPreviousPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Users", new { page = Model.Pagination.CurrentPage - 1, search = ViewBag.Search })">
-                                    Trước
-                                </a>
-                            </li>
+        <!-- Footer / Pagination -->
+        <div class="um-footer">
+            <span class="um-footer-info">
+                Hiển thị @((currentPage - 1) * Model.Pagination.PageSize + 1)
+                đến @Math.Min(currentPage * Model.Pagination.PageSize, Model.Pagination.TotalItems)
+                của @Model.Pagination.TotalItems người dùng
+            </span>
 
-                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == Model.Pagination.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Users", new { page = i, search = ViewBag.Search })">@i</a>
-                                </li>
-                            }
-
-                            <li class="page-item @(!Model.Pagination.HasNextPage ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("Users", new { page = Model.Pagination.CurrentPage + 1, search = ViewBag.Search })">
-                                    Sau
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                }
-            }
-            else
+            @if (Model.Pagination.TotalPages > 1)
             {
-                <p class="text-muted text-center py-4">Không tìm thấy người dùng nào</p>
+                <div class="um-pages">
+                    <a class="um-page-btn @(!Model.Pagination.HasPreviousPage ? "disabled" : "")"
+                       href="@Url.Action("Users", new { page = currentPage - 1, search, filterType })">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    @{
+                        int startPage = Math.Max(1, currentPage - 2);
+                        int endPage   = Math.Min(Model.Pagination.TotalPages, currentPage + 2);
+                    }
+                    @if (startPage > 1)
+                    {
+                        <a class="um-page-btn" href="@Url.Action("Users", new { page = 1, search, filterType })">1</a>
+                        if (startPage > 2) { <span style="color:#9ca3af;padding:0 .25rem;">…</span> }
+                    }
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <a class="um-page-btn @(i == currentPage ? "active" : "")"
+                           href="@Url.Action("Users", new { page = i, search, filterType })">@i</a>
+                    }
+                    @if (endPage < Model.Pagination.TotalPages)
+                    {
+                        if (endPage < Model.Pagination.TotalPages - 1) { <span style="color:#9ca3af;padding:0 .25rem;">…</span> }
+                        <a class="um-page-btn" href="@Url.Action("Users", new { page = Model.Pagination.TotalPages, search, filterType })">@Model.Pagination.TotalPages</a>
+                    }
+
+                    <a class="um-page-btn @(!Model.Pagination.HasNextPage ? "disabled" : "")"
+                       href="@Url.Action("Users", new { page = currentPage + 1, search, filterType })">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
             }
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="um-empty">
+            <i class="fas fa-users-slash"></i>
+            <p>Không tìm thấy người dùng nào phù hợp</p>
+        </div>
+    }
 </div>

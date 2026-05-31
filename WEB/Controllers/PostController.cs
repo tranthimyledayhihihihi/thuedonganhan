@@ -67,6 +67,23 @@ namespace WEB.Controllers
                 
                 // Gán OwnerId từ session
                 request.OwnerId = userId.Value;
+
+                // Giải mã JSON danh sách hình ảnh
+                if (!string.IsNullOrEmpty(request.ProductImagesJson))
+                {
+                    try
+                    {
+                        var imagesList = System.Text.Json.JsonSerializer.Deserialize<List<string>>(request.ProductImagesJson);
+                        if (imagesList != null && imagesList.Count > 0)
+                        {
+                            request.ProductImages = imagesList;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Lỗi giải mã ProductImagesJson");
+                    }
+                }
                 
                 // Gọi API để tạo product
                 var response = await _productService.CreateProductAsync(request, jwtToken);

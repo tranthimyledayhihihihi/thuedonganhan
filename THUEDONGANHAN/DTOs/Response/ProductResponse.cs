@@ -31,6 +31,8 @@ namespace THUEDONGANHAN.DTOs.Response
         
         // Thông tin Owner (không có Products để tránh circular reference)
         public OwnerResponse? Owner { get; set; }
+        
+        public List<string> ProductImages { get; set; } = new List<string>();
     }
 
     public class CategoryResponse

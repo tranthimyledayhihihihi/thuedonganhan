@@ -1288,7 +1288,7 @@ VALUES
      N'Bộ lễ phục tốt nghiệp chính thức của UTE, áo + mũ + cổ, Size M. Giặt sạch sau mỗi lần thuê.',
      'Good', NULL, 50000, NULL, NULL,
      0, NULL, 'Rent', 200000, 2, 2,
-     'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800',
+     'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800',
      N'Gần cổng chính UTE', 1, 6, 4, '2025-03-01'),
 
     (7, N'Vest nam xanh navy (Size L)',
@@ -1333,8 +1333,8 @@ VALUES
      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800',
      N'Đà Nẵng', 1, 6, 10, '2025-03-20'),
 
-    (15, N'máy ảnh', N'còn mới', 'Good', 20000.00, 49000.00, 300000.00, 990000.00, 0, NULL, 'Rent', 500000.00, 1, 1, '/uploads/de40ffb1-3f34-48f2-bb66-89254b25c42d.jpg', N'ký túc xá', 1, 6, 1, SYSUTCDATETIME()),
-    (16, N'áo dài', N'còn mới', 'Good', 10000.00, 29000.00, 60000.00, 100000.00, 0, NULL, 'Rent', 100000.00, 1, 1, 'https://localhost:7000/uploads/ec6ca6cc-5106-4bd7-8400-df4f230a251e.jpg', N'ký túc xá', 1, 6, 4, SYSUTCDATETIME());
+    (15, N'máy ảnh', N'còn mới', 'Good', 20000.00, 49000.00, 300000.00, 990000.00, 0, NULL, 'Rent', 500000.00, 1, 1, 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800', N'ký túc xá', 1, 6, 1, SYSUTCDATETIME()),
+    (16, N'áo dài', N'còn mới', 'Good', 10000.00, 29000.00, 60000.00, 100000.00, 0, NULL, 'Rent', 100000.00, 1, 1, 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=800', N'ký túc xá', 1, 6, 4, SYSUTCDATETIME());
 SET IDENTITY_INSERT dbo.Products OFF;
 UPDATE dbo.Products SET IsApproved = 1;
 GO

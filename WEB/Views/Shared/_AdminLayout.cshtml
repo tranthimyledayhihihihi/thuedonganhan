@@ -3,535 +3,384 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - UTE Rent Admin</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>@ViewData["Title"] — UTE Rent Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    :root {
+        --brown:   #3d2b1f;
+        --brown2:  #5c3d2e;
+        --brown3:  #7a5544;
+        --green:   #4a7c59;
+        --green2:  #6aab7e;
+        --green3:  #d4edda;
+        --yellow:  #f5c842;
+        --yellow2: #fde68a;
+        --yellow3: #fffbeb;
+        --cream:   #fdf6ec;
+        --cream2:  #f7ede0;
+        --cream3:  #e8d5c0;
+        --white:   #ffffff;
+        --sidebar-w:   220px;
+        --topbar-h:    60px;
+        --radius:      12px;
+        --shadow:      0 4px 16px rgba(61,43,31,.1);
+        --shadow-sm:   0 2px 8px rgba(61,43,31,.07);
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            overflow-x: hidden;
-        }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        /* Admin Layout Container */
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--cream);
+        color: var(--brown);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-        /* Sidebar */
-        .admin-sidebar {
-            width: 260px;
-            background: #ffffff;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-        }
+    /* ══════════════════════════════════════
+       SIDEBAR — cố định, không overlay
+    ══════════════════════════════════════ */
+    .adm-sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        width: var(--sidebar-w);
+        background: var(--brown);
+        display: flex;
+        flex-direction: column;
+        z-index: 300;
+        /* KHÔNG có transition width, KHÔNG hover expand */
+    }
 
-        .admin-sidebar.collapsed {
-            width: 80px;
-        }
+    /* Logo */
+    .adm-logo {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        min-height: var(--topbar-h);
+        flex-shrink: 0;
+    }
+    .adm-logo-mark {
+        width: 36px; height: 36px; flex-shrink: 0;
+        background: var(--yellow);
+        border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; color: var(--brown); font-weight: 900;
+    }
+    .adm-logo-name { font-size: .9rem; font-weight: 800; color: var(--white); display: block; line-height: 1.2; }
+    .adm-logo-sub  { font-size: .62rem; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .7px; }
 
-        /* Logo */
-        .admin-logo {
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
+    /* Nav */
+    .adm-nav { flex: 1; padding: .5rem 0; overflow-y: auto; }
+    .adm-nav::-webkit-scrollbar { width: 3px; }
+    .adm-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 
-        .admin-logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
+    .adm-nav-section {
+        font-size: .6rem; font-weight: 700;
+        color: rgba(255,255,255,.3);
+        text-transform: uppercase; letter-spacing: .9px;
+        padding: .875rem 1.25rem .3rem;
+    }
 
-        .admin-logo-text {
-            display: flex;
-            flex-direction: column;
-        }
+    .adm-nav-item {
+        display: flex; align-items: center; gap: .75rem;
+        padding: .6rem 1rem .6rem 1.25rem;
+        color: rgba(255,255,255,.55);
+        text-decoration: none;
+        font-size: .875rem; font-weight: 500;
+        transition: all .15s;
+        position: relative;
+        margin: .1rem .5rem;
+        border-radius: 9px;
+    }
+    .adm-nav-item .nav-icon {
+        width: 32px; height: 32px; flex-shrink: 0;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .875rem;
+        background: rgba(255,255,255,.06);
+        transition: all .15s;
+    }
+    .adm-nav-item:hover {
+        color: var(--white);
+        background: rgba(255,255,255,.07);
+    }
+    .adm-nav-item:hover .nav-icon { background: rgba(255,255,255,.12); }
+    .adm-nav-item.active {
+        color: var(--brown);
+        background: var(--yellow);
+    }
+    .adm-nav-item.active .nav-icon {
+        background: rgba(61,43,31,.15);
+        color: var(--brown);
+    }
 
-        .admin-logo-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
+    /* Footer */
+    .adm-sidebar-footer {
+        border-top: 1px solid rgba(255,255,255,.08);
+        padding: .5rem;
+        flex-shrink: 0;
+    }
+    .adm-nav-item.logout:hover { color: #fca5a5; background: rgba(252,165,165,.1); }
+    .adm-nav-item.logout:hover .nav-icon { background: rgba(252,165,165,.15); color: #fca5a5; }
 
-        .admin-logo-subtitle {
-            font-size: 0.75rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    /* ══════════════════════════════════════
+       TOPBAR
+    ══════════════════════════════════════ */
+    .adm-topbar {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-w);
+        right: 0;
+        height: var(--topbar-h);
+        background: var(--white);
+        border-bottom: 1.5px solid var(--cream3);
+        display: flex; align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        z-index: 200;
+    }
 
-        .admin-sidebar.collapsed .admin-logo-text {
-            display: none;
-        }
+    .adm-topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .adm-page-title  { font-size: .95rem; font-weight: 700; color: var(--brown); }
+    .adm-breadcrumb  { font-size: .72rem; color: var(--brown3); display: flex; align-items: center; gap: .3rem; }
+    .adm-breadcrumb .sep { color: var(--cream3); }
 
-        /* Navigation */
-        .admin-nav {
-            flex: 1;
-            padding: 1rem 0;
-            overflow-y: auto;
-        }
+    .adm-search { position: relative; }
+    .adm-search i { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--brown3); font-size: .78rem; }
+    .adm-search input {
+        padding: .5rem 1rem .5rem 2.1rem;
+        border: 1.5px solid var(--cream3);
+        border-radius: 20px; width: 210px;
+        font-size: .82rem; font-family: inherit;
+        background: var(--cream); color: var(--brown);
+        transition: all .2s;
+    }
+    .adm-search input:focus {
+        outline: none; border-color: var(--green);
+        background: var(--white); width: 250px;
+        box-shadow: 0 0 0 3px rgba(74,124,89,.1);
+    }
+    .adm-search input::placeholder { color: var(--brown3); }
 
-        .admin-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.875rem 1.5rem;
-            color: #6b7280;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            position: relative;
-        }
+    .adm-topbar-right { display: flex; align-items: center; gap: .5rem; }
 
-        .admin-nav-item:hover {
-            background: #f3f4f6;
-            color: #667eea;
-        }
+    .adm-icon-btn {
+        width: 34px; height: 34px; border-radius: 8px;
+        background: var(--cream); border: 1.5px solid var(--cream3);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--brown2); font-size: .85rem; cursor: pointer;
+        transition: all .15s; position: relative;
+    }
+    .adm-icon-btn:hover { background: var(--green3); border-color: var(--green2); color: var(--green); }
+    .adm-icon-btn .dot {
+        position: absolute; top: 5px; right: 5px;
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--yellow); border: 1.5px solid var(--white);
+    }
 
-        .admin-nav-item.active {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
-            color: #667eea;
-            font-weight: 600;
-        }
+    .adm-user-pill {
+        display: flex; align-items: center; gap: .5rem;
+        padding: .3rem .7rem .3rem .3rem;
+        background: var(--cream2); border: 1.5px solid var(--cream3);
+        border-radius: 20px; cursor: pointer; transition: all .15s;
+    }
+    .adm-user-pill:hover { border-color: var(--green2); background: var(--green3); }
+    .adm-avatar {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--green), var(--brown2));
+        display: flex; align-items: center; justify-content: center;
+        color: var(--white); font-size: .75rem; font-weight: 700;
+    }
+    .adm-user-info-name { font-size: .8rem; font-weight: 700; color: var(--brown); }
+    .adm-user-info-role { font-size: .62rem; color: var(--brown3); }
+    .adm-user-pill .fa-chevron-down { font-size: .58rem; color: var(--brown3); }
 
-        .admin-nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
+    .adm-user-menu { position: relative; }
+    .adm-user-dropdown {
+        position: absolute; top: calc(100% + .5rem); right: 0;
+        background: var(--white); border-radius: var(--radius);
+        box-shadow: var(--shadow); min-width: 190px;
+        border: 1.5px solid var(--cream3);
+        opacity: 0; visibility: hidden; transform: translateY(-6px);
+        transition: all .18s; z-index: 400;
+    }
+    .adm-user-dropdown.open { opacity:1; visibility:visible; transform:translateY(0); }
+    .adm-user-dropdown a {
+        display: flex; align-items: center; gap: .7rem;
+        padding: .7rem 1rem; color: var(--brown2);
+        font-size: .875rem; text-decoration: none; transition: background .12s;
+    }
+    .adm-user-dropdown a:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .adm-user-dropdown a:last-child  { border-radius: 0 0 var(--radius) var(--radius); color: #dc2626; }
+    .adm-user-dropdown a:hover { background: var(--cream2); }
+    .adm-user-dropdown a:last-child:hover { background: #fef2f2; }
+    .adm-user-dropdown a i { width: 15px; font-size: .85rem; }
 
-        .admin-nav-item i {
-            font-size: 1.2rem;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+    /* ══════════════════════════════════════
+       MAIN — margin-left = sidebar width cố định
+    ══════════════════════════════════════ */
+    .adm-main {
+        margin-left: var(--sidebar-w);
+        padding-top: var(--topbar-h);
+        min-height: 100vh;
+    }
+    .adm-content { padding: 1.5rem 1.75rem; }
 
-        .admin-nav-item span {
-            white-space: nowrap;
-        }
+    /* Alerts */
+    .adm-alert {
+        display: flex; align-items: center; gap: .75rem;
+        padding: .875rem 1.1rem; border-radius: var(--radius);
+        margin-bottom: 1.25rem; font-size: .875rem;
+    }
+    .adm-alert-success { background: var(--green3); color: #166534; border: 1px solid #86efac; }
+    .adm-alert-danger  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .adm-alert-close { margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; opacity:.6; font-size:1.1rem; }
+    .adm-alert-close:hover { opacity:1; }
 
-        .admin-sidebar.collapsed .admin-nav-item span {
-            display: none;
-        }
-
-        /* Main Content */
-        .admin-main {
-            flex: 1;
-            margin-left: 260px;
-            transition: margin-left 0.3s ease;
-        }
-
-        .admin-sidebar.collapsed ~ .admin-main {
-            margin-left: 80px;
-        }
-
-        /* Top Bar */
-        .admin-topbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .admin-topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .admin-topbar-toggle {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .admin-topbar-toggle:hover {
-            background: #f3f4f6;
-            color: #667eea;
-        }
-
-        .admin-topbar-search {
-            position: relative;
-        }
-
-        .admin-topbar-search input {
-            padding: 0.625rem 1rem 0.625rem 2.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            width: 300px;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .admin-topbar-search input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .admin-topbar-search i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-        }
-
-        .admin-topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .admin-topbar-icon {
-            position: relative;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .admin-topbar-icon:hover {
-            background: #f3f4f6;
-            color: #667eea;
-        }
-
-        .admin-topbar-badge {
-            position: absolute;
-            top: 0.25rem;
-            right: 0.25rem;
-            background: #ef4444;
-            color: white;
-            font-size: 0.625rem;
-            padding: 0.125rem 0.375rem;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .admin-user-menu {
-            position: relative;
-        }
-
-        .admin-user-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 10px;
-            transition: all 0.2s ease;
-        }
-
-        .admin-user-btn:hover {
-            background: #f3f4f6;
-        }
-
-        .admin-user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .admin-user-info {
-            text-align: left;
-        }
-
-        .admin-user-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        .admin-user-role {
-            font-size: 0.75rem;
-            color: #6b7280;
-        }
-
-        .admin-user-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 0.5rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            min-width: 200px;
-            display: none;
-            z-index: 1000;
-        }
-
-        .admin-user-dropdown.active {
-            display: block;
-        }
-
-        .admin-user-dropdown a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #6b7280;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .admin-user-dropdown a:hover {
-            background: #f3f4f6;
-            color: #667eea;
-        }
-
-        .admin-user-dropdown a:first-child {
-            border-radius: 10px 10px 0 0;
-        }
-
-        .admin-user-dropdown a:last-child {
-            border-radius: 0 0 10px 10px;
-            color: #ef4444;
-        }
-
-        .admin-user-dropdown a:last-child:hover {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        /* Content Area */
-        .admin-content {
-            padding: 2rem;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .admin-sidebar {
-                transform: translateX(-100%);
-            }
-
-            .admin-sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .admin-main {
-                margin-left: 0;
-            }
-
-            .admin-topbar-search input {
-                width: 200px;
-            }
-        }
-
-        /* Scrollbar */
-        .admin-nav::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .admin-nav::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .admin-nav::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 10px;
-        }
-
-        .admin-nav::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af;
-        }
+    /* Mobile */
+    @@media (max-width: 768px) {
+        .adm-sidebar { transform: translateX(-100%); transition: transform .25s; }
+        .adm-sidebar.mobile-open { transform: translateX(0); }
+        .adm-topbar { left: 0; }
+        .adm-main { margin-left: 0; }
+        .adm-search { display: none; }
+    }
     </style>
 </head>
 <body>
-    <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <!-- Logo -->
-            <div class="admin-logo">
-                <div class="admin-logo-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div class="admin-logo-text">
-                    <span class="admin-logo-title">UTE Rent</span>
-                    <span class="admin-logo-subtitle">Admin Panel</span>
-                </div>
-            </div>
+@{
+    var userName    = Context.Session.GetString("UserName") ?? "Admin";
+    var firstLetter = userName.Length > 0 ? userName[0].ToString().ToUpper() : "A";
+    var action      = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+}
 
-            <!-- Navigation -->
-            <nav class="admin-nav">
-                <a href="@Url.Action("Dashboard", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="@Url.Action("Users", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
-                    <i class="fas fa-users"></i>
-                    <span>Quản lý người dùng</span>
-                </a>
-                <a href="@Url.Action("Products", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Products" ? "active" : "")">
-                    <i class="fas fa-box"></i>
-                    <span>Quản lý sản phẩm</span>
-                </a>
-                <a href="@Url.Action("Rentals", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Rentals" ? "active" : "")">
-                    <i class="fas fa-handshake"></i>
-                    <span>Quản lý đơn thuê</span>
-                </a>
-                <a href="@Url.Action("Commissions", "Admin")" class="admin-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Commissions" ? "active" : "")">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Hoa hồng</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="admin-main">
-            <!-- Top Bar -->
-            <header class="admin-topbar">
-                <div class="admin-topbar-left">
-                    <button class="admin-topbar-toggle" onclick="toggleSidebar()">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="admin-topbar-search">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Tìm kiếm...">
-                    </div>
-                </div>
-
-                <div class="admin-topbar-right">
-                    <button class="admin-topbar-icon">
-                        <i class="fas fa-bell"></i>
-                        <span class="admin-topbar-badge">3</span>
-                    </button>
-
-                    <div class="admin-user-menu">
-                        <button class="admin-user-btn" onclick="toggleUserDropdown()">
-                            <div class="admin-user-avatar">
-                                @{
-                                    var userName = Context.Session.GetString("UserName");
-                                    var firstLetter = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "A";
-                                }
-                                @firstLetter
-                            </div>
-                            <div class="admin-user-info">
-                                <div class="admin-user-name">@userName</div>
-                                <div class="admin-user-role">Quản trị viên</div>
-                            </div>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="admin-user-dropdown" id="adminUserDropdown">
-                            <a href="#">
-                                <i class="fas fa-user"></i>
-                                <span>Tài khoản</span>
-                            </a>
-                            <a href="#">
-                                <i class="fas fa-cog"></i>
-                                <span>Cài đặt</span>
-                            </a>
-                            <a href="@Url.Action("Logout", "Account")">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Đăng xuất</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content -->
-            <main class="admin-content">
-                @if (TempData["SuccessMessage"] != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show mb-4">
-                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                }
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible fade show mb-4">
-                        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                }
-
-                @RenderBody()
-            </main>
+<!-- Sidebar cố định -->
+<aside class="adm-sidebar" id="admSidebar">
+    <div class="adm-logo">
+        <div class="adm-logo-mark">U</div>
+        <div>
+            <span class="adm-logo-name">UTE Rent</span>
+            <span class="adm-logo-sub">Admin Terminal</span>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <nav class="adm-nav">
+        <div class="adm-nav-section">Tổng quan</div>
+        <a href="@Url.Action("Dashboard","Admin")" class="adm-nav-item @(action=="Dashboard"?"active":"")">
+            <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+            Dashboard
+        </a>
 
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('adminSidebar');
-            sidebar.classList.toggle('collapsed');
+        <div class="adm-nav-section">Quản lý</div>
+        <a href="@Url.Action("Users","Admin")" class="adm-nav-item @(action=="Users"?"active":"")">
+            <span class="nav-icon"><i class="fas fa-users"></i></span>
+            Người dùng
+        </a>
+        <a href="@Url.Action("Products","Admin")" class="adm-nav-item @(action=="Products"?"active":"")">
+            <span class="nav-icon"><i class="fas fa-box"></i></span>
+            Sản phẩm
+        </a>
+        <a href="@Url.Action("Rentals","Admin")" class="adm-nav-item @(action=="Rentals"?"active":"")">
+            <span class="nav-icon"><i class="fas fa-handshake"></i></span>
+            Đơn thuê
+        </a>
+
+        <div class="adm-nav-section">Tài chính</div>
+        <a href="@Url.Action("Commissions","Admin")" class="adm-nav-item @(action=="Commissions"?"active":"")">
+            <span class="nav-icon"><i class="fas fa-coins"></i></span>
+            Hoa hồng
+        </a>
+    </nav>
+
+    <div class="adm-sidebar-footer">
+        <a href="@Url.Action("Logout","Account")" class="adm-nav-item logout">
+            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+            Đăng xuất
+        </a>
+    </div>
+</aside>
+
+<!-- Topbar -->
+<header class="adm-topbar">
+    <div class="adm-topbar-left">
+        <div>
+            <div class="adm-page-title">@(ViewData["Title"] ?? "Dashboard")</div>
+            <div class="adm-breadcrumb">
+                <span>UTE Rent</span>
+                <span class="sep">/</span>
+                <span>@(ViewData["Title"] ?? "Dashboard")</span>
+            </div>
+        </div>
+        <div class="adm-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Tìm kiếm tài nguyên..." />
+        </div>
+    </div>
+
+    <div class="adm-topbar-right">
+        <button class="adm-icon-btn" title="Thông báo">
+            <i class="fas fa-bell"></i>
+            <span class="dot"></span>
+        </button>
+        <button class="adm-icon-btn" title="Trợ giúp">
+            <i class="fas fa-question-circle"></i>
+        </button>
+        <div class="adm-user-menu">
+            <div class="adm-user-pill" onclick="toggleUserMenu()">
+                <div class="adm-avatar">@firstLetter</div>
+                <div>
+                    <div class="adm-user-info-name">@userName</div>
+                    <div class="adm-user-info-role">Quản trị viên</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="adm-user-dropdown" id="admDropdown">
+                <a href="#"><i class="fas fa-user"></i> Tài khoản</a>
+                <a href="#"><i class="fas fa-cog"></i> Cài đặt</a>
+                <a href="@Url.Action("Logout","Account")"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main content — luôn bắt đầu sau sidebar cố định -->
+<main class="adm-main">
+    <div class="adm-content">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="adm-alert adm-alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>@TempData["SuccessMessage"]</span>
+                <button class="adm-alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
         }
-
-        function toggleUserDropdown() {
-            const dropdown = document.getElementById('adminUserDropdown');
-            dropdown.classList.toggle('active');
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="adm-alert adm-alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>@TempData["ErrorMessage"]</span>
+                <button class="adm-alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
         }
+        @RenderBody()
+    </div>
+</main>
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const userMenu = document.querySelector('.admin-user-menu');
-            const dropdown = document.getElementById('adminUserDropdown');
-            
-            if (dropdown && !userMenu?.contains(event.target)) {
-                dropdown.classList.remove('active');
-            }
-        });
-
-        // Mobile sidebar toggle
-        if (window.innerWidth <= 768) {
-            function toggleSidebar() {
-                const sidebar = document.getElementById('adminSidebar');
-                sidebar.classList.toggle('mobile-open');
-            }
-        }
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+<script>
+function toggleUserMenu() {
+    document.getElementById('admDropdown').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+    const menu = document.querySelector('.adm-user-menu');
+    if (!menu?.contains(e.target))
+        document.getElementById('admDropdown')?.classList.remove('open');
+});
+</script>
 </body>
 </html>
