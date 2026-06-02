@@ -1,0 +1,613 @@
+@{
+    ViewData["Title"] = "Quy định & Giới thiệu";
+}
+
+<div class="about-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">UTE Rent</h1>
+            <p class="hero-subtitle">Cho thuê thông minh</p>
+            <div class="hero-divider"></div>
+            <p class="hero-desc">Môi trường kết nối an toàn, tiện lợi và tiết kiệm giữa các sinh viên.<br>Vui lòng đọc kỹ các quy định dưới đây để đảm bảo quyền lợi cho cả hai bên.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Feature Cards -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon feature-icon-primary">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h4>An Toàn</h4>
+                <p>Hệ thống đặt cọc và khiếu nại minh bạch giúp bảo vệ tài sản và tiền bạc của bạn.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon feature-icon-success">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h4>Tiết Kiệm</h4>
+                <p>Thuê thay vì mua giúp tiết kiệm chi phí cho các sự kiện và nhu cầu ngắn hạn.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon feature-icon-warning">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h4>Uy Tín</h4>
+                <p>Cộng đồng sinh viên văn minh, đánh giá công khai và xử lý nghiêm vi phạm.</p>
+            </div>
+        </div>
+
+        <!-- Rules Grid -->
+        <div class="rules-grid">
+            <!-- Rules for Renters -->
+            <div class="rule-card rule-card-renter">
+                <div class="rule-header">
+                    <div class="rule-icon rule-icon-renter">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3>Dành Cho Người Thuê</h3>
+                </div>
+                <ul class="rule-list">
+                    <li>
+                        <i class="fas fa-check-circle rule-check-renter"></i>
+                        <div>
+                            <strong>Kiểm tra tình trạng</strong>
+                            <span>Luôn kiểm tra kỹ tình trạng hàng hóa khi nhận. Chụp ảnh/quay video làm bằng chứng.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-renter"></i>
+                        <div>
+                            <strong>Giữ gìn tài sản</strong>
+                            <span>Sử dụng đồ đạc đúng mục đích, cẩn thận. Bồi thường theo thỏa thuận nếu làm hỏng hóc hoặc mất mát.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-renter"></i>
+                        <div>
+                            <strong>Tiền cọc (Deposit)</strong>
+                            <span>Bắt buộc thanh toán tiền cọc thông qua hệ thống ví ký quỹ. Tiền cọc sẽ được hoàn lại sau khi trả đồ nguyên vẹn.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-renter"></i>
+                        <div>
+                            <strong>Trả đồ đúng hạn</strong>
+                            <span>Bàn giao lại tài sản đúng ngày giờ đã cam kết. Quá hạn có thể bị tính thêm phí hoặc bị trừ tiền cọc.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Rules for Owners -->
+            <div class="rule-card rule-card-owner">
+                <div class="rule-header">
+                    <div class="rule-icon rule-icon-owner">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <h3>Dành Cho Người Cho Thuê</h3>
+                </div>
+                <ul class="rule-list">
+                    <li>
+                        <i class="fas fa-check-circle rule-check-owner"></i>
+                        <div>
+                            <strong>Mô tả trung thực</strong>
+                            <span>Đăng tải hình ảnh thực tế và mô tả chính xác tình trạng đồ vật (kể cả lỗi nhỏ nếu có).</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-owner"></i>
+                        <div>
+                            <strong>Đảm bảo vệ sinh</strong>
+                            <span>Tài sản bàn giao cho người thuê phải sạch sẽ, hoạt động tốt và đầy đủ phụ kiện như đã cam kết.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-owner"></i>
+                        <div>
+                            <strong>Giao đúng hẹn</strong>
+                            <span>Có mặt đúng giờ và địa điểm để giao đồ. Cố tình hủy đơn không lý do có thể bị khóa tài khoản.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle rule-check-owner"></i>
+                        <div>
+                            <strong>Kiểm tra khi nhận lại</strong>
+                            <span>Chụp ảnh lúc giao và lúc nhận để làm căn cứ nếu có hư hỏng xảy ra.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Dispute Resolution Section -->
+        <div class="dispute-card">
+            <div class="dispute-header">
+                <div class="dispute-icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div>
+                    <h3>Chính sách Khiếu nại & Tranh chấp</h3>
+                    <p>Trong trường hợp xảy ra sự cố (hư hỏng, mất mát, không đúng mô tả), xin vui lòng sử dụng chức năng <strong>Khiếu Nại</strong> trong bảng điều khiển.</p>
+                </div>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-badge">1</div>
+                    <div class="timeline-content">
+                        <strong>Gửi khiếu nại</strong>
+                        <span>Cung cấp lý do và đính kèm bằng chứng (hình ảnh/video).</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">2</div>
+                    <div class="timeline-content">
+                        <strong>Đóng băng giao dịch</strong>
+                        <span>Hệ thống tạm giữ tiền cọc/tiền thuê để bảo vệ quyền lợi.</span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-badge">3</div>
+                    <div class="timeline-content">
+                        <strong>Ban Quản Trị (Admin) can thiệp</strong>
+                        <span>Admin xem xét bằng chứng của cả hai bên để đưa ra quyết định xử lý đền bù cuối cùng.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Escrow Note -->
+        <div class="escrow-note">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>Hệ thống ví ký quỹ (Escrow)</strong>
+                <p>Tiền của bạn sẽ được giữ an toàn trên hệ thống ví ký quỹ của UTE Rent và chỉ thanh toán cho chủ sở hữu sau khi đơn thuê hoàn tất tốt đẹp. Mọi giao dịch đều được ghi nhận và minh bạch.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Reset & Base */
+    .about-page {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f0f2f8;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    /* Hero Section - Đồng bộ với Wallet */
+    .hero-section {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 60px 0 80px;
+        text-align: center;
+        position: relative;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .hero-title {
+        font-size: 48px;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 8px;
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 20px;
+    }
+
+    .hero-divider {
+        width: 60px;
+        height: 3px;
+        background: #f59e0b;
+        margin: 0 auto 24px;
+        border-radius: 2px;
+    }
+
+    .hero-desc {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.6;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-top: -40px;
+        margin-bottom: 48px;
+        position: relative;
+        z-index: 2;
+    }
+
+    @@media (max-width: 768px) {
+        .features-grid
+
+    {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 28px 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 28px;
+    }
+
+    .feature-icon-primary {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .feature-icon-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .feature-icon-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .feature-card h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Rules Grid */
+    .rules-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+        margin-bottom: 48px;
+    }
+
+    @@media (max-width: 768px) {
+        .rules-grid
+
+    {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    }
+
+    .rule-card {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .rule-card-renter:hover {
+        border-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08);
+    }
+
+    .rule-card-owner:hover {
+        border-color: rgba(245, 158, 11, 0.3);
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.08);
+    }
+
+    .rule-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .rule-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .rule-icon-renter {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .rule-icon-owner {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .rule-header h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .rule-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .rule-list li {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+            .rule-list li:last-child {
+                margin-bottom: 0;
+            }
+
+            .rule-list li i {
+                font-size: 18px;
+                margin-top: 2px;
+                flex-shrink: 0;
+            }
+
+    .rule-check-renter {
+        color: #3b82f6;
+    }
+
+    .rule-check-owner {
+        color: #f59e0b;
+    }
+
+    .rule-list li div {
+        flex: 1;
+    }
+
+    .rule-list li strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+
+    .rule-list li span {
+        font-size: 13.5px;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    /* Dispute Card */
+    .dispute-card {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 28px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+
+        .dispute-card:hover {
+            border-color: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.05);
+        }
+
+    .dispute-header {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    @@media (max-width: 550px) {
+        .dispute-header
+
+    {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    }
+
+    .dispute-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(239, 68, 68, 0.1);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        color: #ef4444;
+        flex-shrink: 0;
+    }
+
+    .dispute-header h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+    }
+
+    .dispute-header p {
+        font-size: 14px;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+        .dispute-header p strong {
+            color: #1e293b;
+        }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: #fee2e2;
+            border-radius: 2px;
+        }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 24px;
+    }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .timeline-badge {
+        position: absolute;
+        left: -30px;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+    }
+
+    .timeline-content {
+        background: #fef2f2;
+        padding: 14px 18px;
+        border-radius: 14px;
+        margin-left: 12px;
+    }
+
+        .timeline-content strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .timeline-content span {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            display: block;
+        }
+
+    /* Escrow Note - Đồng bộ với Wallet */
+    .escrow-note {
+        display: flex;
+        gap: 14px;
+        background: rgba(245, 158, 11, 0.05);
+        border: 1px dashed rgba(245, 158, 11, 0.3);
+        border-radius: 18px;
+        padding: 18px 22px;
+        margin-top: 8px;
+        margin-bottom: 40px;
+    }
+
+        .escrow-note i {
+            font-size: 22px;
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .escrow-note strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #78350f;
+            margin-bottom: 6px;
+        }
+
+        .escrow-note p {
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+    /* Responsive */
+    @@media (max-width: 480px) {
+        .container
+
+    {
+        padding: 0 16px;
+    }
+
+    .rule-card {
+        padding: 24px;
+    }
+
+    .dispute-card {
+        padding: 24px;
+    }
+
+    .hero-title {
+        font-size: 36px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .hero-desc {
+        font-size: 13px;
+    }
+
+    }
+</style>

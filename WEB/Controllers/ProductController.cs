@@ -260,6 +260,11 @@ namespace WEB.Controllers
         [HttpGet]
         public IActionResult Cart()
         {
+            var token = HttpContext.Session.GetString("JWTToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
             return View();
         }
 

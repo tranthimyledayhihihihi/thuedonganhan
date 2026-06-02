@@ -2,350 +2,159 @@
     ViewData["Title"] = "Tin nhắn";
 }
 
-<div class="message-container">
-    <!-- Chat Sidebar -->
-    <aside class="chat-sidebar">
-        <div class="chat-sidebar-header">
-            <h2>Tin nhắn</h2>
-            <button class="btn-new-chat" title="Tin nhắn mới">
-                <i class="fas fa-edit"></i>
-            </button>
-        </div>
-
-        <div class="chat-search">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Tìm kiếm cuộc trò chuyện..." class="chat-search-input" />
-        </div>
-
-        <div class="chat-tabs">
-            <button class="chat-tab active">
-                Tất cả
-                <span class="tab-badge">12</span>
-            </button>
-            <button class="chat-tab">
-                Chưa đọc
-                <span class="tab-badge">3</span>
-            </button>
-        </div>
-
-        <div class="chat-list">
-            <div class="chat-item active">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                    <span class="online-indicator"></span>
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Minh Anh</div>
-                    <div class="chat-preview">Sách còn không bạn?</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">10:30</div>
-                    <span class="unread-badge">2</span>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Thuy+Trang&background=c084fc&color=fff" alt="Thúy Trang" />
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Thúy Trang</div>
-                    <div class="chat-preview">Cảm ơn bạn nhiều nhé!</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">Hôm qua</div>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Hoang+Nam&background=10b981&color=fff" alt="Hoàng Nam" />
-                    <span class="online-indicator"></span>
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Hoàng Nam</div>
-                    <div class="chat-preview">Máy ảnh còn không bạn?</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">2 ngày</div>
-                    <span class="unread-badge">1</span>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Phuong+Linh&background=f59e0b&color=fff" alt="Phương Linh" />
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Phương Linh</div>
-                    <div class="chat-preview">Mình muốn thuê laptop</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">3 ngày</div>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Duc+Anh&background=ef4444&color=fff" alt="Đức Anh" />
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Đức Anh</div>
-                    <div class="chat-preview">Ok bạn, hẹn gặp lại</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">1 tuần</div>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Thu+Ha&background=8b5cf6&color=fff" alt="Thu Hà" />
-                </div>
-                <div class="chat-info">
-                    <div class="chat-name">Thu Hà</div>
-                    <div class="chat-preview">Bạn có thể giao hàng không?</div>
-                </div>
-                <div class="chat-meta">
-                    <div class="chat-time">1 tuần</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Chat Main -->
-    <div class="chat-main">
-        <div class="chat-header">
-            <div class="chat-header-user">
-                <div class="chat-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                    <span class="online-indicator"></span>
-                </div>
-                <div class="chat-header-info">
-                    <div class="chat-header-name">Minh Anh</div>
-                    <div class="chat-header-status">Đang hoạt động</div>
-                </div>
-            </div>
-            <div class="chat-header-actions">
-                <button class="chat-action-btn" title="Gọi thoại">
-                    <i class="fas fa-phone"></i>
-                </button>
-                <button class="chat-action-btn" title="Gọi video">
-                    <i class="fas fa-video"></i>
-                </button>
-                <button class="chat-action-btn" title="Thông tin">
-                    <i class="fas fa-info-circle"></i>
+<div class="message-wrapper-bg">
+    <div class="message-container">
+        <aside class="chat-sidebar">
+            <div class="chat-sidebar-header">
+                <h2>Tin nhắn</h2>
+                <button class="btn-new-chat" title="Tin nhắn mới">
+                    <i class="fas fa-edit"></i>
                 </button>
             </div>
-        </div>
 
-        <div class="chat-messages">
-            <div class="message-date">Hôm nay, 10:25</div>
-
-            <div class="message received">
-                <div class="message-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Chào bạn! Mình thấy bạn đăng cho thuê sách Giải tích nâng cao
-                    </div>
-                    <div class="message-time">10:25</div>
-                </div>
+            <div class="chat-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Tìm cuộc hội thoại..." class="chat-search-input" />
             </div>
 
-            <div class="message received">
-                <div class="message-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Sách còn không bạn? Mình muốn thuê từ tuần sau
-                    </div>
-                    <div class="message-time">10:26</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Chào bạn! Sách vẫn còn nha
-                    </div>
-                    <div class="message-time">10:27</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Bạn muốn thuê bao lâu? Giá 5k/ngày, cọc 100k nhé
-                    </div>
-                    <div class="message-time">10:27</div>
-                </div>
-            </div>
-
-            <div class="message received">
-                <div class="message-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Mình thuê khoảng 2 tuần được không?
-                    </div>
-                    <div class="message-time">10:28</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Được bạn! 2 tuần là 70k. Bạn lấy ở đâu?
-                    </div>
-                    <div class="message-time">10:29</div>
-                </div>
-            </div>
-
-            <div class="message received">
-                <div class="message-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        Mình ở ký túc xá UTE. Bạn có thể gặp mình ở đó không?
-                    </div>
-                    <div class="message-time">10:30</div>
-                </div>
-            </div>
-
-            <div class="typing-indicator">
-                <div class="message-avatar">
-                    <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-                </div>
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-input-container">
-            <button class="chat-input-btn" title="Đính kèm file">
-                <i class="fas fa-paperclip"></i>
-            </button>
-            <button class="chat-input-btn" title="Hình ảnh">
-                <i class="fas fa-image"></i>
-            </button>
-            <div class="chat-input-wrapper">
-                <input type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
-                <button class="chat-input-emoji" title="Emoji">
-                    <i class="far fa-smile"></i>
+            <div class="chat-tabs">
+                <button class="chat-tab active">
+                    Tất cả
+                </button>
+                <button class="chat-tab">
+                    Chưa đọc
+                    <span class="tab-badge">3</span>
+                </button>
+                <button class="chat-tab">
+                    Đang thuê
                 </button>
             </div>
-            <button class="chat-send-btn">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+
+            <div class="chat-list">
+                <div style="display:flex; justify-content:center; align-items:center; height:100px; color:var(--text-muted);">
+                    <i class="fas fa-spinner fa-spin" style="margin-right:0.5rem;"></i> Đang tải danh sách...
+                </div>
+            </div>
+        </aside>
+
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="chat-header-user">
+                    <div class="chat-avatar">
+                        <img src="https://ui-avatars.com/api/?name=Minh+Trần&background=8b5a3c&color=fff" alt="Minh Trần" />
+                        <span class="online-indicator"></span>
+                    </div>
+                    <div class="chat-header-info">
+                        <div class="chat-header-name">Minh Trần</div>
+                        <div class="chat-header-status">Đang trực tuyến</div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-action-btn" title="Gọi thoại">
+                        <i class="fas fa-phone-alt"></i>
+                    </button>
+                    <button class="chat-action-btn" title="Gọi video">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="chat-action-btn" title="Thông tin">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+                <div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-muted); flex-direction:column; gap:1rem;">
+                    <i class="far fa-comments" style="font-size:3rem; color:#e0dcd3;"></i>
+                    <span>Đang kết nối cuộc trò chuyện...</span>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <button class="chat-input-btn" title="Đính kèm">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+                <button class="chat-input-btn" title="Hình ảnh">
+                    <i class="far fa-image"></i>
+                </button>
+                <div class="chat-input-wrapper">
+                    <input type="text" placeholder="Nhập tin nhắn..." class="chat-input" />
+                    <button class="chat-input-emoji" title="Emoji">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+                <button class="chat-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
-
-    <!-- Chat Info Sidebar (Optional) -->
-    <aside class="chat-info-sidebar">
-        <div class="chat-info-header">
-            <div class="chat-info-avatar">
-                <img src="https://ui-avatars.com/api/?name=Minh+Anh&background=2563eb&color=fff" alt="Minh Anh" />
-            </div>
-            <h3>Minh Anh</h3>
-            <p>@@minhanh.ute</p>
-        </div>
-
-        <div class="chat-info-section">
-            <h4>Thông tin</h4>
-            <div class="info-item">
-                <i class="fas fa-envelope"></i>
-                <span>minhanh@@sv.ute.udn.vn</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-phone"></i>
-                <span>0123 456 789</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Đà Nẵng</span>
-            </div>
-        </div>
-
-        <div class="chat-info-section">
-            <h4>Sản phẩm liên quan</h4>
-            <div class="related-product">
-                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=100&h=100&fit=crop" alt="Product" />
-                <div class="related-product-info">
-                    <div class="related-product-name">Sách Giải tích nâng cao</div>
-                    <div class="related-product-price">5.000đ/ngày</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-info-section">
-            <h4>File đã chia sẻ</h4>
-            <div class="shared-files">
-                <div class="shared-file">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>hop_dong_thue.pdf</span>
-                </div>
-                <div class="shared-file">
-                    <i class="fas fa-file-image"></i>
-                    <span>hinh_san_pham.jpg</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-info-actions">
-            <button class="info-action-btn danger">
-                <i class="fas fa-ban"></i>
-                Chặn người dùng
-            </button>
-            <button class="info-action-btn danger">
-                <i class="fas fa-trash"></i>
-                Xóa cuộc trò chuyện
-            </button>
-        </div>
-    </aside>
 </div>
 
 <style>
+    :root {
+        --bg-body: #f5f6f8;
+        --bg-container: #fffcf9;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --accent-green-bg: #e6f0e9;
+        --accent-green-text: #2f5c3f;
+        --text-main: #2b2825;
+        --text-muted: #8c8a86;
+        --border-color: #f0ebe1;
+        --msg-received: #f4f1ed;
+        --font-main: 'Inter', sans-serif;
+    }
+
+    .message-wrapper-bg {
+        background-color: var(--bg-body);
+        padding: 20px;
+        min-height: calc(100vh - 70px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .message-container {
         display: grid;
-        grid-template-columns: 320px 1fr 300px;
-        height: calc(100vh - 70px);
-        background: #f8f9fa;
+        grid-template-columns: 340px 1fr;
+        width: 100%;
+        max-width: 1200px;
+        height: 85vh;
+        background: var(--bg-container);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        font-family: var(--font-main);
     }
 
     /* Chat Sidebar */
     .chat-sidebar {
-        background: white;
-        border-right: 1px solid #e2e8f0;
+        background: #ffffff;
+        border-right: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
     }
 
     .chat-sidebar-header {
         padding: 1.5rem;
-        border-bottom: 1px solid #e2e8f0;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .chat-sidebar-header h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
+        .chat-sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
 
     .btn-new-chat {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--primary-blue);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--primary-brown);
         color: white;
         border: none;
         cursor: pointer;
@@ -355,106 +164,121 @@
         transition: all 0.3s ease;
     }
 
-    .btn-new-chat:hover {
-        transform: scale(1.1);
-    }
+        .btn-new-chat:hover {
+            background: var(--primary-brown-hover);
+            transform: translateY(-2px);
+        }
 
     .chat-search {
-        padding: 1rem 1.5rem;
+        padding: 0 1.5rem 1rem;
         position: relative;
     }
 
-    .chat-search i {
-        position: absolute;
-        left: 2.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-    }
+        .chat-search i {
+            position: absolute;
+            left: 2.5rem;
+            top: 40%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
 
     .chat-search-input {
         width: 100%;
         padding: 0.75rem 1rem 0.75rem 2.5rem;
-        background: #f8f9fa;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
+        background: var(--msg-received);
+        border: 1px solid transparent;
+        border-radius: 50px;
         font-size: 0.875rem;
+        color: var(--text-main);
+        transition: all 0.2s;
     }
+
+        .chat-search-input:focus {
+            outline: none;
+            border-color: #d8d3c9;
+            background: #ffffff;
+        }
 
     .chat-tabs {
         display: flex;
-        padding: 0 1.5rem;
+        padding: 0 1.5rem 1rem;
         gap: 0.5rem;
-        border-bottom: 1px solid #e2e8f0;
     }
 
     .chat-tab {
         flex: 1;
-        padding: 0.75rem 1rem;
-        background: none;
+        padding: 0.5rem 0.75rem;
+        background: transparent;
         border: none;
-        border-bottom: 3px solid transparent;
+        border-radius: 20px;
         font-weight: 600;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--text-muted);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         transition: all 0.3s ease;
+        /* Thêm dòng này để cấm rớt dòng */
+        white-space: nowrap;
     }
 
-    .chat-tab.active {
-        color: var(--primary-blue);
-        border-bottom-color: var(--primary-blue);
-    }
+        .chat-tab:hover {
+            background: var(--msg-received);
+        }
+
+        .chat-tab.active {
+            background: var(--accent-green-bg);
+            color: var(--accent-green-text);
+        }
 
     .tab-badge {
-        padding: 0.125rem 0.5rem;
-        background: #e2e8f0;
-        border-radius: 10px;
-        font-size: 0.75rem;
-    }
-
-    .chat-tab.active .tab-badge {
-        background: var(--primary-blue);
+        padding: 0.125rem 0.4rem;
+        background: var(--primary-brown);
         color: white;
+        border-radius: 10px;
+        font-size: 0.7rem;
     }
 
     .chat-list {
         flex: 1;
         overflow-y: auto;
+        padding: 0 1rem 1rem;
     }
 
     .chat-item {
         display: flex;
         align-items: center;
         gap: 1rem;
-        padding: 1rem 1.5rem;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 16px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+        background: transparent;
     }
 
-    .chat-item:hover {
-        background: #f8f9fa;
-    }
+        .chat-item:hover {
+            background: var(--msg-received);
+        }
 
-    .chat-item.active {
-        background: #eff6ff;
-        border-left-color: var(--primary-blue);
-    }
+        .chat-item.active {
+            background: var(--accent-green-bg);
+        }
 
     .chat-avatar {
         position: relative;
         flex-shrink: 0;
     }
 
-    .chat-avatar img {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
+        .chat-avatar img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
     .online-indicator {
         position: absolute;
@@ -463,8 +287,12 @@
         width: 12px;
         height: 12px;
         background: #10b981;
-        border: 2px solid white;
+        border: 2px solid #ffffff;
         border-radius: 50%;
+    }
+
+    .chat-item.active .online-indicator {
+        border-color: var(--accent-green-bg);
     }
 
     .chat-info {
@@ -473,38 +301,49 @@
     }
 
     .chat-name {
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-main);
         margin-bottom: 0.25rem;
     }
 
     .chat-preview {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--text-muted);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .chat-item.active .chat-preview {
+        color: var(--accent-green-text);
     }
 
     .chat-meta {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        gap: 0.25rem;
+        gap: 0.35rem;
     }
 
     .chat-time {
         font-size: 0.75rem;
-        color: var(--text-secondary);
+        color: var(--text-muted);
+    }
+
+    .chat-item.active .chat-time {
+        color: var(--accent-green-text);
+        font-weight: 600;
     }
 
     .unread-badge {
-        min-width: 20px;
-        height: 20px;
-        padding: 0 0.375rem;
-        background: var(--primary-blue);
+        min-width: 18px;
+        height: 18px;
+        padding: 0 0.3rem;
+        background: #ef4444;
         color: white;
         border-radius: 10px;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
         display: flex;
         align-items: center;
@@ -515,15 +354,16 @@
     .chat-main {
         display: flex;
         flex-direction: column;
-        background: white;
+        background: transparent;
     }
 
     .chat-header {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #e2e8f0;
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: #ffffff;
     }
 
     .chat-header-user {
@@ -539,72 +379,76 @@
 
     .chat-header-name {
         font-weight: 700;
-        font-size: 1.125rem;
+        font-size: 1.1rem;
+        color: var(--text-main);
     }
 
     .chat-header-status {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         color: #10b981;
+        font-weight: 500;
     }
 
     .chat-header-actions {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
 
     .chat-action-btn {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: #f8f9fa;
-        border: none;
-        color: var(--text-secondary);
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 
-    .chat-action-btn:hover {
-        background: #eff6ff;
-        color: var(--primary-blue);
-    }
+        .chat-action-btn:hover {
+            background: var(--msg-received);
+            color: var(--text-main);
+        }
 
     .chat-messages {
         flex: 1;
         overflow-y: auto;
-        padding: 1.5rem;
-        background: #f8f9fa;
+        padding: 2rem;
+        background: #ffffff;
     }
 
     .message-date {
         text-align: center;
         font-size: 0.75rem;
-        color: var(--text-secondary);
-        margin: 1rem 0;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin: 1.5rem 0;
     }
 
     .message {
         display: flex;
         gap: 0.75rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
     }
 
-    .message.sent {
-        flex-direction: row-reverse;
-    }
+        .message.sent {
+            flex-direction: row-reverse;
+        }
 
     .message-avatar img {
         width: 36px;
         height: 36px;
         border-radius: 50%;
+        margin-top: auto;
     }
 
     .message-content {
         display: flex;
         flex-direction: column;
-        max-width: 60%;
+        max-width: 65%;
     }
 
     .message.sent .message-content {
@@ -612,94 +456,59 @@
     }
 
     .message-bubble {
-        padding: 0.75rem 1rem;
-        border-radius: 16px;
+        padding: 0.85rem 1.25rem;
+        border-radius: 20px;
         line-height: 1.5;
+        font-size: 0.95rem;
     }
 
     .message.received .message-bubble {
-        background: white;
+        background: var(--msg-received);
+        color: var(--text-main);
         border-bottom-left-radius: 4px;
     }
 
     .message.sent .message-bubble {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
-        color: white;
+        background: var(--primary-brown);
+        color: #ffffff;
         border-bottom-right-radius: 4px;
     }
 
     .message-time {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        margin-top: 0.25rem;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 0.4rem;
         padding: 0 0.5rem;
     }
 
-    .typing-indicator {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-    }
-
-    .typing-dots {
-        display: flex;
-        gap: 0.25rem;
-        padding: 0.75rem 1rem;
-        background: white;
-        border-radius: 16px;
-        border-bottom-left-radius: 4px;
-    }
-
-    .typing-dots span {
-        width: 8px;
-        height: 8px;
-        background: #cbd5e1;
-        border-radius: 50%;
-        animation: typing 1.4s infinite;
-    }
-
-    .typing-dots span:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .typing-dots span:nth-child(3) {
-        animation-delay: 0.4s;
-    }
-
-    @@keyframes typing {
-        0%, 60%, 100% {
-            transform: translateY(0);
-        }
-        30% {
-            transform: translateY(-10px);
-        }
-    }
-
+    /* Input Area */
     .chat-input-container {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #e2e8f0;
+        padding: 1.25rem 2rem;
+        background: #ffffff;
         display: flex;
         gap: 0.75rem;
         align-items: center;
+        border-top: 1px solid var(--border-color);
     }
 
     .chat-input-btn {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #f8f9fa;
+        background: transparent;
         border: none;
-        color: var(--text-secondary);
+        color: var(--text-muted);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        font-size: 1.25rem;
+        transition: all 0.2s;
     }
 
-    .chat-input-btn:hover {
-        background: #e2e8f0;
-    }
+        .chat-input-btn:hover {
+            color: var(--primary-brown);
+        }
 
     .chat-input-wrapper {
         flex: 1;
@@ -708,38 +517,42 @@
 
     .chat-input {
         width: 100%;
-        padding: 0.75rem 3rem 0.75rem 1rem;
-        background: #f8f9fa;
-        border: 2px solid #e2e8f0;
-        border-radius: 24px;
-        font-size: 0.9375rem;
+        padding: 0.85rem 3rem 0.85rem 1.25rem;
+        background: var(--msg-received);
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        transition: all 0.2s;
     }
 
-    .chat-input:focus {
-        outline: none;
-        border-color: var(--primary-blue);
-        background: white;
-    }
+        .chat-input:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--border-color);
+        }
 
     .chat-input-emoji {
         position: absolute;
-        right: 0.75rem;
+        right: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        width: 32px;
-        height: 32px;
         border: none;
         background: none;
-        color: var(--text-secondary);
+        color: var(--text-muted);
         cursor: pointer;
         font-size: 1.25rem;
     }
 
+        .chat-input-emoji:hover {
+            color: var(--primary-brown);
+        }
+
     .chat-send-btn {
-        width: 44px;
-        height: 44px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
+        background: var(--primary-brown);
         color: white;
         border: none;
         cursor: pointer;
@@ -747,178 +560,458 @@
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(139, 90, 60, 0.2);
     }
 
-    .chat-send-btn:hover {
-        transform: scale(1.1);
-    }
-
-    /* Chat Info Sidebar */
-    .chat-info-sidebar {
-        background: white;
-        border-left: 1px solid #e2e8f0;
-        overflow-y: auto;
-    }
-
-    .chat-info-header {
-        padding: 2rem 1.5rem;
-        text-align: center;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .chat-info-avatar img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-bottom: 1rem;
-    }
-
-    .chat-info-header h3 {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 0.25rem;
-    }
-
-    .chat-info-header p {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .chat-info-section {
-        padding: 1.5rem;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .chat-info-section h4 {
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--text-secondary);
-        margin-bottom: 1rem;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 0;
-        font-size: 0.875rem;
-    }
-
-    .info-item i {
-        width: 20px;
-        color: var(--text-secondary);
-    }
-
-    .related-product {
-        display: flex;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-
-    .related-product img {
-        width: 60px;
-        height: 60px;
-        border-radius: 8px;
-        object-fit: cover;
-    }
-
-    .related-product-info {
-        flex: 1;
-    }
-
-    .related-product-name {
-        font-weight: 600;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .related-product-price {
-        font-size: 0.875rem;
-        color: var(--primary-blue);
-        font-weight: 700;
-    }
-
-    .shared-files {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .shared-file {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .shared-file:hover {
-        background: #e2e8f0;
-    }
-
-    .shared-file i {
-        color: var(--primary-blue);
-        font-size: 1.25rem;
-    }
-
-    .chat-info-actions {
-        padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .info-action-btn {
-        padding: 0.75rem 1rem;
-        background: #f8f9fa;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .info-action-btn.danger {
-        color: #dc2626;
-    }
-
-    .info-action-btn:hover {
-        background: #fef2f2;
-    }
-
-    @@media (max-width: 1200px) {
-        .chat-info-sidebar {
-            display: none;
+        .chat-send-btn:hover {
+            background: var(--primary-brown-hover);
+            transform: scale(1.05);
         }
 
-        .message-container {
-            grid-template-columns: 320px 1fr;
-        }
+    @@media (max-width: 900px) {
+        .message-container
+
+    {
+        grid-template-columns: 1fr;
     }
 
-    @@media (max-width: 768px) {
-        .message-container {
-            grid-template-columns: 1fr;
-        }
+    .chat-sidebar {
+        display: none;
+    }
 
-        .chat-sidebar {
-            display: none;
-        }
-
-        .message-content {
-            max-width: 80%;
-        }
     }
 </style>
+
+<form id="antiForgeryForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let activePartnerId = null;
+            let chatsList = [];
+            let currentPartnerProfile = null;
+            const currentUserId = parseInt('@ViewBag.CurrentUserId');
+            const targetReceiverId = parseInt('@ViewBag.ReceiverId') || null;
+            const targetProductId = parseInt('@ViewBag.ProductId') || null;
+
+            // API Helpers
+            async function apiGet(url) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('HTTP error ' + response.status);
+                    return await response.json();
+                } catch (error) {
+                    return { success: false, message: 'Lỗi kết nối máy chủ' };
+                }
+            }
+
+            async function apiPost(url, data) {
+                try {
+                    const formBody = [];
+                    for (const property in data) {
+                        if (data[property] !== null && data[property] !== undefined) {
+                            const encodedKey = encodeURIComponent(property);
+                            const encodedValue = encodeURIComponent(data[property]);
+                            formBody.push(encodedKey + "=" + encodedValue);
+                        }
+                    }
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                        body: formBody.join("&")
+                    });
+
+                    if (!response.ok) throw new Error('HTTP error ' + response.status);
+                    return await response.json();
+                } catch (error) {
+                    return { success: false, message: 'Lỗi kết nối máy chủ' };
+                }
+            }
+
+            // Core Functions
+            async function loadChats(selectUserId = null) {
+                const res = await apiGet('/Message/GetChats');
+                if (res.success) {
+                    chatsList = res.data;
+                    renderChatsList(chatsList);
+                    updateTabsBadges(chatsList);
+
+                    if (selectUserId) {
+                        if (selectUserId === currentUserId) {
+                            alert("Bạn không thể tự nhắn tin cho chính mình!");
+                            if (chatsList.length > 0) selectChat(chatsList[0].otherUserId);
+                            else showEmptyState();
+                            return;
+                        }
+
+                        const existingChat = chatsList.find(c => c.otherUserId === selectUserId);
+                        if (existingChat) {
+                            selectChat(selectUserId);
+                        } else {
+                            activePartnerId = selectUserId;
+                            const profileRes = await apiGet('/Message/GetUserProfile?userId=' + selectUserId);
+                            if (profileRes.success) {
+                                currentPartnerProfile = {
+                                    otherUserId: selectUserId,
+                                    fullName: profileRes.data.fullName,
+                                    avatarUrl: profileRes.data.avatarUrl
+                                };
+                                updatePartnerUI(currentPartnerProfile);
+                                const $messagesContainer = document.querySelector('.chat-messages');
+                                if ($messagesContainer) {
+                                    $messagesContainer.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-muted); flex-direction:column; gap:1rem;"><i class="far fa-comments" style="font-size:3rem; color:#e0dcd3;"></i><span>Hãy gửi tin nhắn đầu tiên để bắt đầu!</span></div>';
+                                }
+                                if (targetProductId) loadProductDetails(targetProductId);
+                            } else {
+                                showEmptyState();
+                            }
+                        }
+                    } else if (chatsList.length > 0) {
+                        selectChat(chatsList[0].otherUserId);
+                    } else {
+                        showEmptyState();
+                    }
+                } else {
+                    showEmptyState();
+                }
+            }
+
+            function renderChatsList(chats) {
+                const $chatList = document.querySelector('.chat-list');
+                if (!$chatList) return;
+                $chatList.innerHTML = '';
+
+                if (chats.length === 0) {
+                    $chatList.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">Chưa có hội thoại nào</div>';
+                    return;
+                }
+
+                chats.forEach(chat => {
+                    const timeStr = formatTime(chat.lastMessageTime);
+                    const activeClass = chat.otherUserId === activePartnerId ? 'active' : '';
+                    const unreadBadge = chat.unreadCount > 0 ? `<span class="unread-badge">${chat.unreadCount}</span>` : '';
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `chat-item ${activeClass}`;
+                    itemDiv.dataset.partnerId = chat.otherUserId;
+
+                    itemDiv.innerHTML = `
+                        <div class="chat-avatar">
+                            <img src="${chat.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.fullName)}&background=8b5a3c&color=fff`}" alt="${chat.fullName}" />
+                            <span class="online-indicator"></span>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">${chat.fullName}</div>
+                            <div class="chat-preview">${chat.lastMessage || 'Chưa có tin nhắn'}</div>
+                        </div>
+                        <div class="chat-meta">
+                            <div class="chat-time">${timeStr}</div>
+                            ${unreadBadge}
+                        </div>
+                    `;
+                    $chatList.appendChild(itemDiv);
+                });
+            }
+
+            function selectChat(partnerId) {
+                activePartnerId = partnerId;
+                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+                const selectedItem = document.querySelector(`.chat-item[data-partner-id="${partnerId}"]`);
+                if (selectedItem) selectedItem.classList.add('active');
+
+                const partner = chatsList.find(c => c.otherUserId === partnerId);
+                if (partner) {
+                    currentPartnerProfile = partner;
+                    updatePartnerUI(partner);
+
+                    const productBar = document.querySelector('.chat-product-bar');
+                    if (productBar) productBar.remove();
+
+                    if (partner.unreadCount > 0) {
+                        partner.unreadCount = 0;
+                        renderChatsList(chatsList);
+                        updateTabsBadges(chatsList);
+                    }
+                }
+
+                if (!document.querySelector('.chat-main .chat-header')) {
+                    location.reload();
+                    return;
+                }
+
+                loadConversation(partnerId);
+            }
+
+            async function loadConversation(partnerId) {
+                const $messagesContainer = document.querySelector('.chat-messages');
+                if (!$messagesContainer) return;
+                $messagesContainer.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-right:0.5rem; color:var(--primary-brown);"></i> Đang tải...</div>';
+
+                const res = await apiGet('/Message/GetConversation?otherUserId=' + partnerId);
+                if (res.success) {
+                    renderConversation(res.data);
+
+                    let linkedProductId = null;
+                    for (let i = res.data.length - 1; i >= 0; i--) {
+                        if (res.data[i].productId) {
+                            linkedProductId = res.data[i].productId;
+                            break;
+                        }
+                    }
+
+                    if (linkedProductId) {
+                        loadProductDetails(linkedProductId);
+                    } else if (targetProductId && partnerId === targetReceiverId) {
+                        loadProductDetails(targetProductId);
+                    }
+                }
+            }
+
+            function renderConversation(messages) {
+                const $messagesContainer = document.querySelector('.chat-messages');
+                if (!$messagesContainer) return;
+                $messagesContainer.innerHTML = '';
+
+                const partner = currentPartnerProfile;
+                if (!partner) return;
+
+                if (messages.length === 0) {
+                    $messagesContainer.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-muted); flex-direction:column; gap:1rem;"><i class="far fa-comments" style="font-size:3rem; color:#e0dcd3;"></i><span>Hãy gửi tin nhắn đầu tiên!</span></div>';
+                    return;
+                }
+
+                let lastDateStr = "";
+                messages.forEach(msg => {
+                    const isSent = msg.senderId === currentUserId;
+                    const messageClass = isSent ? 'sent' : 'received';
+                    const msgDate = new Date(msg.createdAt);
+                    const dateStr = msgDate.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                    if (dateStr !== lastDateStr) {
+                        const dateDiv = document.createElement('div');
+                        dateDiv.className = 'message-date';
+                        dateDiv.textContent = dateStr;
+                        $messagesContainer.appendChild(dateDiv);
+                        lastDateStr = dateStr;
+                    }
+
+                    const timeStr = msgDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${messageClass}`;
+
+                    let avatarHtml = '';
+                    if (!isSent) {
+                        avatarHtml = `
+                            <div class="message-avatar">
+                                <img src="${partner.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.fullName)}&background=8b5a3c&color=fff`}" alt="${partner.fullName}" />
+                            </div>
+                        `;
+                    }
+
+                    messageDiv.innerHTML = `
+                        ${avatarHtml}
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                ${escapeHtml(msg.content)}
+                            </div>
+                            <div class="message-time">${timeStr}</div>
+                        </div>
+                    `;
+                    $messagesContainer.appendChild(messageDiv);
+                });
+
+                scrollToBottom();
+            }
+
+            async function sendMessage() {
+                const $input = document.querySelector('.chat-input');
+                if (!$input) return;
+                const content = $input.value.trim();
+                if (!content || !activePartnerId) return;
+
+                $input.value = '';
+
+                const antiForgeryForm = document.querySelector('#antiForgeryForm');
+                const token = antiForgeryForm ? antiForgeryForm.querySelector('input[name="__RequestVerificationToken"]').value : '';
+
+                appendTempMessage(content);
+
+                const payload = {
+                    receiverId: activePartnerId,
+                    content: content,
+                    __RequestVerificationToken: token
+                };
+
+                if (targetProductId && activePartnerId === targetReceiverId) {
+                    payload.productId = targetProductId;
+                }
+
+                const res = await apiPost('/Message/SendMessage', payload);
+                if (res.success) {
+                    await loadChats(activePartnerId);
+                } else {
+                    alert("Lỗi: " + res.message);
+                }
+            }
+
+            function appendTempMessage(content) {
+                const $messagesContainer = document.querySelector('.chat-messages');
+                if (!$messagesContainer) return;
+
+                const placeholder = $messagesContainer.querySelector('.far.fa-comments');
+                if (placeholder) $messagesContainer.innerHTML = '';
+
+                const timeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-bubble" style="opacity: 0.8;">
+                            ${escapeHtml(content)}
+                        </div>
+                        <div class="message-time">${timeStr} <i class="far fa-clock"></i></div>
+                    </div>
+                `;
+                $messagesContainer.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            async function loadProductDetails(productId) {
+                const res = await apiGet('/Message/GetProductDetails?productId=' + productId);
+                if (res.success) {
+                    const prod = res.data;
+
+                    // Render embedded product card style inside chat area
+                    let productBar = document.querySelector('.chat-product-bar');
+                    if (!productBar) {
+                        productBar = document.createElement('div');
+                        productBar.className = 'chat-product-bar';
+                        // Matching the exact style of the image's embedded product box
+                        productBar.style.cssText = `
+                            display: flex;
+                            align-items: center;
+                            margin: 1rem 2rem 0;
+                            padding: 1rem;
+                            background: #ffffff;
+                            border: 1px solid var(--border-color);
+                            border-radius: 20px;
+                            gap: 1.25rem;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+                        `;
+                        const mainPanel = document.querySelector('.chat-main');
+                        const messagesContainer = document.querySelector('.chat-messages');
+                        if (mainPanel && messagesContainer) {
+                            mainPanel.insertBefore(productBar, messagesContainer);
+                        }
+                    }
+
+                    productBar.innerHTML = `
+                        <img src="${prod.imageUrl || '/images/default-product.png'}" alt="${prod.productName}" style="width:50px; height:50px; border-radius:12px; object-fit:cover;" />
+                        <div style="flex:1;">
+                            <a href="/Product/Details/${prod.productId}" style="font-size:0.95rem; font-weight:700; color:var(--text-main); text-decoration:none;">${prod.productName}</a>
+                            <span style="font-size:0.85rem; font-weight:600; color:var(--primary-brown); display:block; margin-top:0.2rem;">${formatPrice(prod.pricePerDay)}đ / ngày</span>
+                        </div>
+                    `;
+                }
+            }
+
+            function updatePartnerUI(partner) {
+                if (!partner) return;
+                const headerName = document.querySelector('.chat-header-name');
+                if (headerName) headerName.textContent = partner.fullName;
+
+                const headerImg = document.querySelector('.chat-header-user img');
+                if (headerImg) {
+                    headerImg.src = partner.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner.fullName)}&background=8b5a3c&color=fff`;
+                    headerImg.alt = partner.fullName;
+                }
+            }
+
+            function updateTabsBadges(chats) {
+                const unreadCount = chats.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+                const tabs = document.querySelectorAll('.chat-tabs .chat-tab');
+                if (tabs.length > 1) {
+                    const unreadBadge = tabs[1].querySelector('.tab-badge');
+                    if (unreadBadge) unreadBadge.textContent = unreadCount;
+                }
+            }
+
+            function scrollToBottom() {
+                const container = document.querySelector('.chat-messages');
+                if (container) container.scrollTop = container.scrollHeight;
+            }
+
+            function showEmptyState() {
+                const chatMain = document.querySelector('.chat-main');
+                if (chatMain) {
+                    chatMain.innerHTML = '<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:var(--text-muted); gap:1.5rem;"><i class="far fa-comments" style="font-size:6rem; color:#e0dcd3;"></i><h3 style="font-weight:700; color:var(--text-main); font-size:1.25rem;">Hộp thư trống</h3><p style="font-size:0.95rem;">Bạn chưa có cuộc trò chuyện nào.</p></div>';
+                }
+            }
+
+            function formatTime(isoString) {
+                if (!isoString) return '';
+                const d = new Date(isoString);
+                const now = new Date();
+                const diffMs = now - d;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                if (diffDays === 1) return 'Hôm qua';
+                if (diffDays < 7) return diffDays + ' ngày';
+                return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' });
+            }
+
+            function formatPrice(val) {
+                if (!val) return '0';
+                return parseFloat(val).toLocaleString('vi-VN');
+            }
+
+            function escapeHtml(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+
+            // Events
+            const chatListContainer = document.querySelector('.chat-list');
+            if (chatListContainer) {
+                chatListContainer.addEventListener('click', function(e) {
+                    const item = e.target.closest('.chat-item');
+                    if (item) selectChat(parseInt(item.dataset.partnerId));
+                });
+            }
+
+            const sendBtn = document.querySelector('.chat-send-btn');
+            if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+
+            const chatInput = document.querySelector('.chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            }
+
+            const searchInput = document.querySelector('.chat-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase().trim();
+                    const filtered = chatsList.filter(c => c.fullName.toLowerCase().includes(query) || (c.lastMessage && c.lastMessage.toLowerCase().includes(query)));
+                    renderChatsList(filtered);
+                });
+            }
+
+            // Init
+            loadChats(targetReceiverId);
+            setInterval(async function() {
+                if (activePartnerId) {
+                    const res = await apiGet('/Message/GetConversation?otherUserId=' + activePartnerId);
+                    if (res.success) {
+                        const currentCount = document.querySelectorAll('.chat-messages .message').length;
+                        if (res.data.length !== currentCount) renderConversation(res.data);
+                    }
+                }
+            }, 3500);
+        });
+    </script>
+}

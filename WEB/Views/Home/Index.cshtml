@@ -6,8 +6,7 @@
     var userName = Context.Session.GetString("UserName");
     var hasSession = !string.IsNullOrEmpty(jwtToken);
     var mode = (ViewBag.Mode ?? "home").ToString();
-    
-    // Debug: Log mode value
+
     System.Diagnostics.Debug.WriteLine($"[INDEX] Current Mode: {mode}, HasSession: {hasSession}");
 }
 
@@ -15,76 +14,1490 @@
     public string GetPerfectCardImage(WEB.Models.ProductViewModel product)
     {
         var cardImageUrl = product.ImageUrl;
-        
-        // We only override if it's a seed placeholder (contains unsplash or is null/empty)
         bool isPlaceholder = string.IsNullOrEmpty(cardImageUrl) || cardImageUrl.Contains("unsplash.com");
-        if (!isPlaceholder)
-        {
-            return cardImageUrl;
-        }
+        if (!isPlaceholder) return cardImageUrl;
 
         var pName = product.ProductName?.ToLower() ?? "";
         var cName = product.Category?.CategoryName?.ToLower() ?? "";
 
-        // Perfect overrides for mock data placeholders
-        if (pName.Contains("áo dài") || cName.Contains("áo dài"))
-        {
-            return "/images/aodai.png";
-        }
-        if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp"))
-        {
-            return "/images/dototnghiep.png";
-        }
-        if (pName.Contains("vest") || pName.Contains("suit"))
-        {
-            return "/images/vestnam.png";
-        }
-        if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4"))
-        {
-            return "/images/tainghe.png";
-        }
-        if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu"))
-        {
-            return "/images/maychieu.png";
-        }
-        if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ"))
-        {
-            return "/images/guitar.png";
-        }
-        if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike"))
-        {
-            return "/images/xedap.png";
-        }
-        if (pName.Contains("ipad") || pName.Contains("tablet"))
-        {
-            return "/images/ipad.png";
-        }
-        if (pName.Contains("macbook") || pName.Contains("laptop"))
-        {
-            return "/images/mac.png";
-        }
-        if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh"))
-        {
-            return "/images/mayanh.png";
-        }
-        if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ"))
-        {
-            return "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
-        }
-        if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách"))
-        {
-            return "/images/giaitich1.png";
-        }
+        if (pName.Contains("áo dài") || cName.Contains("áo dài")) return "/images/aodai.png";
+        if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp")) return "/images/dototnghiep.png";
+        if (pName.Contains("vest") || pName.Contains("suit")) return "/images/vestnam.png";
+        if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4")) return "/images/tainghe.png";
+        if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu")) return "/images/maychieu.png";
+        if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ")) return "/images/guitar.png";
+        if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike")) return "/images/xedap.png";
+        if (pName.Contains("ipad") || pName.Contains("tablet")) return "/images/ipad.png";
+        if (pName.Contains("macbook") || pName.Contains("laptop")) return "/images/mac.png";
+        if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh")) return "/images/mayanh.png";
+        if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ")) return "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
+        if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách")) return "/images/giaitich1.png";
 
         return cardImageUrl;
     }
 }
 
-<link rel="stylesheet" href="~/css/home-styles.css" asp-append-version="true" />
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+    :root {
+        --primary: #8B5E3C;
+        --primary-light: #C4956A;
+        --primary-dark: #5C3D22;
+        --accent: #E8B89A;
+        --bg: #F7F4F0;
+        --bg-warm: #EFE9E1;
+        --surface: #FFFFFF;
+        --text-primary: #1A1208;
+        --text-secondary: #6B5B4E;
+        --text-muted: #A89585;
+        --success: #5C8A5A;
+        --border: #E0D5C9;
+        --shadow: 0 4px 24px rgba(90,60,30,0.08);
+        --shadow-md: 0 8px 40px rgba(90,60,30,0.13);
+        --radius: 16px;
+        --radius-sm: 10px;
+        --font-display: 'Playfair Display', Georgia, serif;
+        --font-body: 'DM Sans', sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: var(--font-body);
+        background-color: var(--bg);
+        color: var(--text-primary);
+    }
+
+    /* ========== HERO ========== */
+    .hero-section {
+        position: relative;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5e6d3 0%, #e8d5bc 30%, #d4c0a8 70%, #c9b696 100%);
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 0;
+    }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1200&q=60') center/cover no-repeat;
+            opacity: 0.25;
+            mix-blend-mode: overlay;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(245,230,211,0.75) 0%, rgba(232,213,188,0.5) 60%, rgba(201,182,150,0.3) 100%);
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 680px;
+        padding: 5rem 5%;
+    }
+
+    .hero-title {
+        font-family: var(--font-display);
+        font-size: clamp(2.2rem, 5vw, 3.8rem);
+        font-weight: 700;
+        color: #2c1810;
+        line-height: 1.15;
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.01em;
+        text-align: left;
+    }
+
+        .hero-title em {
+            font-style: italic;
+            color: #8B5E3C;
+        }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #8B5E3C, #C4956A);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: #4a3520;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .hero-desc {
+        font-size: 1rem;
+        color: #5c4230;
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+        text-align: left;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--primary);
+        color: #fff;
+        padding: 0.85rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(139,94,60,0.35);
+    }
+
+        .btn-hero-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139,94,60,0.4);
+        }
+
+    .btn-hero-secondary {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(139,94,60,0.15);
+        color: #4a3520;
+        padding: 0.85rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        border: 1px solid rgba(139,94,60,0.3);
+        backdrop-filter: blur(6px);
+        transition: background 0.2s, transform 0.15s;
+    }
+
+        .btn-hero-secondary:hover {
+            background: rgba(139,94,60,0.25);
+            transform: translateY(-2px);
+        }
+
+    /* ========== STATS ========== */
+    .stats-section-home {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        background: var(--surface);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        margin: -1.5rem 5% 2.5rem;
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+    }
+
+    .stat-item-home {
+        flex: 1;
+        text-align: center;
+        padding: 2rem 1.5rem;
+        border-right: 1px solid var(--border);
+    }
+
+        .stat-item-home:last-child {
+            border-right: none;
+        }
+
+    .stat-num {
+        font-family: var(--font-display);
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1;
+        margin-bottom: 0.35rem;
+    }
+
+    .stat-lbl {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }
+
+    /* ========== SEARCH ========== */
+    .search-section-home {
+        padding: 1rem 5% 2rem;
+    }
+
+    .search-container-home {
+        display: flex;
+        gap: 0.75rem;
+        background: var(--surface);
+        border-radius: 60px;
+        padding: 0.6rem 0.75rem;
+        box-shadow: var(--shadow);
+        max-width: 860px;
+        margin: 0 auto;
+        border: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+
+    .search-input-group {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0 0.75rem;
+    }
+
+    .search-icon {
+        font-size: 1rem;
+        color: var(--text-muted);
+    }
+
+    .search-input-home {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        background: transparent;
+    }
+
+        .search-input-home::placeholder {
+            color: var(--text-muted);
+        }
+
+    .search-select {
+        border: none;
+        outline: none;
+        background: var(--bg);
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        padding: 0.6rem 1rem;
+        border-radius: 40px;
+        cursor: pointer;
+        border: 1px solid var(--border);
+    }
+
+    .btn-search {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 0.7rem 1.75rem;
+        border-radius: 40px;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.15s;
+        white-space: nowrap;
+    }
+
+        .btn-search:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+    /* ========== HOME LAYOUT ========== */
+    .home-layout {
+        min-height: 100vh;
+    }
+
+    /* ========== SECTIONS ========== */
+    .products-section-home,
+    .categories-section,
+    .cta-section,
+    .testimonials-section {
+        padding: 3rem 5%;
+    }
+
+    .section-header-home {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+    }
+
+        .section-header-home h2,
+        .section-title-center {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+    .section-title-center {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-header-home p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .section-subtitle-center {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .link-view-all {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        white-space: nowrap;
+        transition: gap 0.2s;
+    }
+
+        .link-view-all:hover {
+            gap: 0.5rem;
+        }
+
+    /* ========== PRODUCT GRID ========== */
+    .product-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    @@media (max-width: 900px) {
+        .product-grid-3 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .product-grid-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* HOME product card */
+    .product-card-home {
+        background: var(--surface);
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        transition: transform 0.25s, box-shadow 0.25s;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-card-home:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-card-home .product-img,
+        .product-card-modern .product-img,
+        .product-card-owner .product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s;
+        }
+
+        .product-card-home:hover .product-img {
+            transform: scale(1.04);
+        }
+
+    .product-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-category {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.4rem;
+    }
+
+    .product-name {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.35;
+    }
+
+    .product-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .product-footer-flex {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .product-price-box {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+    }
+
+    .price-main {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .price-unit {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .btn-rent {
+        background: var(--primary);
+        color: #fff;
+        padding: 0.5rem 1.1rem;
+        border-radius: 40px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.15s;
+        white-space: nowrap;
+    }
+
+        .btn-rent:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+    /* ========== BADGE STATUS ========== */
+    .badge-status {
+        position: absolute;
+        top: 0.85rem;
+        left: 0.85rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        z-index: 2;
+        letter-spacing: 0.03em;
+    }
+
+        .badge-status.available {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .badge-status.rented {
+            background: #64748b;
+            color: #fff;
+        }
+
+        .badge-status.pending {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+    /* ========== CATEGORY GRID ========== */
+    .category-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+
+    @@media (max-width: 800px) {
+        .category-grid-4 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .category-grid-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .category-card-img {
+        position: relative;
+        border-radius: var(--radius);
+        overflow: hidden;
+        aspect-ratio: 3/2;
+        display: block;
+        text-decoration: none;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .category-card-img:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .category-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s;
+        }
+
+        .category-card-img:hover img {
+            transform: scale(1.06);
+        }
+
+    .category-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(26,8,2,0.8) 0%, transparent 100%);
+        padding: 1.5rem 1rem 1rem;
+        color: #fff;
+    }
+
+        .category-overlay h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .category-overlay p {
+            font-size: 0.78rem;
+            opacity: 0.8;
+        }
+
+    /* ========== CTA BOX ========== */
+    .cta-section {
+        padding: 2rem 5% 3rem;
+    }
+
+    .cta-box {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+        border-radius: 28px;
+        padding: 3.5rem 4rem;
+        text-align: center;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-box h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .cta-box p {
+            font-size: 1rem;
+            opacity: 0.85;
+            max-width: 520px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        background: #fff;
+        color: var(--primary-dark);
+        padding: 0.85rem 2.2rem;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+    /* ========== LOGIN CTA ========== */
+    .cta-login-box {
+        text-align: center;
+        background: var(--bg-warm);
+        border: 1px dashed var(--border);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+    }
+
+        .cta-login-box h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+    /* ========== TESTIMONIALS ========== */
+    .testimonials-section {
+        background: var(--surface);
+        border-radius: 32px;
+        margin: 0 5% 3rem;
+        padding: 3rem;
+        box-shadow: var(--shadow);
+    }
+
+        .testimonials-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .testimonials-section .sub {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+    .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    @@media (max-width: 800px) {
+        .testimonial-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .testimonial-card {
+        background: var(--bg);
+        border-radius: var(--radius-sm);
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .author-info .name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+
+    .author-info .role {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .testimonial-text {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        font-style: italic;
+    }
+
+    /* ========== EMPTY ========== */
+    .empty-box {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 1px dashed var(--border);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .empty-box h3 {
+        font-family: var(--font-display);
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-box p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ========== DASHBOARD LAYOUT ========== */
+    .dashboard-layout {
+        display: flex;
+        min-height: calc(100vh - 70px);
+    }
+
+    .sidebar-left {
+        width: 260px;
+        flex-shrink: 0;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 2rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .sidebar-welcome {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        background: linear-gradient(135deg, var(--bg-warm), #fff);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+    }
+
+        .sidebar-welcome .welcome-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-welcome h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-welcome p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+    .sidebar-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: background 0.15s, color 0.15s;
+    }
+
+        .menu-item:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background: #FDF0E8;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .menu-item .icon {
+            font-size: 1.1rem;
+        }
+
+    .dashboard-content {
+        flex: 1;
+        padding: 2.5rem;
+        overflow-y: auto;
+    }
+
+    .page-title {
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .filter-tab {
+        padding: 0.5rem 1.25rem;
+        border-radius: 40px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+        .filter-tab.active, .filter-tab:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+    /* ========== OWNER STATS ========== */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-box {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .stat-icon.blue {
+            background: #EFF6FF;
+        }
+
+        .stat-icon.purple {
+            background: #F5F3FF;
+        }
+
+        .stat-icon.yellow {
+            background: #FFFBEB;
+        }
+
+    .stat-info .stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-info .stat-value {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: #DCFCE7;
+        color: #16a34a;
+        padding: 0.15rem 0.5rem;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 0.25rem;
+    }
+
+    .chart-box {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+        .chart-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+        }
+
+    .chart-select {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.35rem 0.75rem;
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        outline: none;
+        cursor: pointer;
+    }
+
+    .chart-placeholder {
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .section-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .section-header-flex h2 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+        }
+
+    .product-card-modern, .product-card-owner {
+        background: var(--surface);
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-card-modern:hover, .product-card-owner:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .btn-favorite {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.85rem;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1rem;
+        z-index: 3;
+        transition: background 0.15s, transform 0.15s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+        .btn-favorite:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+
+    .product-actions-inline {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-icon-action {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+        .btn-icon-action:hover {
+            background: var(--bg-warm);
+        }
+
+    .add-more-box {
+        background: var(--bg);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+        min-height: 200px;
+        text-decoration: none;
+        color: var(--text-secondary);
+    }
+
+        .add-more-box:hover {
+            border-color: var(--primary);
+            background: #FDF6F1;
+        }
+
+    .add-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .add-more-box h4 {
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        color: var(--text-primary);
+    }
+
+    .add-more-box p {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    /* ========== FOOTER ========== */
+    .site-footer {
+        background: #1A0E05;
+        color: rgba(255,255,255,0.75);
+        padding: 4rem 5% 2rem;
+        margin-top: 3rem;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.5fr;
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    @@media (max-width: 800px) {
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .footer-brand .logo {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .footer-brand p {
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: rgba(255,255,255,0.6);
+        max-width: 280px;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+
+    .social-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+        .social-btn:hover {
+            background: var(--primary);
+        }
+
+    .footer-col h4 {
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        color: #fff;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .footer-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+        .footer-col ul li a {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+            .footer-col ul li a:hover {
+                color: var(--accent);
+            }
+
+    .footer-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.6);
+    }
+
+        .contact-item .icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 0.05em;
+        }
+
+    .footer-bottom {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+        text-align: center;
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.4);
+    }
+
+    /* ========== TEXT CENTER ========== */
+    .text-center {
+        text-align: center;
+    }
+
+    .btn-view-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+        border: 1.5px solid var(--primary);
+        padding: 0.65rem 1.75rem;
+        border-radius: 40px;
+        transition: background 0.2s, color 0.2s;
+    }
+
+        .btn-view-more:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+    /* ========== RESPONSIVE ========== */
+    @@media (max-width: 768px) {
+        .hero-content {
+            padding: 3.5rem 5%;
+        }
+
+        .stats-section-home {
+            flex-direction: column;
+            margin: 1rem 4%;
+        }
+
+        .stat-item-home {
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem;
+        }
+
+            .stat-item-home:last-child {
+                border-bottom: none;
+            }
+
+        .search-container-home {
+            border-radius: 20px;
+            padding: 1rem;
+            flex-direction: column;
+        }
+
+        .search-input-group {
+            padding: 0;
+        }
+
+        .products-section-home, .categories-section, .cta-section {
+            padding: 2rem 4%;
+        }
+
+        .cta-box {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .dashboard-layout {
+            flex-direction: column;
+        }
+
+        .sidebar-left {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem;
+            flex-direction: row;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .sidebar-welcome {
+            display: none;
+        }
+
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        .testimonial-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+    }
+
+    /* ========== CHAT WIDGET ========== */
+    .chat-widget {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+        font-family: var(--font-body);
+    }
+
+    .chat-toggle {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 0.85rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.2s, background 0.2s;
+    }
+
+        .chat-toggle:hover {
+            transform: translateY(-2px);
+            background: var(--primary-dark);
+        }
+
+    .chat-box {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        width: 340px;
+        background: var(--surface);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 40px rgba(90,60,30,0.2);
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: opacity 0.3s, transform 0.3s;
+        transform-origin: bottom right;
+    }
+
+        .chat-box.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(10px);
+        }
+
+    .chat-header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: #fff;
+        padding: 1.2rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .chat-header h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+    .chat-close {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 0.9rem;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+        .chat-close:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+    .chat-messages {
+        height: 320px;
+        padding: 1.25rem;
+        overflow-y: auto;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .message {
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        font-size: 0.9rem;
+        max-width: 85%;
+        line-height: 1.4;
+    }
+
+    .bot-message {
+        background: #fff;
+        align-self: flex-start;
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-bottom-left-radius: 4px;
+    }
+
+    .user-message {
+        background: var(--primary-light);
+        align-self: flex-end;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+
+    .chat-input-area {
+        display: flex;
+        padding: 1rem;
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+        gap: 0.5rem;
+    }
+
+        .chat-input-area input {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            outline: none;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+            .chat-input-area input:focus {
+                border-color: var(--primary);
+            }
+
+        .chat-input-area button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 0 1.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+            .chat-input-area button:hover {
+                background: var(--primary-dark);
+            }
+</style>
 
 @if (mode == "renter")
 {
-    <!-- ========== TRANG NGƯỜI THUÊ - CÓ SIDEBAR ========== -->
     <div class="dashboard-layout">
         <aside class="sidebar-left">
             <div class="sidebar-welcome">
@@ -111,11 +1524,11 @@
         <main class="dashboard-content">
             <h2 class="page-title">Gợi ý dành riêng cho bạn</h2>
             <p class="page-subtitle">Dựa trên các tiêu chí và ngành học của bạn</p>
-            
+
             <div class="filter-tabs">
-                <button class="filter-tab active">Tất cả</button>
-                <button class="filter-tab">Điện tử</button>
-                <button class="filter-tab">Giáo trình</button>
+                <button class="filter-tab active" onclick="filterTab(this, 'all')">Tất cả</button>
+                <button class="filter-tab" onclick="filterTab(this, 'Điện tử')">Điện tử</button>
+                <button class="filter-tab" onclick="filterTab(this, 'Giáo trình')">Giáo trình</button>
             </div>
 
             @if (allProducts.Any())
@@ -123,7 +1536,7 @@
                 <div class="product-grid-3">
                     @foreach (var product in allProducts.Take(6))
                     {
-                        <div class="product-card-modern">
+                        <div class="product-card-modern filter-item" data-cat="@(product.Category?.CategoryName ?? "Khác")">
                             @if (product.IsAvailable)
                             {
                                 <span class="badge-status available">Sẵn sàng</span>
@@ -133,7 +1546,8 @@
                                 <span class="badge-status rented">Đang thuê</span>
                             }
                             <button class="btn-favorite">♡</button>
-                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img"
+                                 onerror="this.src='https://via.placeholder.com/400x300/8B5E3C/ffffff?text=Product'">
                             <div class="product-body">
                                 <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
                                 <h3 class="product-name">@product.ProductName</h3>
@@ -152,12 +1566,12 @@
             else
             {
                 <div class="empty-box">
-                    <div class="empty-icon">📦</div>
+                    <span class="empty-icon">📦</span>
                     <h3>Chưa có sản phẩm nào</h3>
                     <p>Hãy quay lại sau để xem các sản phẩm mới</p>
                 </div>
             }
-            
+
             <div class="text-center" style="margin-top: 2rem;">
                 <a href="/Product" class="btn-view-more">Xem thêm sản phẩm →</a>
             </div>
@@ -166,7 +1580,6 @@
 }
 else if (mode == "owner")
 {
-    <!-- ========== TRANG NGƯỜI CHO THUÊ - CÓ SIDEBAR ========== -->
     <div class="dashboard-layout">
         <aside class="sidebar-left">
             <div class="sidebar-welcome">
@@ -197,7 +1610,7 @@ else if (mode == "owner")
                     <div class="stat-info">
                         <div class="stat-label">Doanh thu tháng này</div>
                         <div class="stat-value">@((myProducts.Sum(p => p.PricePerDay) * 30).ToString("N0"))đ</div>
-                        <span class="stat-badge new">+15%</span>
+                        <span class="stat-badge">+15%</span>
                     </div>
                 </div>
                 <div class="stat-box">
@@ -225,14 +1638,12 @@ else if (mode == "owner")
                     </select>
                 </div>
                 <div class="chart-placeholder">
-                    <p style="color: #94a3b8; text-align: center; padding: 3rem;">📊 Biểu đồ sẽ hiển thị ở đây</p>
+                    <p style="color:#A89585;text-align:center;">📊 Biểu đồ sẽ hiển thị ở đây</p>
                 </div>
             </div>
 
             <div class="section-header-flex">
-                <div>
-                    <h2>Danh sách đang đăng</h2>
-                </div>
+                <h2>Danh sách đang đăng</h2>
                 <a href="/Product" class="link-view-all">Xem tất cả →</a>
             </div>
 
@@ -241,10 +1652,10 @@ else if (mode == "owner")
                 <div class="product-grid-3">
                     @foreach (var product in myProducts.Take(3))
                     {
-                        <div class="product-card-owner">
+                        <div class="product-card-owner filter-item" data-cat="@(product.Category?.CategoryName ?? "Khác")">
                             @if (!product.IsApproved)
                             {
-                                <span class="badge-status pending" style="background: #fef3c7; color: #d97706; border: 1px solid #fde68a;">Chờ duyệt</span>
+                                <span class="badge-status pending">Chờ duyệt</span>
                             }
                             else if (product.IsAvailable)
                             {
@@ -254,7 +1665,8 @@ else if (mode == "owner")
                             {
                                 <span class="badge-status rented">Đang thuê</span>
                             }
-                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img"
+                                 onerror="this.src='https://via.placeholder.com/400x300/8B5E3C/ffffff?text=Product'">
                             <div class="product-body">
                                 <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
                                 <h3 class="product-name">@product.ProductName</h3>
@@ -271,17 +1683,17 @@ else if (mode == "owner")
                             </div>
                         </div>
                     }
-                    <div class="add-more-box">
+                    <a href="/Post/Create" class="add-more-box">
                         <div class="add-icon">➕</div>
                         <h4>Thêm mới</h4>
                         <p>Đăng thêm đồ dùng để tăng thu nhập</p>
-                    </div>
+                    </a>
                 </div>
             }
             else
             {
                 <div class="empty-box">
-                    <div class="empty-icon">📦</div>
+                    <span class="empty-icon">📦</span>
                     <h3>Bạn chưa có sản phẩm nào</h3>
                     <p>Bắt đầu cho thuê đồ dùng của bạn</p>
                     <a href="/Post/Create" class="btn-primary">Đăng sản phẩm đầu tiên</a>
@@ -292,32 +1704,32 @@ else if (mode == "owner")
 }
 else
 {
-    <!-- ========== TRANG CHỦ - KHÔNG CÓ SIDEBAR ========== -->
     <div class="home-layout">
+
         <section class="hero-section">
             <div class="hero-content">
                 @if (hasSession)
                 {
                     <h1 class="hero-title">
-                        Thuê đồ thông minh,<br />
-                        <span class="text-gradient">tiết kiệm cùng sinh viên</span>
+                        Trải nghiệm đồ dùng cao cấp —<br />
+                        <em>không cần sở hữu</em>
                     </h1>
                     <p class="hero-subtitle">Chào mừng @userName quay trở lại!</p>
-                    <p class="hero-desc">Thuê dùng các thiết bị học tập với giá từ chỉ 20.000đ/ngày</p>
+                    <p class="hero-desc">Thuê dùng thiết bị học tập, công nghệ và phong cách sống từ 20.000đ/ngày</p>
                 }
                 else
                 {
                     <h1 class="hero-title">
-                        Thuê đồ thông minh,<br />
-                        <span class="text-gradient">tiết kiệm cùng sinh viên</span>
+                        Trải nghiệm đồ dùng cao cấp —<br />
+                        <em>không cần sở hữu</em>
                     </h1>
-                    <p class="hero-desc">Tìm nhanh các thiết bị công nghệ và đồ dùng học tập<br />Thuê dùng với giá từ 20.000đ/ngày</p>
+                    <p class="hero-desc">Tìm nhanh thiết bị công nghệ và đồ dùng học tập<br />Thuê với giá từ 20.000đ/ngày</p>
                 }
                 <div class="hero-buttons">
                     @if (hasSession)
                     {
-                        <a href="/Product" class="btn-hero-primary">Tiếp tục khám phá</a>
-                        <a href="/?mode=renter" class="btn-hero-secondary">Đăng tin ngay</a>
+                        <a href="/Product" class="btn-hero-primary">Khám phá ngay</a>
+                        <a href="/?mode=renter" class="btn-hero-secondary">Xem đề xuất cho tôi</a>
                     }
                     else
                     {
@@ -327,6 +1739,21 @@ else
                 </div>
             </div>
         </section>
+
+        <div class="stats-section-home">
+            <div class="stat-item-home">
+                <div class="stat-num">5,000+</div>
+                <div class="stat-lbl">sản phẩm<br />sẵn có</div>
+            </div>
+            <div class="stat-item-home">
+                <div class="stat-num">15,000+</div>
+                <div class="stat-lbl">giao dịch<br />thành công</div>
+            </div>
+            <div class="stat-item-home">
+                <div class="stat-num">4.9/5</div>
+                <div class="stat-lbl">đánh giá từ<br />người dùng</div>
+            </div>
+        </div>
 
         <section class="search-section-home">
             <form action="/Product" method="get" class="search-container-home">
@@ -338,7 +1765,7 @@ else
                     <option value="">Tất cả danh mục</option>
                     <option value="1">Điện tử</option>
                     <option value="2">Học tập</option>
-                    <option value="3">Sách & Giáo trình</option>
+                    <option value="3">Sách &amp; Giáo trình</option>
                     <option value="5">Thời trang</option>
                 </select>
                 <select name="maxPrice" class="search-select">
@@ -346,17 +1773,17 @@ else
                     <option value="50000">Dưới 50k/ngày</option>
                     <option value="100000">Dưới 100k/ngày</option>
                 </select>
-                <button type="submit" class="btn-search">Lọc</button>
+                <button type="submit" class="btn-search">Khám phá ngay</button>
             </form>
         </section>
 
         <section class="products-section-home">
             <div class="section-header-home">
                 <div>
-                    <h2>Đồ dùng nổi bật</h2>
-                    <p>Sản phẩm được ưa chuộng nhất trong cộng đồng UTE</p>
+                    <h2>Sản phẩm nổi bật</h2>
+                    <p>Được ưa chuộng nhất trong cộng đồng sinh viên</p>
                 </div>
-                <a href="/Product" class="link-view-all">Xem tất cả đồ dùng →</a>
+                <a href="/Product" class="link-view-all">Xem tất cả →</a>
             </div>
 
             @if (allProducts.Any())
@@ -367,20 +1794,18 @@ else
                         <div class="product-card-home">
                             @if (product.IsAvailable)
                             {
-                                <span class="badge-status available" style="position: absolute; top: 1rem; left: 1rem; background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2;">Sẵn sàng</span>
+                                <span class="badge-status available">Sẵn sàng</span>
                             }
                             else
                             {
-                                <span class="badge-status rented" style="position: absolute; top: 1rem; left: 1rem; background: var(--text-secondary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2;">Đang thuê</span>
+                                <span class="badge-status rented">Đang thuê</span>
                             }
-                            
-                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img" onerror="this.src='https://via.placeholder.com/400x300/667eea/ffffff?text=Product'">
+                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName" class="product-img"
+                                 onerror="this.src='https://via.placeholder.com/400x300/8B5E3C/ffffff?text=Product'">
                             <div class="product-body">
                                 <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
                                 <h3 class="product-name">@product.ProductName</h3>
-                                <p class="product-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 3em; margin-bottom: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                                    @(string.IsNullOrEmpty(product.Description) ? "Sản phẩm cho thuê trên UTE Rent" : product.Description)
-                                </p>
+                                <p class="product-desc">@(string.IsNullOrEmpty(product.Description) ? "Sản phẩm cho thuê trên UTE Rent" : product.Description)</p>
                                 <div class="product-footer-flex">
                                     <div class="product-price-box">
                                         <span class="price-main">@product.PricePerDay.ToString("N0")đ</span>
@@ -395,17 +1820,17 @@ else
             }
             else
             {
-                <div class="empty-box" style="text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
-                    <h3 style="color: var(--text-primary);">Chưa có sản phẩm nào</h3>
-                    <p style="color: var(--text-secondary);">Hãy quay lại sau để xem các sản phẩm mới nhất</p>
+                <div class="empty-box">
+                    <span class="empty-icon">📦</span>
+                    <h3>Chưa có sản phẩm nào</h3>
+                    <p>Hãy quay lại sau để xem sản phẩm mới nhất</p>
                 </div>
             }
 
             @if (!hasSession)
             {
                 <div class="cta-login-box">
-                    <h3>Đăng nhập để xem thêm sản phẩm và thuê đồ</h3>
+                    <h3>Đăng nhập để xem thêm sản phẩm và bắt đầu thuê đồ</h3>
                     <a href="/Account/Login" class="btn-primary">Đăng nhập ngay</a>
                 </div>
             }
@@ -413,7 +1838,8 @@ else
 
         <section class="categories-section">
             <h2 class="section-title-center">Danh mục phổ biến</h2>
-            <p class="section-subtitle-center">Khám phá các danh mục sản phẩm được yêu thích</p>
+            <p class="section-subtitle-center">Khám phá các danh mục sản phẩm được yêu thích nhất</p>
+
             <div class="category-grid-4">
                 <a href="/Product?categoryIds=1" class="category-card-img">
                     <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop" alt="Điện tử">
@@ -425,7 +1851,7 @@ else
                 <a href="/Product?categoryIds=3" class="category-card-img">
                     <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&h=400&fit=crop" alt="Sách">
                     <div class="category-overlay">
-                        <h3>Sách & Tài liệu</h3>
+                        <h3>Sách &amp; Tài liệu</h3>
                         <p>Giáo trình, sách tham khảo</p>
                     </div>
                 </a>
@@ -437,7 +1863,7 @@ else
                     </div>
                 </a>
                 <a href="/Product?categoryIds=6" class="category-card-img">
-                    <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&h=400&fit=crop" alt="Nhiếp ảnh">
+                    <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&h=400&fit=crop" alt="Phụ kiện">
                     <div class="category-overlay">
                         <h3>Phụ kiện khác</h3>
                         <p>Chuột, bàn phím, tai nghe</p>
@@ -449,24 +1875,186 @@ else
         <section class="cta-section">
             <div class="cta-box">
                 <h2>Bạn có đồ dùng dư thừa?<br />Cho thuê để tăng thu nhập.</h2>
-                <p>Biến chiếc laptop cũ, máy ảnh hay bất kỳ đồ dùng nào thành nguồn thu nhập thụ động.</p>
+                <p>Biến chiếc laptop cũ, máy ảnh hay bất kỳ đồ dùng nào thành nguồn thu nhập thụ động mỗi ngày.</p>
                 @if (hasSession)
                 {
                     <a href="/Post/Create" class="btn-primary">Đăng tin cho thuê</a>
                 }
                 else
                 {
-                    <a href="/Account/Register" class="btn-primary">Đăng ký ngay</a>
+                    <a href="/Account/Register" class="btn-primary">Bắt đầu ngay</a>
                 }
             </div>
         </section>
+
+        <section class="testimonials-section">
+            <h2>Câu chuyện từ khách hàng</h2>
+            <p class="sub">Hàng nghìn sinh viên đã tin tưởng và trải nghiệm UTE Rent</p>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-author">
+                        <div class="avatar-circle">NA</div>
+                        <div class="author-info">
+                            <div class="name">Nhật Anh</div>
+                            <div class="role">Sinh viên CNTT</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Tôi thuê MacBook qua UTE Rent để làm đồ án. Giá rất hợp lý, máy sạch sẽ và chủ thuê rất nhiệt tình hỗ trợ."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-author">
+                        <div class="avatar-circle">HQ</div>
+                        <div class="author-info">
+                            <div class="name">Hoàng Quân</div>
+                            <div class="role">Sinh viên Kinh tế</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Cho thuê áo vest cho buổi thuyết trình, tiết kiệm được cả triệu so với mua mới. Nền tảng dễ dùng và đáng tin!"</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-author">
+                        <div class="avatar-circle">LC</div>
+                        <div class="author-info">
+                            <div class="name">Linh Chi</div>
+                            <div class="role">Sinh viên Kiến trúc</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Mình đăng cho thuê máy ảnh và kiếm thêm 2-3 triệu mỗi tháng. Quá tuyệt! Nên trải nghiệm nếu có đồ nhàn rỗi."</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo">UTE Rent</span>
+                    <p>Nền tảng cho thuê đồ dùng chia sẻ dành cho sinh viên UTE. Thuê thông minh — sống tiết kiệm.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-btn">📘</a>
+                        <a href="#" class="social-btn">📸</a>
+                        <a href="#" class="social-btn">🐦</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Khám phá</h4>
+                    <ul>
+                        <li><a href="/Product">Tất cả sản phẩm</a></li>
+                        <li><a href="/Product?categoryIds=1">Điện tử</a></li>
+                        <li><a href="/Product?categoryIds=5">Thời trang</a></li>
+                        <li><a href="/Post/Create">Đăng tin</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ</h4>
+                    <ul>
+                        <li><a href="#">Hướng dẫn thuê</a></li>
+                        <li><a href="#">Quy chính bảo mật</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Liên hệ chúng tôi</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Liên hệ</h4>
+                    <div class="footer-contact">
+                        <div class="contact-item"><span class="icon">📍</span><span>48 Cao Thắng, Hải Châu, Đà Nẵng</span></div>
+                        <div class="contact-item"><span class="icon">📞</span><span>0909 111 222</span></div>
+                        <div class="contact-item"><span class="icon">✉️</span><span>hello@UTERent.vn</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © @DateTime.Now.Year UTE Rent — Nền tảng thuê đồ thông minh cho sinh viên
+            </div>
+        </footer>
     </div>
 }
 
+<div id="chat-widget" class="chat-widget">
+    <div id="chat-box" class="chat-box hidden">
+        <div class="chat-header">
+            <h4>Hỗ trợ UTE Rent</h4>
+            <button id="chat-close" class="chat-close">✖</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">Chào bạn! Bạn cần hỗ trợ gì về việc thuê hoặc đăng tin trên hệ thống?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off" />
+            <button id="chat-send">Gửi</button>
+        </div>
+    </div>
+    <button id="chat-toggle" class="chat-toggle">
+        <span class="chat-icon">💬</span>
+        <span class="chat-text">Chat hỗ trợ</span>
+    </button>
+</div>
+
 <script>
-function deleteProduct(productId) {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-        alert('Chức năng xóa sản phẩm đang được phát triển');
+    function deleteProduct(productId) {
+        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+            alert('Chức năng xóa sản phẩm đang được phát triển');
+        }
     }
-}
+
+    // Lọc sản phẩm theo tab (dùng cho trang Người thuê)
+    function filterTab(el, cat) {
+        var tabs = el.parentElement.querySelectorAll('.filter-tab');
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        el.classList.add('active');
+
+        document.querySelectorAll('.filter-item').forEach(function (card) {
+            var itemCat = card.getAttribute('data-cat') || "";
+            if (cat === 'all' || itemCat.includes(cat)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // ========== CHAT WIDGET LOGIC ==========
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtn = document.getElementById('chat-toggle');
+        const chatBox = document.getElementById('chat-box');
+        const closeBtn = document.getElementById('chat-close');
+        const sendBtn = document.getElementById('chat-send');
+        const chatInput = document.getElementById('chat-input');
+        const messagesContainer = document.getElementById('chat-messages');
+
+        // Mở / Đóng khung chat
+        toggleBtn.addEventListener('click', () => {
+            chatBox.classList.toggle('hidden');
+            if (!chatBox.classList.contains('hidden')) {
+                chatInput.focus();
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatBox.classList.add('hidden');
+        });
+
+        // Xử lý gửi tin nhắn
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text !== "") {
+                // Thêm tin nhắn của người dùng
+                messagesContainer.innerHTML += `<div class="message user-message">${text}</div>`;
+                chatInput.value = '';
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Giả lập hệ thống phản hồi sau 1 giây
+                setTimeout(() => {
+                    messagesContainer.innerHTML += `<div class="message bot-message">Cảm ơn bạn đã nhắn tin. Quản trị viên UTE Rent sẽ phản hồi lại trong giây lát!</div>`;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    });
 </script>

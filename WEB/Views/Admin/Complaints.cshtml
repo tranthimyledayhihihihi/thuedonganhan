@@ -1,0 +1,1308 @@
+@model List<WEB.Models.ComplaintViewModel>
+@{
+    ViewData["Title"] = "Quản lý Khiếu nại";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // Summary stats
+    var allCount = Model.Count;
+    var pendingCount = Model.Count(c => c.Status == "Pending");
+    var resolvingCount = Model.Count(c => c.Status == "Resolving");
+    var resolvedCount = Model.Count(c => c.Status == "Resolved");
+    var rejectedCount = Model.Count(c => c.Status == "Rejected");
+}
+
+<div class="lm-admin-wrapper">
+
+    <!-- Header -->
+    <div class="lm-page-header">
+        <div class="lm-breadcrumb">UTE Rent Admin</div>
+        <h1 class="lm-page-title">Quản lý Khiếu nại</h1>
+        <p class="lm-page-subtitle">Phân xử và giải quyết các khiếu nại tranh chấp giữa người thuê và chủ sản phẩm để đảm bảo công bằng.</p>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="lm-stats-grid">
+        <div class="lm-stat-card">
+            <div class="lm-stat-top">
+                <div class="lm-stat-icon" style="background:#eef2ff; color:#4f46e5;">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+            </div>
+            <div class="lm-stat-label">Tổng khiếu nại</div>
+            <div class="lm-stat-value">@allCount</div>
+            <div class="lm-stat-border" style="background:#4f46e5;"></div>
+        </div>
+
+        <div class="lm-stat-card">
+            <div class="lm-stat-top">
+                <div class="lm-stat-icon" style="background:var(--badge-yellow-bg); color:var(--badge-yellow-text);">
+                    <i class="fas fa-hourglass-start"></i>
+                </div>
+            </div>
+            <div class="lm-stat-label">Đang chờ xử lý</div>
+            <div class="lm-stat-value">@pendingCount</div>
+            <div class="lm-stat-border" style="background:var(--badge-yellow-text);"></div>
+        </div>
+
+        <div class="lm-stat-card">
+            <div class="lm-stat-top">
+                <div class="lm-stat-icon" style="background:var(--badge-blue-bg); color:var(--badge-blue-text);">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+            <div class="lm-stat-label">Đang giải quyết</div>
+            <div class="lm-stat-value">@resolvingCount</div>
+            <div class="lm-stat-border" style="background:var(--badge-blue-text);"></div>
+        </div>
+
+        <div class="lm-stat-card">
+            <div class="lm-stat-top">
+                <div class="lm-stat-icon" style="background:var(--badge-green-bg); color:var(--badge-green-text);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            <div class="lm-stat-label">Đã hoàn tất</div>
+            <div class="lm-stat-value">@(resolvedCount + rejectedCount)</div>
+            <div class="lm-stat-border" style="background:var(--badge-green-text);"></div>
+        </div>
+    </div>
+
+    <!-- Controls (Tabs & Search) -->
+    <div class="lm-controls-row">
+        <div class="lm-tabs">
+            <button class="lm-tab active" onclick="setActiveTab(this, 'all')">
+                Tất cả <span class="lm-tab-count">@allCount</span>
+            </button>
+            <button class="lm-tab" onclick="setActiveTab(this, 'Pending')">
+                Chờ xử lý <span class="lm-tab-count">@pendingCount</span>
+            </button>
+            <button class="lm-tab" onclick="setActiveTab(this, 'Resolving')">
+                Đang xử lý <span class="lm-tab-count">@resolvingCount</span>
+            </button>
+            <button class="lm-tab" onclick="setActiveTab(this, 'Resolved')">
+                Đã giải quyết <span class="lm-tab-count">@resolvedCount</span>
+            </button>
+            <button class="lm-tab" onclick="setActiveTab(this, 'Rejected')">
+                Đã từ chối <span class="lm-tab-count">@rejectedCount</span>
+            </button>
+        </div>
+
+        <div class="lm-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="lmSearchInput" placeholder="Tìm ID, lý do, tiêu đề..." />
+        </div>
+    </div>
+
+    <!-- Main Table Panel -->
+    <div class="lm-table-card">
+        @if (Model.Any())
+        {
+            <div class="lm-table-responsive">
+                <table class="lm-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">MÃ KN</th>
+                            <th>ĐƠN THUÊ & NGƯỜI GỬI</th>
+                            <th style="width: 35%;">NỘI DUNG KHIẾU NẠI</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>HÀNH ĐỘNG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lmTableBody">
+                        @foreach (var complaint in Model)
+                        {
+                            var badgeClass = complaint.Status switch
+                            {
+                                "Pending" => "lm-badge-yellow",
+                                "Resolving" => "lm-badge-blue",
+                                "Resolved" => "lm-badge-green",
+                                "Rejected" => "lm-badge-red",
+                                _ => "lm-badge-yellow"
+                            };
+                            var statusText = complaint.Status switch
+                            {
+                                "Pending" => "Đang chờ",
+                                "Resolving" => "Đang xử lý",
+                                "Resolved" => "Đã giải quyết",
+                                "Rejected" => "Bị từ chối",
+                                _ => complaint.Status
+                            };
+
+                            <tr class="lm-row" data-status="@complaint.Status">
+                                <td>
+                                    <span class="lm-id">#CMP-@complaint.ComplaintId.ToString("D4")</span>
+                                </td>
+                                <td>
+                                    <div class="lm-order-ref">
+                                        <a href="/Admin/Rentals?search=@complaint.RentalId" class="lm-order-link">
+                                            <i class="fas fa-shopping-bag"></i> Đơn thuê #ORD-@complaint.RentalId.ToString("D4")
+                                        </a>
+                                    </div>
+                                    <div class="lm-user-ref">User ID: <strong>@complaint.UserId</strong></div>
+                                    <div class="lm-date-ref">Ngày gửi: @complaint.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                                </td>
+                                <td>
+                                    <span class="lm-reason-tag">@complaint.Reason</span>
+                                    <div class="lm-c-title">@complaint.Title</div>
+                                    <div class="lm-c-desc">@complaint.Description</div>
+
+                                    @if (!string.IsNullOrEmpty(complaint.ImageUrl))
+                                    {
+                                        var images = complaint.ImageUrl.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                                        <div class="lm-evidence-area">
+                                            @if (images.Length > 1)
+                                            {
+                                                <div class="lm-evidence-item">
+                                                    <span class="lm-evidence-lbl green"><i class="fas fa-camera"></i> 1. Lúc cho thuê</span>
+                                                    <a href="@images[0]" target="_blank" class="lm-evidence-link"><i class="far fa-eye"></i> Xem ảnh</a>
+                                                </div>
+                                                <div class="lm-evidence-item">
+                                                    <span class="lm-evidence-lbl orange"><i class="fas fa-truck-pickup"></i> 2. Lúc lấy đồ</span>
+                                                    <a href="@images[1]" target="_blank" class="lm-evidence-link"><i class="far fa-eye"></i> Xem ảnh/video</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="lm-evidence-item">
+                                                    <a href="@complaint.ImageUrl" target="_blank" class="lm-evidence-link"><i class="fas fa-image"></i> Xem ảnh bằng chứng</a>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="lm-badge @badgeClass">@statusText</span>
+                                </td>
+                                <td>
+                                    <div class="lm-actions-wrapper">
+                                        @if (complaint.Status == "Pending")
+                                        {
+                                            <button type="button" class="lm-btn lm-btn-primary" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Resolving')">
+                                                <i class="fas fa-spinner"></i> Tiếp nhận
+                                            </button>
+                                            <button type="button" class="lm-btn lm-btn-danger" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Rejected')">
+                                                <i class="fas fa-ban"></i> Từ chối
+                                            </button>
+                                        }
+                                        else if (complaint.Status == "Resolving")
+                                        {
+                                            <button type="button" class="lm-btn lm-btn-success" onclick="openResolveModal(@complaint.ComplaintId, @(complaint.Rental?.TotalPrice ?? 0), @(complaint.Rental?.DepositAmount ?? 0))">
+                                                <i class="fas fa-gavel"></i> Phân xử
+                                            </button>
+                                            <button type="button" class="lm-btn lm-btn-danger" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Rejected')">
+                                                <i class="fas fa-ban"></i> Từ chối
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="lm-action-done">
+                                                <i class="fas fa-check-double"></i> Đã hoàn tất xử lý
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <!-- Empty state -->
+        <div class="lm-empty" id="lmEmptyState" style="@(Model.Any() ? "display:none;" : "")">
+            <i class="fas fa-balance-scale-left"></i>
+            <p>Không tìm thấy khiếu nại nào phù hợp</p>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+<!-- Modal Phân xử (Thừa kế cấu trúc Bootstrap nhưng ghi đè style nội bộ) -->
+<div class="modal fade" id="resolveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content lm-modal-content">
+            <div class="lm-modal-header">
+                <h5 class="lm-modal-title">
+                    <i class="fas fa-gavel"></i> Phân xử & Bồi thường
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="lm-modal-body">
+                <input type="hidden" id="resolveComplaintId" />
+
+                <div class="lm-alert-warning">
+                    <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> LƯU Ý KHI PHÂN XỬ</div>
+                    <ul>
+                        <li>Đơn <b>InProgress</b>: Hệ thống đang giữ cả Tiền thuê + Tiền cọc.</li>
+                        <li>Đơn <b>Active / Returned</b>: Hệ thống chỉ giữ Tiền cọc.</li>
+                    </ul>
+                </div>
+
+                <div class="lm-modal-stats">
+                    <div class="stat-col">
+                        <span class="lbl">TIỀN THUÊ</span>
+                        <strong id="calcRentalPriceText">0đ</strong>
+                    </div>
+                    <div class="stat-col">
+                        <span class="lbl">TIỀN ĐẶT CỌC</span>
+                        <strong id="calcDepositPriceText">0đ</strong>
+                    </div>
+                </div>
+
+                <div class="lm-modal-section">
+                    <label class="lm-form-label">Bên chịu trách nhiệm chính</label>
+                    <div class="lm-radio-group">
+                        <input type="radio" class="btn-check" name="faultParty" id="faultOwner" autocomplete="off" checked onchange="calculateArbitration()">
+                        <label class="lm-radio-btn owner" for="faultOwner">
+                            <i class="fas fa-store"></i> Chủ đồ có lỗi
+                        </label>
+
+                        <input type="radio" class="btn-check" name="faultParty" id="faultRenter" autocomplete="off" onchange="calculateArbitration()">
+                        <label class="lm-radio-btn renter" for="faultRenter">
+                            <i class="fas fa-user"></i> Khách thuê có lỗi
+                        </label>
+                    </div>
+                </div>
+
+                <div class="lm-modal-section">
+                    <label class="lm-form-label">Mức độ thiệt hại / Bồi thường</label>
+                    <div class="lm-percent-presets">
+                        <button type="button" onclick="setPresetPercent(20)">20% (Nhẹ)</button>
+                        <button type="button" onclick="setPresetPercent(50)">50% (Vừa)</button>
+                        <button type="button" onclick="setPresetPercent(100)">100% (Tối đa)</button>
+                    </div>
+
+                    <div class="lm-slider-box">
+                        <div class="slider-head">
+                            <span>Tỷ lệ phân xử bồi thường:</span>
+                            <strong id="sliderValLabel">50%</strong>
+                        </div>
+                        <input type="range" class="form-range lm-range" id="calcPercentSlider" min="0" max="100" value="50" oninput="calculateArbitration()">
+                    </div>
+                </div>
+
+                <div class="lm-preview-box">
+                    <div class="preview-head"><i class="fas fa-calculator"></i> Đề xuất phân xử tự động</div>
+                    <div class="preview-row">
+                        <span>Chuyển cho Chủ đồ:</span>
+                        <strong id="previewOwnerComp">0đ</strong>
+                    </div>
+                    <div class="preview-row">
+                        <span>Hoàn cho Khách thuê:</span>
+                        <strong class="text-green" id="previewRenterRefund">0đ</strong>
+                    </div>
+                </div>
+
+                <div class="lm-modal-section">
+                    <label class="lm-switch">
+                        <input type="checkbox" id="manualOverrideSwitch" onchange="toggleManualInputs()">
+                        <span class="slider round"></span>
+                        <span class="lbl">Chỉnh sửa thủ công số tiền bồi thường</span>
+                    </label>
+
+                    <div id="manualInputsArea" class="lm-manual-inputs" style="display: none;">
+                        <div class="input-col">
+                            <label>Tiền CHỦ ĐỒ (VNĐ)</label>
+                            <input type="number" id="ownerCompInput" value="0">
+                        </div>
+                        <div class="input-col">
+                            <label>Tiền NGƯỜI THUÊ (VNĐ)</label>
+                            <input type="number" id="renterRefInput" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lm-modal-section" style="margin-bottom:0;">
+                    <label class="lm-form-label">Ghi chú của Admin</label>
+                    <textarea class="lm-textarea" id="adminNotesInput" rows="3" placeholder="Nhập lý do phân xử..."></textarea>
+                </div>
+            </div>
+
+            <div class="lm-modal-footer">
+                <button type="button" class="lm-btn lm-btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="lm-btn lm-btn-primary" onclick="submitResolve()">Xác nhận Giải quyết</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --bg-body: #f7f5f2;
+        --card-bg: #ffffff;
+        --text-main: #2b3a30;
+        --text-muted: #8b9690;
+        --primary-green: #3f5947;
+        --primary-green-hover: #324738;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --border-color: #f0ebe1;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+        --badge-yellow-bg: #fdf3e7;
+        --badge-yellow-text: #b86e24;
+        --badge-blue-bg: #e0f2fe;
+        --badge-blue-text: #0284c7;
+        --badge-red-bg: #fee2e2;
+        --badge-red-text: #dc2626;
+    }
+
+    .lm-admin-wrapper {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .lm-page-header {
+        margin-bottom: 25px;
+    }
+
+    .lm-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .lm-page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 5px 0;
+    }
+
+    .lm-page-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0;
+    }
+
+    /* Stats Grid */
+    .lm-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .lm-stat-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        position: relative;
+        overflow: hidden;
+        transition: 0.2s;
+    }
+
+        .lm-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        }
+
+    .lm-stat-top {
+        margin-bottom: 10px;
+    }
+
+    .lm-stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .lm-stat-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .lm-stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1;
+    }
+
+    .lm-stat-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+
+    /* Controls */
+    .lm-controls-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .lm-tabs {
+        display: flex;
+        gap: 10px;
+        background: white;
+        padding: 5px;
+        border-radius: 50px;
+        border: 1px solid var(--border-color);
+    }
+
+    .lm-tab {
+        background: transparent;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .lm-tab:hover {
+            color: var(--text-main);
+        }
+
+        .lm-tab.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+    .lm-tab-count {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 50px;
+        background: #f1f5f9;
+        color: var(--text-muted);
+    }
+
+    .lm-tab.active .lm-tab-count {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .lm-search-box {
+        position: relative;
+        width: 300px;
+    }
+
+        .lm-search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .lm-search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+            .lm-search-box input:focus {
+                border-color: var(--primary-brown);
+            }
+
+    /* Table */
+    .lm-table-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .lm-table-responsive {
+        overflow-x: auto;
+    }
+
+    .lm-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .lm-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+            background: #fafafa;
+            white-space: nowrap;
+        }
+
+        .lm-table td {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .lm-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .lm-table tr:hover td {
+            background: #fdfaf6;
+        }
+
+    .lm-id {
+        font-weight: 800;
+        color: var(--primary-brown);
+        font-size: 0.9rem;
+    }
+
+    .lm-order-ref {
+        margin-bottom: 8px;
+    }
+
+    .lm-order-link {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .lm-order-link:hover {
+            text-decoration: underline;
+        }
+
+    .lm-user-ref {
+        font-size: 0.85rem;
+        color: var(--text-main);
+        margin-bottom: 2px;
+    }
+
+    .lm-date-ref {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .lm-reason-tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        background: var(--badge-red-bg);
+        color: var(--badge-red-text);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .lm-c-title {
+        font-weight: 800;
+        font-size: 1rem;
+        color: var(--text-main);
+        margin-bottom: 5px;
+    }
+
+    .lm-c-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .lm-evidence-area {
+        background: #fafafa;
+        border: 1px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 10px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .lm-evidence-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .lm-evidence-lbl {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 6px;
+    }
+
+        .lm-evidence-lbl.green {
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
+        }
+
+        .lm-evidence-lbl.orange {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+    .lm-evidence-link {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--primary-brown);
+        text-decoration: none;
+    }
+
+        .lm-evidence-link:hover {
+            text-decoration: underline;
+        }
+
+    .lm-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    .lm-badge-yellow {
+        background: var(--badge-yellow-bg);
+        color: var(--badge-yellow-text);
+    }
+
+    .lm-badge-blue {
+        background: var(--badge-blue-bg);
+        color: var(--badge-blue-text);
+    }
+
+    .lm-badge-green {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+    }
+
+    .lm-badge-red {
+        background: var(--badge-red-bg);
+        color: var(--badge-red-text);
+    }
+
+    .lm-actions-wrapper {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .lm-btn {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .lm-btn-primary {
+        background: var(--primary-green);
+        color: white;
+    }
+
+        .lm-btn-primary:hover {
+            background: var(--primary-green-hover);
+        }
+
+    .lm-btn-success {
+        background: #16a34a;
+        color: white;
+    }
+
+        .lm-btn-success:hover {
+            background: #15803d;
+        }
+
+    .lm-btn-danger {
+        background: var(--badge-red-bg);
+        color: var(--badge-red-text);
+    }
+
+        .lm-btn-danger:hover {
+            background: #fecaca;
+        }
+
+    .lm-btn-secondary {
+        background: #f1f5f9;
+        color: var(--text-main);
+    }
+
+        .lm-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+    .lm-action-done {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--text-muted);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .lm-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+        .lm-empty i {
+            font-size: 3rem;
+            color: #d1d5db;
+            margin-bottom: 15px;
+        }
+
+        .lm-empty p {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+    /* Modal Styling Overrides */
+    .lm-modal-content {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .lm-modal-header {
+        padding: 25px 30px 15px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .lm-modal-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        margin: 0;
+    }
+
+    .lm-modal-body {
+        padding: 25px 30px;
+    }
+
+    .lm-modal-footer {
+        padding: 15px 30px 25px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .lm-alert-warning {
+        background: var(--badge-yellow-bg);
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--badge-yellow-text);
+    }
+
+        .lm-alert-warning .alert-title {
+            font-weight: 800;
+            color: var(--badge-yellow-text);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .lm-alert-warning ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+    .lm-modal-stats {
+        display: flex;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        background: #fafafa;
+    }
+
+        .lm-modal-stats .stat-col {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+        }
+
+            .lm-modal-stats .stat-col:first-child {
+                border-right: 1px solid var(--border-color);
+            }
+
+        .lm-modal-stats .lbl {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .lm-modal-stats strong {
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+    .lm-modal-section {
+        margin-bottom: 20px;
+    }
+
+    .lm-form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+
+    .lm-radio-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .lm-radio-btn {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: 0.2s;
+    }
+
+    input[type="radio"]:checked + .lm-radio-btn.owner {
+        border-color: var(--primary-brown);
+        background: var(--primary-brown);
+        color: white;
+    }
+
+    input[type="radio"]:checked + .lm-radio-btn.renter {
+        border-color: var(--primary-green);
+        background: var(--primary-green);
+        color: white;
+    }
+
+    .lm-percent-presets {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+        .lm-percent-presets button {
+            flex: 1;
+            padding: 8px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+            .lm-percent-presets button:hover {
+                border-color: var(--primary-green);
+                color: var(--primary-green);
+            }
+
+    .lm-slider-box {
+        background: #fafafa;
+        border: 1px solid var(--border-color);
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .slider-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+        .slider-head strong {
+            font-size: 1.1rem;
+            color: var(--primary-green);
+        }
+
+    .lm-range {
+        width: 100%;
+        accent-color: var(--primary-green);
+    }
+
+    .lm-preview-box {
+        background: var(--badge-green-bg);
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .preview-head {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .preview-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        color: var(--text-main);
+    }
+
+        .preview-row strong {
+            font-weight: 800;
+        }
+
+        .preview-row .text-green {
+            color: var(--primary-green);
+        }
+
+    /* Switch */
+    .lm-switch {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+        .lm-switch input {
+            display: none;
+        }
+
+        .lm-switch .slider {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 34px;
+            transition: .4s;
+        }
+
+            .lm-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 14px;
+                width: 14px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                border-radius: 50%;
+                transition: .4s;
+            }
+
+        .lm-switch input:checked + .slider {
+            background-color: var(--primary-green);
+        }
+
+            .lm-switch input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+
+        .lm-switch .lbl {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+    .lm-manual-inputs {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .input-col {
+        flex: 1;
+    }
+
+        .input-col label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .input-col input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+        }
+
+            .input-col input:focus {
+                border-color: var(--primary-green);
+            }
+
+    .lm-textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        resize: none;
+    }
+
+        .lm-textarea:focus {
+            border-color: var(--primary-green);
+        }
+
+    @@media (max-width: 1024px) {
+        .lm-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .lm-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-controls-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .lm-search-box {
+            width: 100%;
+        }
+
+        .lm-tabs {
+            overflow-x: auto;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // ── Client-side filter and search ─────────────────────
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function filterComplaints() {
+            const rows = document.querySelectorAll('.lm-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const textContent = row.textContent.toLowerCase();
+
+                const matchesStatus = (currentFilter === 'all') || (status === currentFilter);
+                const matchesSearch = textContent.includes(searchQuery.toLowerCase());
+
+                if (matchesStatus && matchesSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const emptyState = document.getElementById('lmEmptyState');
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        }
+
+        document.getElementById('lmSearchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            filterComplaints();
+        });
+
+        function setActiveTab(tabElement, status) {
+            document.querySelectorAll('.lm-tab').forEach(t => t.classList.remove('active'));
+            tabElement.classList.add('active');
+            currentFilter = status;
+            filterComplaints();
+        }
+
+        // ── Status updates via Fetch API ──────────────────────
+        function updateComplaintStatus(id, newStatus) {
+            let confirmMsg = 'Bạn có chắc chắn muốn cập nhật trạng thái khiếu nại này?';
+            if (newStatus === 'Resolving') {
+                confirmMsg = 'Tiếp nhận xử lý khiếu nại này? Trạng thái sẽ đổi sang "Đang xử lý".';
+            } else if (newStatus === 'Rejected') {
+                confirmMsg = 'Từ chối khiếu nại này? Thao tác không thể hoàn tác.';
+            }
+
+            if (!confirm(confirmMsg)) return;
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('/Admin/UpdateComplaintStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `complaintId=${id}&status=${newStatus}&__RequestVerificationToken=${token}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật trạng thái thành công!');
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
+                console.error(err);
+            });
+        }
+
+        // ── Modal arbitration handling ────────────────────────
+        let bsResolveModal = null;
+        let currentRentalPrice = 0;
+        let currentDepositPrice = 0;
+
+        function openResolveModal(id, rentalPrice, depositPrice) {
+            document.getElementById('resolveComplaintId').value = id;
+            currentRentalPrice = rentalPrice;
+            currentDepositPrice = depositPrice;
+
+            // Reset controls
+            document.getElementById('faultOwner').checked = true;
+            document.getElementById('calcPercentSlider').value = 50;
+            document.getElementById('sliderValLabel').innerText = '50%';
+            document.getElementById('manualOverrideSwitch').checked = false;
+            document.getElementById('manualInputsArea').style.display = 'none';
+            document.getElementById('adminNotesInput').value = '';
+
+            // Update static info
+            document.getElementById('calcRentalPriceText').innerText = rentalPrice.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('calcDepositPriceText').innerText = depositPrice.toLocaleString('vi-VN') + 'đ';
+
+            calculateArbitration();
+
+            const modalEl = document.getElementById('resolveModal');
+            bsResolveModal = new bootstrap.Modal(modalEl);
+            bsResolveModal.show();
+        }
+
+        function setPresetPercent(percent) {
+            document.getElementById('calcPercentSlider').value = percent;
+            calculateArbitration();
+        }
+
+        function calculateArbitration() {
+            const isOwnerFault = document.getElementById('faultOwner').checked;
+            const percent = parseFloat(document.getElementById('calcPercentSlider').value);
+
+            document.getElementById('sliderValLabel').innerText = percent + '%';
+
+            let renterRefund = 0;
+            let ownerComp = 0;
+
+            if (isOwnerFault) {
+                renterRefund = currentDepositPrice + (currentRentalPrice * (percent / 100));
+                ownerComp = - (currentRentalPrice * (percent / 100));
+            } else {
+                ownerComp = currentDepositPrice * (percent / 100);
+                renterRefund = currentDepositPrice - ownerComp;
+            }
+
+            renterRefund = Math.round(renterRefund);
+            ownerComp = Math.round(ownerComp);
+
+            if (!document.getElementById('manualOverrideSwitch').checked) {
+                document.getElementById('ownerCompInput').value = ownerComp;
+                document.getElementById('renterRefInput').value = renterRefund;
+            }
+
+            document.getElementById('previewOwnerComp').innerText = (ownerComp >= 0 ? '+' : '') + ownerComp.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('previewRenterRefund').innerText = renterRefund.toLocaleString('vi-VN') + 'đ';
+        }
+
+        function toggleManualInputs() {
+            const override = document.getElementById('manualOverrideSwitch').checked;
+            const area = document.getElementById('manualInputsArea');
+            area.style.display = override ? 'flex' : 'none';
+
+            if (!override) calculateArbitration();
+        }
+
+        function submitResolve() {
+            const id = document.getElementById('resolveComplaintId').value;
+            const ownerComp = document.getElementById('ownerCompInput').value;
+            const renterRef = document.getElementById('renterRefInput').value;
+            const adminNotes = document.getElementById('adminNotesInput').value;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            if (!adminNotes.trim()) {
+                alert("Vui lòng nhập ghi chú phân xử của Admin.");
+                return;
+            }
+
+            fetch('/Admin/ResolveComplaint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `complaintId=${id}&ownerCompensation=${ownerComp}&renterRefund=${renterRef}&adminNotes=${encodeURIComponent(adminNotes)}&__RequestVerificationToken=${token}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã phân xử và thực hiện các giao dịch bồi thường thành công!');
+                    if (bsResolveModal) bsResolveModal.hide();
+                    location.reload();
+                } else {
+                    alert('Lỗi phân xử: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
+                console.error(err);
+            });
+        }
+    </script>
+}

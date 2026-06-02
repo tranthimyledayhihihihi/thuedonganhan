@@ -838,6 +838,134 @@
     ]
   },
   {
+    "ContainingType": "THUEDONGANHAN.Controllers.ComplaintController",
+    "Method": "CreateComplaint",
+    "RelativePath": "api/Complaint",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "THUEDONGANHAN.DTOs.Request.CreateComplaintRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Complaint, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.ComplaintController",
+    "Method": "GetAllComplaints",
+    "RelativePath": "api/Complaint/admin",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[THUEDONGANHAN.Models.Complaint, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.ComplaintController",
+    "Method": "UpdateComplaintStatus",
+    "RelativePath": "api/Complaint/admin/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "status",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Complaint, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.ComplaintController",
+    "Method": "ResolveComplaint",
+    "RelativePath": "api/Complaint/admin/{id}/resolve",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "THUEDONGANHAN.DTOs.Request.ResolveComplaintRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Complaint, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.ComplaintController",
+    "Method": "GetUserComplaints",
+    "RelativePath": "api/Complaint/user",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[THUEDONGANHAN.Models.Complaint, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "THUEDONGANHAN.Controllers.DebugController",
     "Method": "CheckAdmin",
     "RelativePath": "api/Debug/check-admin",
@@ -1031,41 +1159,81 @@
     ]
   },
   {
-    "ContainingType": "THUEDONGANHAN.Controllers.OTPController",
-    "Method": "ResendOTP",
-    "RelativePath": "api/OTP/resend",
+    "ContainingType": "THUEDONGANHAN.Controllers.MessageController",
+    "Method": "SendMessage",
+    "RelativePath": "api/Message",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "request",
-        "Type": "THUEDONGANHAN.Controllers.SendOTPRequest",
+        "Type": "THUEDONGANHAN.DTOs.Request.SendMessageRequest",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Message, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "THUEDONGANHAN.Controllers.OTPController",
-    "Method": "SendOTP",
-    "RelativePath": "api/OTP/send",
-    "HttpMethod": "POST",
+    "ContainingType": "THUEDONGANHAN.Controllers.MessageController",
+    "Method": "GetActiveChats",
+    "RelativePath": "api/Message/chats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.MessageController",
+    "Method": "GetConversation",
+    "RelativePath": "api/Message/conversation/{otherUserId}",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "THUEDONGANHAN.Controllers.SendOTPRequest",
+        "Name": "otherUserId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[THUEDONGANHAN.Models.Message, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "THUEDONGANHAN.Controllers.OTPController",
-    "Method": "GetVerificationStatus",
-    "RelativePath": "api/OTP/status/{userId}",
+    "ContainingType": "THUEDONGANHAN.Controllers.MessageController",
+    "Method": "GetUserProfile",
+    "RelativePath": "api/Message/user/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1076,23 +1244,129 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "THUEDONGANHAN.Controllers.OTPController",
-    "Method": "VerifyOTP",
-    "RelativePath": "api/OTP/verify",
+    "ContainingType": "THUEDONGANHAN.Controllers.NotificationController",
+    "Method": "GetNotifications",
+    "RelativePath": "api/Notification",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[THUEDONGANHAN.Models.Notification, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.NotificationController",
+    "Method": "CreateNotification",
+    "RelativePath": "api/Notification/create",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "THUEDONGANHAN.Controllers.VerifyOTPRequest",
+        "Name": "model",
+        "Type": "THUEDONGANHAN.Models.Notification",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Notification, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.NotificationController",
+    "Method": "MarkAllAsRead",
+    "RelativePath": "api/Notification/mark-all-read",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.NotificationController",
+    "Method": "MarkAsRead",
+    "RelativePath": "api/Notification/mark-read/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.NotificationController",
+    "Method": "GetUnreadCount",
+    "RelativePath": "api/Notification/unread-count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "THUEDONGANHAN.Controllers.PaymentController",
@@ -1704,6 +1978,58 @@
     "ContainingType": "THUEDONGANHAN.Controllers.RentalController",
     "Method": "ConfirmDelivery",
     "RelativePath": "api/Rental/{id}/deliver",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Rental, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.RentalController",
+    "Method": "ReceiveRental",
+    "RelativePath": "api/Rental/{id}/receive",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "THUEDONGANHAN.DTOs.Response.ApiResponse\u00601[[THUEDONGANHAN.Models.Rental, THUEDONGANHAN, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "THUEDONGANHAN.Controllers.RentalController",
+    "Method": "ReturnRental",
+    "RelativePath": "api/Rental/{id}/return",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

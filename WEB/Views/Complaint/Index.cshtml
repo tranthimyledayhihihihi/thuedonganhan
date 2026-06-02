@@ -1,0 +1,383 @@
+@model IEnumerable<WEB.Models.ComplaintViewModel>
+@{
+    ViewData["Title"] = "Lịch sử khiếu nại";
+}
+
+<div class="lm-complaint-wrapper">
+    <div class="lm-container">
+
+        <div class="lm-page-header">
+            <div class="lm-header-flex">
+                <div>
+                    <a href="javascript:history.back()" class="lm-back-link"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                    <h1 class="lm-page-title">Lịch Sử Khiếu Nại</h1>
+                </div>
+            </div>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="lm-alert-success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="lm-empty-state">
+                <i class="fas fa-box-open"></i>
+                <h4>Bạn chưa có khiếu nại nào</h4>
+                <p>Mọi giao dịch của bạn đang diễn ra suôn sẻ.</p>
+            </div>
+        }
+        else
+        {
+            <div class="lm-complaints-list">
+                @foreach (var item in Model)
+                {
+                    var statusBadgeClass = item.Status == "Pending" ? "lm-badge-yellow" :
+                    (item.Status == "Resolving" ? "lm-badge-blue" :
+                    (item.Status == "Resolved" ? "lm-badge-green" : "lm-badge-red"));
+
+                    var statusText = item.Status == "Pending" ? "Đang chờ" :
+                    (item.Status == "Resolving" ? "Đang xử lý" :
+                    (item.Status == "Resolved" ? "Đã giải quyết" : "Bị từ chối"));
+
+                    <div class="lm-complaint-card">
+                        <div class="lm-card-header">
+                            <span class="lm-order-id">Đơn: <strong>#@item.RentalId</strong></span>
+                            <span class="lm-badge @statusBadgeClass">@statusText</span>
+                        </div>
+
+                        <div class="lm-card-body">
+                            <div class="lm-reason-tag">
+                                <i class="fas fa-exclamation-triangle"></i> @item.Reason
+                            </div>
+                            <h3 class="lm-complaint-title">@item.Title</h3>
+                            <p class="lm-complaint-desc">@item.Description</p>
+
+                            <div class="lm-evidence-box">
+                                <span class="lm-evidence-label">Bằng chứng tải lên:</span>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    var images = item.ImageUrl.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                                    if (images.Length > 1)
+                                    {
+                                        <div class="lm-evidence-links">
+                                            <a href="@images[0]" target="_blank" class="lm-link-green">
+                                                <i class="fas fa-image"></i> Ảnh lúc cho thuê
+                                            </a>
+                                            <span class="lm-sep">|</span>
+                                            <a href="@images[1]" target="_blank" class="lm-link-orange">
+                                                <i class="fas fa-video"></i> Ảnh/video lấy đồ
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="lm-evidence-links">
+                                            <a href="@item.ImageUrl" target="_blank" class="lm-link-blue">
+                                                <i class="fas fa-paperclip"></i> Xem bằng chứng
+                                            </a>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="lm-no-evidence">Không có ảnh đính kèm</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="lm-card-footer">
+                            <div class="lm-date-info">
+                                <i class="far fa-calendar-alt"></i> Ngày gửi: @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --bg-body: #fcfaf6;
+        --card-bg: #ffffff;
+        --text-main: #1a1a1a;
+        --text-muted: #8b8b8b;
+        --primary-green: #4a6754;
+        --primary-brown: #8b5a3c;
+        --border-color: #f0ebe1;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+        --badge-yellow-bg: #fdf3e7;
+        --badge-yellow-text: #b86e24;
+        --badge-blue-bg: #e0f2fe;
+        --badge-blue-text: #0284c7;
+        --badge-red-bg: #fee2e2;
+        --badge-red-text: #dc2626;
+        --radius-lg: 24px;
+        --radius-md: 16px;
+    }
+
+    .lm-complaint-wrapper {
+        background-color: var(--bg-body);
+        min-height: calc(100vh - 70px);
+        padding: 40px 20px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .lm-container {
+        max-width: 800px; /* Hẹp hơn một chút để dễ đọc nội dung text */
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .lm-page-header {
+        margin-bottom: 30px;
+    }
+
+    .lm-back-link {
+        display: inline-block;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 15px;
+        transition: color 0.2s;
+    }
+
+        .lm-back-link:hover {
+            color: var(--primary-brown);
+        }
+
+    .lm-page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    /* Alerts */
+    .lm-alert-success {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+        padding: 15px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        border: 1px solid #dce8df;
+    }
+
+    .lm-empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        border: 1px dashed #d0d0d0;
+    }
+
+        .lm-empty-state i {
+            font-size: 3rem;
+            color: #d0d0d0;
+            margin-bottom: 15px;
+        }
+
+        .lm-empty-state h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .lm-empty-state p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+    /* List Cards */
+    .lm-complaints-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .lm-complaint-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .lm-complaint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        }
+
+    .lm-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px;
+        border-bottom: 1px solid var(--border-color);
+        background: #fafafa;
+    }
+
+    .lm-order-id {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .lm-order-id strong {
+            color: var(--primary-brown);
+            font-weight: 800;
+        }
+
+    .lm-badge {
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .lm-badge-yellow {
+        background: var(--badge-yellow-bg);
+        color: var(--badge-yellow-text);
+    }
+
+    .lm-badge-blue {
+        background: var(--badge-blue-bg);
+        color: var(--badge-blue-text);
+    }
+
+    .lm-badge-green {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+    }
+
+    .lm-badge-red {
+        background: var(--badge-red-bg);
+        color: var(--badge-red-text);
+    }
+
+    .lm-card-body {
+        padding: 25px;
+    }
+
+    .lm-reason-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: #dc2626;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .lm-complaint-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 10px 0;
+    }
+
+    .lm-complaint-desc {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 0 0 20px 0;
+    }
+
+    .lm-evidence-box {
+        background: var(--bg-body);
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px dashed #d0d0d0;
+    }
+
+    .lm-evidence-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .lm-evidence-links {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+        .lm-evidence-links a {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+    .lm-link-green {
+        color: var(--primary-green);
+    }
+
+    .lm-link-orange {
+        color: #ea580c;
+    }
+
+    .lm-link-blue {
+        color: #0284c7;
+    }
+
+    .lm-evidence-links a:hover {
+        text-decoration: underline;
+    }
+
+    .lm-sep {
+        color: #cbd5e1;
+        font-size: 0.8rem;
+    }
+
+    .lm-no-evidence {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    .lm-card-footer {
+        padding: 15px 25px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .lm-date-info {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 600px) {
+        .lm-evidence-links {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .lm-sep {
+            display: none;
+        }
+    }
+</style>

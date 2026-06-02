@@ -4,47 +4,825 @@
     ViewData["Title"] = "Sản phẩm cho thuê";
 }
 
-<div class="product-index-container">
-    <!-- Hero Section -->
-    <div class="product-hero">
-        <div class="hero-content">
-            <h1>Khám phá thiết bị cho thuê</h1>
-            <p>Hơn 1,000+ sản phẩm từ cộng đồng sinh viên UTE</p>
-            
-            <div class="hero-search">
-                <form asp-action="Search" method="get" class="search-form">
-                    <div class="search-input-wrapper">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="keyword" placeholder="Tìm kiếm laptop, máy ảnh, sách..." class="search-input" value="@ViewBag.Keyword" />
-                    </div>
-                    <button type="submit" class="search-btn">
-                        <i class="fas fa-search"></i>
-                        Tìm kiếm
-                    </button>
-                </form>
-            </div>
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+    :root {
+        --pr: #8B5E3C;
+        --pr-light: #C4956A;
+        --pr-dark: #5C3D22;
+        --accent: #E8B89A;
+        --bg: #F7F4F0;
+        --bg-warm: #EFE9E1;
+        --surface: #FFFFFF;
+        --text1: #1A1208;
+        --text2: #6B5B4E;
+        --text3: #A89585;
+        --success: #5C8A5A;
+        --border: #E0D5C9;
+        --sh: 0 2px 16px rgba(90,60,30,0.07);
+        --sh-md: 0 8px 32px rgba(90,60,30,0.12);
+        --r: 14px;
+        --fd: 'Playfair Display', Georgia, serif;
+        --fb: 'DM Sans', sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .plp-wrap {
+        font-family: var(--fb);
+        background: var(--bg);
+        min-height: calc(100vh - 70px);
+        color: var(--text1);
+    }
+
+    /* HERO */
+    .plp-hero {
+        position: relative;
+        background: linear-gradient(135deg, #1a0e05 0%, #3d2010 45%, #6b3c1a 80%, #8b5e3c 100%);
+        padding: 5rem 5% 4rem;
+        text-align: center;
+        overflow: hidden;
+    }
+
+        .plp-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(196,149,106,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .plp-hero h1 {
+            font-family: var(--fd);
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            position: relative;
+        }
+
+        .plp-hero p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+    .hero-search {
+        max-width: 680px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+        background: #fff;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        padding: 0 1.25rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+        .search-input-wrapper i {
+            color: var(--text3);
+            margin-right: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+    .search-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-family: var(--fb);
+        font-size: 0.95rem;
+        color: var(--text1);
+        background: transparent;
+        padding: 0.9rem 0;
+    }
+
+        .search-input::placeholder {
+            color: var(--text3);
+        }
+
+    .search-btn {
+        padding: 0.9rem 1.75rem;
+        background: var(--pr);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        font-family: var(--fb);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.2s, transform 0.15s;
+        box-shadow: 0 4px 16px rgba(139,94,60,0.35);
+        white-space: nowrap;
+    }
+
+        .search-btn:hover {
+            background: var(--pr-dark);
+            transform: translateY(-2px);
+        }
+
+    /* MAIN LAYOUT */
+    .plp-body {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 5%;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* SIDEBAR */
+    .plp-sidebar {
+        position: sticky;
+        top: 90px;
+    }
+
+    .filter-card {
+        background: var(--surface);
+        border-radius: var(--r);
+        padding: 1.5rem;
+        box-shadow: var(--sh);
+        border: 1px solid var(--border);
+    }
+
+    .filter-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+        .filter-head h3 {
+            font-family: var(--fd);
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+    .filter-reset-link {
+        font-size: 0.78rem;
+        color: var(--pr);
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-family: var(--fb);
+    }
+
+        .filter-reset-link:hover {
+            text-decoration: underline;
+        }
+
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-group-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text3);
+        margin-bottom: 0.85rem;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        cursor: pointer;
+        position: relative;
+        padding: 0.1rem 0;
+    }
+
+        .filter-checkbox input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    .checkmark {
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--border);
+        border-radius: 50%;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .filter-checkbox input:checked ~ .checkmark {
+        background: var(--pr);
+        border-color: var(--pr);
+    }
+
+        .filter-checkbox input:checked ~ .checkmark::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .filter-label {
+        font-size: 0.875rem;
+        color: var(--text2);
+    }
+
+        .filter-label .fas, .filter-label .far {
+            color: #E8B033;
+            font-size: 0.7rem;
+        }
+
+    .filter-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 1.25rem 0;
+    }
+
+    .price-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .price-input {
+        flex: 1;
+        min-width: 0;
+        padding: 0.55rem 0.75rem;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: var(--fb);
+        color: var(--text1);
+        background: var(--bg);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .price-input:focus {
+            border-color: var(--pr-light);
+        }
+
+    .price-separator {
+        color: var(--text3);
+        font-size: 0.9rem;
+    }
+
+    .conscious-box {
+        background: linear-gradient(135deg, #f0ede8, #e8e0d4);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .conscious-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--pr-dark);
+    }
+
+        .conscious-label span {
+            font-size: 1rem;
+        }
+
+    .conscious-box p {
+        font-size: 0.76rem;
+        color: var(--text2);
+        line-height: 1.5;
+    }
+
+    .filter-apply-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--pr);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        font-family: var(--fb);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: background 0.2s, transform 0.15s;
+        box-shadow: 0 4px 14px rgba(139,94,60,0.25);
+    }
+
+        .filter-apply-btn:hover {
+            background: var(--pr-dark);
+            transform: translateY(-1px);
+        }
+
+    /* CONTENT */
+    .plp-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .plp-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 0.85rem 1.25rem;
+        background: var(--surface);
+        border-radius: var(--r);
+        box-shadow: var(--sh);
+        border: 1px solid var(--border);
+    }
+
+    .plp-count {
+        font-size: 0.875rem;
+        color: var(--text2);
+    }
+
+        .plp-count strong {
+            color: var(--text1);
+            font-size: 1.05rem;
+            font-family: var(--fd);
+        }
+
+    .plp-sort {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+        .plp-sort label {
+            font-size: 0.8rem;
+            color: var(--text3);
+            font-weight: 600;
+        }
+
+    .sort-select {
+        padding: 0.45rem 0.85rem;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: var(--fb);
+        color: var(--text2);
+        background: var(--bg);
+        cursor: pointer;
+        outline: none;
+    }
+
+    /* PRODUCT GRID */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .product-card {
+        background: var(--surface);
+        border-radius: var(--r);
+        overflow: hidden;
+        box-shadow: var(--sh);
+        border: 1px solid var(--border);
+        transition: transform 0.25s, box-shadow 0.25s;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--sh-md);
+        }
+
+    .product-card-image {
+        position: relative;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+    }
+
+        .product-card-image a {
+            display: block;
+            height: 100%;
+        }
+
+        .product-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.35s;
+        }
+
+    .product-card:hover .product-card-image img {
+        transform: scale(1.06);
+    }
+
+    .product-favorite {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: var(--pr);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.15s, background 0.15s;
+        z-index: 2;
+    }
+
+        .product-favorite:hover {
+            transform: scale(1.12);
+            background: #fff;
+        }
+
+    .product-badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.28rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        z-index: 2;
+        text-transform: uppercase;
+    }
+
+    .badge-photo {
+        background: #F5E6D3;
+        color: #8B5E3C;
+    }
+
+    .badge-outdoor {
+        background: #D6EDD4;
+        color: #3A6B38;
+    }
+
+    .badge-fashion {
+        background: #F5D6D6;
+        color: #8B3A3A;
+    }
+
+    .badge-tech {
+        background: #D6E4F5;
+        color: #3A608B;
+    }
+
+    .badge-music {
+        background: #EED6F5;
+        color: #7A3A8B;
+    }
+
+    .badge-travel {
+        background: #D6F0F5;
+        color: #3A7A8B;
+    }
+
+    .badge-default {
+        background: #EDE9E4;
+        color: #6B5B4E;
+    }
+
+    .product-card-content {
+        padding: 1.1rem 1.25rem 1.25rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-category {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--pr);
+        margin-bottom: 0.5rem;
+    }
+
+    .product-name {
+        font-family: var(--fd);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        line-height: 1.35;
+        flex: 1;
+    }
+
+        .product-name a {
+            color: var(--text1);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+            .product-name a:hover {
+                color: var(--pr);
+            }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .stars {
+        display: flex;
+        gap: 1px;
+        color: #E8B033;
+        font-size: 0.72rem;
+    }
+
+    .rating-text {
+        font-size: 0.75rem;
+        color: var(--text3);
+    }
+
+    .product-location {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.78rem;
+        color: var(--text3);
+        margin-bottom: 0.85rem;
+    }
+
+    .product-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-amount {
+        font-family: var(--fd);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--pr);
+    }
+
+    .price-unit {
+        font-size: 0.8rem;
+        color: var(--text3);
+    }
+
+    .product-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+        margin-top: auto;
+    }
+
+    .btn-view {
+        padding: 0.6rem 1rem;
+        background: var(--bg-warm);
+        color: var(--pr-dark);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-family: var(--fb);
+        font-weight: 600;
+        font-size: 0.82rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+        .btn-view:hover {
+            background: var(--accent);
+            border-color: var(--pr-light);
+            transform: translateY(-1px);
+        }
+
+    .btn-quick-rent {
+        width: 38px;
+        height: 38px;
+        background: var(--pr);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        transition: background 0.2s, transform 0.15s;
+        box-shadow: 0 2px 8px rgba(139,94,60,0.25);
+    }
+
+        .btn-quick-rent:hover {
+            background: var(--pr-dark);
+            transform: translateY(-1px);
+        }
+
+    /* PAGINATION */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 2.5rem;
+    }
+
+    .pagination-btn {
+        min-width: 38px;
+        height: 38px;
+        padding: 0 0.65rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-family: var(--fb);
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text2);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--pr);
+            color: var(--pr);
+        }
+
+        .pagination-btn.active {
+            background: var(--pr);
+            border-color: var(--pr);
+            color: #fff;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+    .pagination-dots {
+        color: var(--text3);
+        padding: 0 0.25rem;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--surface);
+        border-radius: var(--r);
+        border: 1px solid var(--border);
+    }
+
+    .empty-icon {
+        font-size: 3.5rem;
+        color: var(--border);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-family: var(--fd);
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text3);
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-back-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        background: var(--pr);
+        color: #fff;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: background 0.2s, transform 0.15s;
+    }
+
+        .btn-back-home:hover {
+            background: var(--pr-dark);
+            transform: translateY(-2px);
+        }
+
+    @@media (max-width: 1024px) {
+        .plp-body {
+            grid-template-columns: 1fr;
+        }
+
+        .plp-sidebar {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .plp-hero {
+            padding: 3rem 5% 2.5rem;
+        }
+
+        .search-form {
+            flex-direction: column;
+        }
+
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+
+        .plp-toolbar {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="plp-wrap">
+    <!-- HERO -->
+    <div class="plp-hero">
+        <h1>Khám phá thiết bị cho thuê</h1>
+        <p>Hơn 1,000+ sản phẩm từ cộng đồng sinh viên UTE</p>
+        <div class="hero-search">
+            <form asp-action="Search" method="get" class="search-form">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="keyword" placeholder="Tìm kiếm laptop, máy ảnh, sách..." class="search-input" value="@ViewBag.Keyword" />
+                </div>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    Tìm kiếm
+                </button>
+            </form>
         </div>
     </div>
 
-    <form action="/Product" method="get" id="filterForm" class="product-main-content">
+    <!-- BODY: SIDEBAR + CONTENT -->
+    <form action="/Product" method="get" id="filterForm" class="plp-body">
         <input type="hidden" name="keyword" value="@ViewBag.Keyword" />
-        <!-- Sidebar Filters -->
-        <aside class="product-sidebar">
-            <div class="filter-section">
-                <h3 class="filter-title">
-                    <i class="fas fa-filter"></i>
-                    Bộ lọc
-                </h3>
+
+        <!-- SIDEBAR -->
+        <aside class="plp-sidebar">
+            <div class="filter-card">
+                <div class="filter-head">
+                    <h3><i class="fas fa-sliders-h"></i> Filters</h3>
+                    <button type="button" class="filter-reset-link" onclick="window.location.href='/Product'">Reset</button>
+                </div>
 
                 <div class="filter-group">
-                    <h4 class="filter-group-title">Danh mục</h4>
+                    <div class="filter-group-title">Categories</div>
                     <div class="filter-options">
                         @if (ViewBag.Categories != null)
                         {
                             foreach (WEB.Models.CategoryViewModel category in ViewBag.Categories)
                             {
                                 <label class="filter-checkbox">
-                                    <input type="checkbox" name="categoryIds" value="@category.CategoryId" onchange="document.getElementById('filterForm').submit();" @(ViewBag.CategoryIds != null && ((string)ViewBag.CategoryIds).Split(',').Contains(category.CategoryId.ToString()) ? "checked" : "") />
+                                    <input type="checkbox" name="categoryIds" value="@category.CategoryId"
+                                           onchange="document.getElementById('filterForm').submit();"
+                                           @(ViewBag.CategoryIds != null && ((string)ViewBag.CategoryIds).Split(',').Contains(category.CategoryId.ToString()) ? "checked" : "") />
                                     <span class="checkmark"></span>
                                     <span class="filter-label">@category.CategoryName</span>
                                 </label>
@@ -56,87 +834,75 @@
                 <div class="filter-divider"></div>
 
                 <div class="filter-group">
-                    <h4 class="filter-group-title">Giá thuê (VNĐ/ngày)</h4>
+                    <div class="filter-group-title">Daily Rate</div>
                     <div class="price-range">
-                        <input type="number" name="minPrice" placeholder="Từ" class="price-input" value="@ViewBag.MinPrice" />
-                        <span class="price-separator">-</span>
-                        <input type="number" name="maxPrice" placeholder="Đến" class="price-input" value="@ViewBag.MaxPrice" />
+                        <input type="number" name="minPrice" placeholder="Min (đ)" class="price-input" value="@ViewBag.MinPrice" />
+                        <span class="price-separator">–</span>
+                        <input type="number" name="maxPrice" placeholder="Max (đ)" class="price-input" value="@ViewBag.MaxPrice" />
                     </div>
                 </div>
 
                 <div class="filter-divider"></div>
 
                 <div class="filter-group">
-                    <h4 class="filter-group-title">Đánh giá</h4>
+                    <div class="filter-group-title">Rating</div>
                     <div class="filter-options">
                         <label class="filter-checkbox">
                             <input type="checkbox" />
                             <span class="checkmark"></span>
                             <span class="filter-label">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             </span>
                         </label>
                         <label class="filter-checkbox">
                             <input type="checkbox" />
                             <span class="checkmark"></span>
                             <span class="filter-label">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                trở lên
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i> trở lên
                             </span>
                         </label>
                         <label class="filter-checkbox">
                             <input type="checkbox" />
                             <span class="checkmark"></span>
                             <span class="filter-label">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                                trở lên
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i> trở lên
                             </span>
                         </label>
                     </div>
                 </div>
 
-                <button type="submit" class="filter-apply-btn" style="width: 100%; padding: 0.75rem; background: var(--primary-blue); border: none; border-radius: 10px; font-weight: 600; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                <div class="filter-divider"></div>
+
+                <div class="conscious-box">
+                    <div class="conscious-label"><span>🌿</span> Conscious Choice</div>
+                    <p>Chỉ hiển thị sản phẩm từ người cho thuê thân thiện với môi trường</p>
+                </div>
+
+                <button type="submit" class="filter-apply-btn">
                     <i class="fas fa-check"></i>
-                    Áp dụng bộ lọc
-                </button>
-                <button type="button" class="filter-reset-btn" onclick="window.location.href='/Product'">
-                    <i class="fas fa-redo"></i>
-                    Đặt lại bộ lọc
+                    Apply Filter
                 </button>
             </div>
         </aside>
 
-        <!-- Products Grid -->
-        <div class="product-content">
-            <div class="product-toolbar">
-                <div class="product-count">
-                    <strong>@(Model?.Count ?? 0)</strong> sản phẩm
+        <!-- PRODUCTS -->
+        <div class="plp-content">
+            <div class="plp-toolbar">
+                <div class="plp-count">
+                    Showing <strong>@(Model?.Count ?? 0)</strong> premium rentals
                 </div>
-                <div class="product-sort">
-                    <label>Sắp xếp:</label>
+                <div class="plp-sort">
+                    <label>Sort by:</label>
                     <select name="sortBy" class="sort-select" onchange="document.getElementById('filterForm').submit();">
-                        @if (ViewBag.SortBy == "newest" || string.IsNullOrEmpty(ViewBag.SortBy))
+                        @if (ViewBag.SortBy == null || (string)ViewBag.SortBy == "newest")
                         {
-                            <option value="newest" selected>Mới nhất</option>
+                            <option value="newest" selected>Recommended</option>
                         }
                         else
                         {
-                            <option value="newest">Mới nhất</option>
+                            <option value="newest">Recommended</option>
                         }
-
-                        @if (ViewBag.SortBy == "price_asc")
+                        @if ((string)ViewBag.SortBy == "price_asc")
                         {
                             <option value="price_asc" selected>Giá thấp đến cao</option>
                         }
@@ -144,8 +910,7 @@
                         {
                             <option value="price_asc">Giá thấp đến cao</option>
                         }
-
-                        @if (ViewBag.SortBy == "price_desc")
+                        @if ((string)ViewBag.SortBy == "price_desc")
                         {
                             <option value="price_desc" selected>Giá cao đến thấp</option>
                         }
@@ -166,109 +931,78 @@
                         var pName = product.ProductName?.ToLower() ?? "";
                         var cName = product.Category?.CategoryName?.ToLower() ?? "";
 
-                        // Perfect overrides for mock data placeholders
                         bool isPlaceholder = string.IsNullOrEmpty(cardImageUrl) || cardImageUrl.Contains("unsplash.com");
                         if (isPlaceholder)
                         {
-                            if (pName.Contains("áo dài") || cName.Contains("áo dài"))
-                            {
-                                cardImageUrl = "/images/aodai.png";
-                            }
-                            else if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp"))
-                            {
-                                cardImageUrl = "/images/dototnghiep.png";
-                            }
-                            else if (pName.Contains("vest") || pName.Contains("suit"))
-                            {
-                                cardImageUrl = "/images/vestnam.png";
-                            }
-                            else if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4"))
-                            {
-                                cardImageUrl = "/images/tainghe.png";
-                            }
-                            else if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu"))
-                            {
-                                cardImageUrl = "/images/maychieu.png";
-                            }
-                            else if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ"))
-                            {
-                                cardImageUrl = "/images/guitar.png";
-                            }
-                            else if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike"))
-                            {
-                                cardImageUrl = "/images/xedap.png";
-                            }
-                            else if (pName.Contains("ipad") || pName.Contains("tablet"))
-                            {
-                                cardImageUrl = "/images/ipad.png";
-                            }
-                            else if (pName.Contains("macbook") || pName.Contains("laptop"))
-                            {
-                                cardImageUrl = "/images/mac.png";
-                            }
-                            else if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh"))
-                            {
-                                cardImageUrl = "/images/mayanh.png";
-                            }
-                            else if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ"))
-                            {
-                                cardImageUrl = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
-                            }
-                            else if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách"))
-                            {
-                                cardImageUrl = "/images/giaitich1.png";
-                            }
+                            if (pName.Contains("áo dài") || cName.Contains("áo dài")) { cardImageUrl = "/images/aodai.png"; }
+                            else if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp")) { cardImageUrl = "/images/dototnghiep.png"; }
+                            else if (pName.Contains("vest") || pName.Contains("suit")) { cardImageUrl = "/images/vestnam.png"; }
+                            else if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4")) { cardImageUrl = "/images/tainghe.png"; }
+                            else if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu")) { cardImageUrl = "/images/maychieu.png"; }
+                            else if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ")) { cardImageUrl = "/images/guitar.png"; }
+                            else if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike")) { cardImageUrl = "/images/xedap.png"; }
+                            else if (pName.Contains("ipad") || pName.Contains("tablet")) { cardImageUrl = "/images/ipad.png"; }
+                            else if (pName.Contains("macbook") || pName.Contains("laptop")) { cardImageUrl = "/images/mac.png"; }
+                            else if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh")) { cardImageUrl = "/images/mayanh.png"; }
+                            else if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ")) { cardImageUrl = "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800"; }
+                            else if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách")) { cardImageUrl = "/images/giaitich1.png"; }
                         }
+
+                        var badgeClass = "badge-default";
+                        if (cName.Contains("máy ảnh") || pName.Contains("camera")) badgeClass = "badge-photo";
+                        else if (cName.Contains("xe") || pName.Contains("bike") || pName.Contains("xe đạp")) badgeClass = "badge-travel";
+                        else if (cName.Contains("thời trang") || pName.Contains("áo") || pName.Contains("vest")) badgeClass = "badge-fashion";
+                        else if (cName.Contains("điện tử") || pName.Contains("laptop") || pName.Contains("ipad")) badgeClass = "badge-tech";
+                        else if (cName.Contains("nhạc") || pName.Contains("guitar") || pName.Contains("đàn")) badgeClass = "badge-music";
+                        else if (cName.Contains("sách") || cName.Contains("giáo trình")) badgeClass = "badge-outdoor";
 
                         <div class="product-card">
                             <div class="product-card-image">
                                 <a asp-action="Details" asp-route-id="@product.ProductId">
-                                    <img src="@cardImageUrl" alt="@product.ProductName" />
+                                    <img src="@cardImageUrl" alt="@product.ProductName" onerror="this.src='https://via.placeholder.com/400x300/8B5E3C/ffffff?text=Product'" />
                                 </a>
-                                <button class="product-favorite">
+                                <button class="product-favorite" type="button">
                                     <i class="far fa-heart"></i>
                                 </button>
-                                <div class="product-badge">Mới</div>
+                                <div class="product-badge @badgeClass">
+                                    @(product.Category?.CategoryName?.ToUpper() ?? "MỚI")
+                                </div>
                             </div>
                             <div class="product-card-content">
-                                <div class="product-category">@product.Category?.CategoryName?.ToUpper()</div>
+                                <div class="product-category">@(product.Category?.CategoryName ?? "Khác")</div>
                                 <h3 class="product-name">
-                                    <a asp-action="Details" asp-route-id="@product.ProductId">
-                                        @product.ProductName
-                                    </a>
+                                    <a asp-action="Details" asp-route-id="@product.ProductId">@product.ProductName</a>
                                 </h3>
                                 <div class="product-rating">
                                     <div class="stars">
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
-                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                                     </div>
-                                    <span class="rating-text">5.0 (24)</span>
+                                    <span class="rating-text">5.0 (24 reviews)</span>
                                 </div>
                                 <div class="product-location">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span>@product.Location</span>
+                                    <span>@(string.IsNullOrEmpty(product.Location) ? "TP. Hồ Chí Minh" : product.Location)</span>
                                 </div>
                                 <div class="product-price">
                                     <span class="price-amount">@product.PricePerDay.ToString("N0")đ</span>
                                     <span class="price-unit">/ngày</span>
                                 </div>
                                 <div class="product-actions">
-                                    <a asp-action="Details" asp-route-id="@product.ProductId" class="btn-view">
-                                        Xem chi tiết
-                                    </a>
+                                    <a asp-action="Details" asp-route-id="@product.ProductId" class="btn-view">Xem chi tiết</a>
                                     @if (Context.Session.GetString("JWTToken") != null)
                                     {
-                                        <button class="btn-quick-rent" onclick="window.location.href='/Product/Details/@product.ProductId'" title="Thuê nhanh">
-                                            <i class="fas fa-shopping-cart"></i>
+                                        <button class="btn-quick-rent" type="button"
+                                                onclick="window.location.href='/Product/Details/@product.ProductId'"
+                                                title="Thuê nhanh">
+                                            <i class="fas fa-arrow-right"></i>
                                         </button>
                                     }
                                     else
                                     {
-                                        <button class="btn-quick-rent" onclick="alert('Vui lòng đăng nhập để thuê đồ!'); window.location.href='/Account/Login?returnUrl=/Product/Details/@product.ProductId'" title="Đăng nhập để thuê">
-                                            <i class="fas fa-lock"></i>
+                                        <button class="btn-quick-rent" type="button"
+                                                onclick="alert('Vui lòng đăng nhập để thuê đồ!'); window.location.href='/Account/Login?returnUrl=/Product/Details/@product.ProductId'"
+                                                title="Đăng nhập để thuê">
+                                            <i class="fas fa-arrow-right"></i>
                                         </button>
                                     }
                                 </div>
@@ -277,33 +1011,23 @@
                     }
                 </div>
 
-                <!-- Pagination -->
                 <div class="pagination">
-                    <button class="pagination-btn" disabled>
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn">4</button>
+                    <button class="pagination-btn" disabled type="button"><i class="fas fa-chevron-left"></i></button>
+                    <button class="pagination-btn active" type="button">1</button>
+                    <button class="pagination-btn" type="button">2</button>
+                    <button class="pagination-btn" type="button">3</button>
                     <span class="pagination-dots">...</span>
-                    <button class="pagination-btn">12</button>
-                    <button class="pagination-btn">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                    <button class="pagination-btn" type="button"><i class="fas fa-chevron-right"></i></button>
                 </div>
             }
             else
             {
                 <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-box-open"></i>
-                    </div>
+                    <div class="empty-icon"><i class="fas fa-box-open"></i></div>
                     <h3>Không tìm thấy sản phẩm</h3>
                     <p>Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
                     <a asp-action="Index" class="btn-back-home">
-                        <i class="fas fa-home"></i>
-                        Về trang chủ
+                        <i class="fas fa-home"></i> Về trang chủ
                     </a>
                 </div>
             }
@@ -311,651 +1035,10 @@
     </form>
 </div>
 
-<style>
-    .product-index-container {
-        background: #f8f9fa;
-        min-height: calc(100vh - 70px);
-    }
-
-    .product-hero {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-        padding: 4rem 2rem;
-        color: white;
-        text-align: center;
-    }
-
-    .hero-content h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .hero-content p {
-        font-size: 1.125rem;
-        opacity: 0.9;
-        margin-bottom: 2rem;
-    }
-
-    .hero-search {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .search-form {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .search-input-wrapper {
-        flex: 1;
-        position: relative;
-    }
-
-    .search-input-wrapper i {
-        position: absolute;
-        left: 1.25rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 1.125rem;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 1rem 1rem 1rem 3.5rem;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        background: white;
-    }
-
-    .search-btn {
-        padding: 1rem 2rem;
-        background: white;
-        color: var(--primary-blue);
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .search-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .product-main-content {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 2rem;
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 2rem;
-    }
-
-    /* Sidebar */
-    .product-sidebar {
-        position: sticky;
-        top: 100px;
-        height: fit-content;
-    }
-
-    .filter-section {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .filter-title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1.125rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        color: var(--text-primary);
-    }
-
-    .filter-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .filter-group-title {
-        font-size: 0.875rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .filter-options {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .filter-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .filter-checkbox input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-    }
-
-    .checkmark {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #cbd5e1;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-
-    .filter-checkbox input:checked ~ .checkmark {
-        background: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-
-    .filter-checkbox input:checked ~ .checkmark::after {
-        content: '✓';
-        position: absolute;
-        color: white;
-        font-size: 0.875rem;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .filter-label {
-        flex: 1;
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .filter-label .fas,
-    .filter-label .far {
-        color: #fbbf24;
-        font-size: 0.75rem;
-    }
-
-    .filter-count {
-        font-size: 0.75rem;
-        color: #94a3b8;
-    }
-
-    .filter-divider {
-        height: 1px;
-        background: #e2e8f0;
-        margin: 1.5rem 0;
-    }
-
-    .price-range {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .price-input {
-        flex: 1;
-        min-width: 0; /* Cho phép input co lại nhỏ hơn kích thước mặc định */
-        padding: 0.5rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.875rem;
-    }
-
-    .price-separator {
-        color: var(--text-secondary);
-    }
-
-    .price-suggestions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .price-tag {
-        padding: 0.375rem 0.75rem;
-        background: #f8f9fa;
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .price-tag:hover {
-        background: #eff6ff;
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-    }
-
-    .filter-reset-btn {
-        width: 100%;
-        padding: 0.75rem;
-        background: #f8f9fa;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .filter-reset-btn:hover {
-        background: #fef2f2;
-        border-color: #fecaca;
-        color: #dc2626;
-    }
-
-    /* Products Content */
-    .product-content {
-        flex: 1;
-    }
-
-    .product-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding: 1rem 1.5rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .product-count {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .product-count strong {
-        color: var(--text-primary);
-        font-size: 1.125rem;
-    }
-
-    .product-sort {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .product-sort label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        font-weight: 600;
-    }
-
-    .sort-select {
-        padding: 0.5rem 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        cursor: pointer;
-        background: white;
-    }
-
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .product-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .product-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    }
-
-    .product-card-image {
-        position: relative;
-        aspect-ratio: 4/3;
-        overflow: hidden;
-    }
-
-    .product-card-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .product-card:hover .product-card-image img {
-        transform: scale(1.05);
-    }
-
-    .product-favorite {
-        position: absolute;
-        top: 0.75rem;
-        right: 0.75rem;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: white;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.125rem;
-        color: #dc2626;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .product-favorite:hover {
-        transform: scale(1.1);
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 0.75rem;
-        left: 0.75rem;
-        padding: 0.375rem 0.75rem;
-        background: #fecaca;
-        color: #dc2626;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-
-    .product-card-content {
-        padding: 1.25rem;
-    }
-
-    .product-category {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        background: #dbeafe;
-        color: var(--primary-blue);
-        border-radius: 4px;
-        font-size: 0.625rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.75rem;
-    }
-
-    .product-name {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-bottom: 0.75rem;
-        line-height: 1.4;
-    }
-
-    .product-name a {
-        color: var(--text-primary);
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .product-name a:hover {
-        color: var(--primary-blue);
-    }
-
-    .product-rating {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .stars {
-        display: flex;
-        gap: 0.125rem;
-        color: #fbbf24;
-        font-size: 0.75rem;
-    }
-
-    .rating-text {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-    }
-
-    .product-location {
-        display: flex;
-        align-items: center;
-        gap: 0.375rem;
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        margin-bottom: 0.75rem;
-    }
-
-    .product-price {
-        display: flex;
-        align-items: baseline;
-        gap: 0.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .price-amount {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-blue);
-    }
-
-    .price-unit {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .product-actions {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 0.5rem;
-    }
-
-    .btn-view {
-        padding: 0.625rem 1rem;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        cursor: pointer;
-        text-decoration: none;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .btn-view:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
-
-    .btn-quick-rent {
-        width: 40px;
-        height: 40px;
-        background: white;
-        color: var(--primary-blue);
-        border: 2px solid var(--primary-blue);
-        border-radius: 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
-
-    .btn-quick-rent:hover {
-        background: #eff6ff;
-    }
-
-    /* Pagination */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 2rem;
-    }
-
-    .pagination-btn {
-        min-width: 40px;
-        height: 40px;
-        padding: 0 0.75rem;
-        background: white;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .pagination-btn:hover:not(:disabled) {
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-    }
-
-    .pagination-btn.active {
-        background: var(--primary-blue);
-        border-color: var(--primary-blue);
-        color: white;
-    }
-
-    .pagination-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .pagination-dots {
-        color: var(--text-secondary);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 16px;
-    }
-
-    .empty-icon {
-        font-size: 4rem;
-        color: #cbd5e1;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-        color: var(--text-secondary);
-        margin-bottom: 2rem;
-    }
-
-    .btn-back-home {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.875rem 1.5rem;
-        background: var(--primary-blue);
-        color: white;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-back-home:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
-    }
-
-    @@media (max-width: 1024px) {
-        .product-main-content {
-            grid-template-columns: 1fr;
-        }
-
-        .product-sidebar {
-            position: static;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .hero-content h1 {
-            font-size: 1.75rem;
-        }
-
-        .search-form {
-            flex-direction: column;
-        }
-
-        .products-grid {
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        }
-
-        .product-toolbar {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-    }
-</style>
-
-
 <script>
-    // Xử lý price tags
-    document.querySelectorAll('.price-tag').forEach(tag => {
-        tag.addEventListener('click', function(e) {
-            e.preventDefault();
-            const text = this.textContent.trim();
-            let minPrice = '';
-            let maxPrice = '';
-            
-            if (text === 'Dưới 10k') { minPrice = 0; maxPrice = 10000; }
-            else if (text === '10k - 50k') { minPrice = 10000; maxPrice = 50000; }
-            else if (text === '50k - 100k') { minPrice = 50000; maxPrice = 100000; }
-            else if (text === 'Trên 100k') { minPrice = 100000; maxPrice = ''; }
-            
-            document.querySelector('input[name="minPrice"]').value = minPrice;
-            document.querySelector('input[name="maxPrice"]').value = maxPrice;
-            
-            document.getElementById('filterForm').submit();
-        });
-    });
-    
-    // Auto-submit when typing prices and pressing Enter, or focus out
     document.querySelectorAll('input[name="minPrice"], input[name="maxPrice"]').forEach(input => {
-        input.addEventListener('change', function() {
+        input.addEventListener('change', function () {
             document.getElementById('filterForm').submit();
         });
     });
 </script>
-
-<style>
-    .price-tag.active {
-        background: #eff6ff;
-        border-color: var(--primary-blue);
-        color: var(--primary-blue);
-        font-weight: 600;
-    }
-</style>

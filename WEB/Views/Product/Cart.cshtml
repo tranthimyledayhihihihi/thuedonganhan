@@ -4,102 +4,108 @@
     var isLoggedIn = !string.IsNullOrEmpty(userName);
 }
 
-<div class="cart-page-wrapper" style="max-width: 1200px; margin: 3rem auto; padding: 0 1.5rem; font-family: 'Inter', sans-serif;">
-    
-    <!-- Header Banner -->
-    <div class="cart-header-banner" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 2.5rem; border-radius: 24px; color: white; margin-bottom: 2.5rem; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); position: relative; overflow: hidden;">
-        <div style="position: absolute; right: -50px; bottom: -50px; font-size: 12rem; color: rgba(255,255,255,0.02); pointer-events: none;">
-            <i class="fas fa-shopping-bag"></i>
-        </div>
-        <h1 style="font-size: 2rem; font-weight: 850; margin: 0 0 0.5rem 0; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.75rem;">
-            <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i>
-            Giỏ hàng ký quỹ
-        </h1>
-        <p style="color: #94a3b8; font-size: 0.95rem; margin: 0; max-width: 600px; line-height: 1.6;">
-            Xem lại các sản phẩm bạn đã chọn để chuẩn bị thuê. Hệ thống bảo vệ ký quỹ của <strong style="color: #3b82f6;">UTE Rent</strong> sẽ giữ khoản đặt cọc an toàn cho đến khi bàn giao thành công.
-        </p>
+<div class="lm-page-wrapper">
+    <div class="lm-cart-header">
+        <h1 class="lm-cart-title">Giỏ hàng của bạn</h1>
+        <p class="lm-cart-subtitle">Lựa chọn phong cách, sống bền vững.</p>
     </div>
 
-    <!-- Empty State Container -->
-    <div id="cart-empty-state" style="display: none; text-align: center; padding: 5rem 2rem; background: white; border: 2px dashed #cbd5e1; border-radius: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-        <div style="font-size: 4rem; color: #94a3b8; margin-bottom: 1.5rem;">
+    <!-- Empty State -->
+    <div id="cart-empty-state" style="display: none;" class="lm-empty-state">
+        <div class="lm-empty-icon">
             <i class="fas fa-shopping-bag"></i>
         </div>
-        <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0 0 0.5rem 0;">Giỏ hàng của bạn đang trống</h2>
-        <p style="color: #64748b; font-size: 0.95rem; margin: 0 0 2rem 0; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-            Khám phá hàng trăm thiết bị công nghệ, học tập hữu ích dành riêng cho sinh viên UTE và bắt đầu thuê ngay hôm nay!
-        </p>
-        <a href="/Product" class="btn-primary-custom" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #2563eb; color: white; padding: 1rem 2rem; border-radius: 16px; font-weight: 700; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);">
+        <h2>Giỏ hàng của bạn đang trống</h2>
+        <p>Khám phá hàng trăm thiết bị công nghệ, học tập hữu ích dành riêng cho sinh viên UTE và bắt đầu thuê ngay hôm nay!</p>
+        <a href="/Product" class="lm-btn-primary" style="display: inline-flex; width: auto; padding: 16px 32px; text-decoration: none; align-items: center; gap: 8px;">
             <i class="fas fa-arrow-left"></i> Quay lại cửa hàng
         </a>
     </div>
 
     <!-- Cart Layout Grid -->
-    <div id="cart-layout-grid" class="cart-grid-container" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem;">
-        
-        <!-- Left Panel: Product List -->
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;" id="cart-items-container">
-            <!-- Dynamic items rendered by JS -->
+    <div id="cart-layout-grid" class="lm-cart-grid">
+
+        <div class="lm-cart-left">
+            <div id="cart-items-container" class="lm-items-list"></div>
+
+            <div class="lm-suggestions-section">
+                <h3 class="lm-sugg-title">Gợi ý phụ kiện đi kèm</h3>
+                <div class="lm-sugg-grid">
+                    <div class="lm-sugg-card">
+                        <div class="lm-sugg-img">
+                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=200" alt="Hộp bảo vệ">
+                        </div>
+                        <h4>Hộp bảo vệ chống sốc</h4>
+                        <p>+50.000đ/ngày</p>
+                        <button class="lm-btn-sugg">Thêm vào</button>
+                    </div>
+                    <div class="lm-sugg-card">
+                        <div class="lm-sugg-img">
+                            <img src="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=200" alt="Trạm sạc">
+                        </div>
+                        <h4>Trạm sạc di động 500W</h4>
+                        <p>+120.000đ/ngày</p>
+                        <button class="lm-btn-sugg">Thêm vào</button>
+                    </div>
+                    <div class="lm-sugg-card">
+                        <div class="lm-sugg-img">
+                            <img src="https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?w=200" alt="Chân máy">
+                        </div>
+                        <h4>Chân máy chuyên nghiệp</h4>
+                        <p>+80.000đ/ngày</p>
+                        <button class="lm-btn-sugg">Thêm vào</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Right Panel: Summary checkout -->
-        <div>
-            <div class="summary-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 24px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); position: sticky; top: 2rem;">
-                <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
-                    <i class="fas fa-file-invoice-dollar" style="color: #10b981;"></i>
-                    Tóm tắt thanh toán ký quỹ
-                </h3>
+        <!-- Right Panel: Summary -->
+        <div class="lm-cart-right">
+            <div class="lm-summary-card">
+                <h3>Tóm tắt đơn hàng</h3>
 
-                <!-- Subtotals -->
-                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: #64748b;">
-                        <span>Số lượng sản phẩm:</span>
-                        <strong id="summary-total-qty" style="color: #1e293b;">0 món</strong>
+                <div class="lm-summary-rows">
+                    <div class="lm-summary-row">
+                        <span>Tổng tiền thuê <small id="summary-total-qty" style="color: #6b7280; font-size: 0.8rem; margin-left: 4px;">(0 món)</small></span>
+                        <strong id="summary-total-rent">0đ</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: #64748b;">
-                        <span>Thành tiền thuê:</span>
-                        <strong id="summary-total-rent" style="color: #1e293b;">0 đ</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: #64748b; padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9;">
+                    <div class="lm-summary-row">
                         <span>
-                            Tổng tiền cọc (hoàn 100%): 
-                            <i class="fas fa-question-circle" title="Toàn bộ tiền cọc sẽ được hệ thống tạm giữ an toàn trong ví bảo vệ và hoàn trả ngay khi trả đồ nguyên vẹn." style="cursor: help; color: #94a3b8;"></i>
+                            Tiền cọc (Hoàn lại 100%)
+                            <i class="fas fa-question-circle" title="Toàn bộ tiền cọc sẽ được hệ thống tạm giữ an toàn trong ví bảo vệ và hoàn trả ngay khi trả đồ nguyên vẹn." style="cursor: help; color: #9ca3af; font-size: 0.8rem;"></i>
                         </span>
-                        <strong id="summary-total-deposit" style="color: #1e293b;">+ 0 đ</strong>
+                        <strong id="summary-total-deposit">0đ</strong>
+                    </div>
+                    <div class="lm-summary-row">
+                        <span>Phí dịch vụ</span>
+                        <strong>Miễn phí</strong>
                     </div>
                 </div>
 
-                <!-- Grand Total -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <span style="font-size: 1rem; font-weight: 800; color: #0f172a;">Tổng cộng tạm giữ:</span>
-                    <div style="text-align: right;">
-                        <div id="summary-grand-total" style="font-size: 1.6rem; font-weight: 900; color: #2563eb;">0 đ</div>
-                        <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 500;">Bao gồm tiền cọc hoàn lại</span>
-                    </div>
+                <div class="lm-summary-total">
+                    <span>Tổng cộng</span>
+                    <strong id="summary-grand-total">0đ</strong>
                 </div>
 
-                <!-- Checkout CTA -->
                 @if (isLoggedIn)
                 {
-                    <button type="button" onclick="checkoutCartAll()" class="btn-checkout-primary" style="width: 100%; border: none; background: #2563eb; color: white; padding: 1.25rem; border-radius: 18px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="fas fa-shopping-bag"></i>
-                        TIẾN HÀNH ĐẶT THUÊ TẤT CẢ
+                    <button type="button" onclick="checkoutCartAll()" class="lm-btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Tiến hành đặt thuê tất cả
                     </button>
                 }
                 else
                 {
-                    <a href="/Account/Login?returnUrl=/Product/Cart" class="btn-checkout-primary" style="text-decoration: none; width: 100%; background: #2563eb; color: white; padding: 1.25rem; border-radius: 18px; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);">
-                        <i class="fas fa-sign-in-alt"></i>
-                        ĐĂNG NHẬP ĐỂ ĐẶT THUÊ
+                    <a href="/Account/Login?returnUrl=/Product/Cart" class="lm-btn-primary" style="display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none;">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập để thanh toán
                     </a>
                 }
 
-                <!-- Protection Policy Card -->
-                <div style="margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 16px; display: flex; gap: 0.75rem; align-items: flex-start;">
-                    <i class="fas fa-shield-alt" style="color: #2563eb; font-size: 1.1rem; margin-top: 0.1rem;"></i>
-                    <p style="margin: 0; font-size: 0.78rem; color: #1e3a8a; line-height: 1.5; font-weight: 500;">
-                        <strong>Bảo vệ ký quỹ thông minh</strong>: UTE Rent giữ tiền thuê & cọc của bạn. Chủ nhà chỉ được nhận tiền khi bạn xác nhận đã nhận đồ thành công. Hoàn cọc 100%.
-                    </p>
+                <div class="lm-trust-badge">
+                    <i class="fas fa-leaf"></i>
+                    <p>Bằng việc thuê đồ, bạn đã giúp giảm thiểu rác thải ra môi trường. <strong>UTE Rent</strong> giữ tiền thuê &amp; cọc an toàn — chủ nhà chỉ nhận tiền sau khi bạn xác nhận thành công.</p>
+                </div>
+                <div class="lm-shipping-text">
+                    Giao hàng miễn phí cho đơn từ 2.000.000đ
                 </div>
             </div>
         </div>
@@ -107,67 +113,488 @@
 </div>
 
 <style>
-    .cart-item-card {
-        background: white;
-        border: 2px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 1.25rem;
+    .lm-page-wrapper {
+        background-color: #faf9f6;
+        color: #1f2937;
+        padding: 40px 20px 80px 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+    }
+
+    /* Header */
+    .lm-cart-header {
+        max-width: 1200px;
+        margin: 0 auto 40px auto;
+    }
+
+    .lm-cart-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .lm-cart-subtitle {
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    /* Layout Grid */
+    .lm-cart-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.8fr 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+
+    /* Left Panel */
+    .lm-items-list {
         display: flex;
-        gap: 1.5rem;
-        transition: all 0.3s ease;
-        position: relative;
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 40px;
     }
 
-    .cart-item-card:hover {
-        border-color: #cbd5e1;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+    .lm-cart-item {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        gap: 24px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        border: 1px solid #f3f4f6;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .btn-checkout-primary:hover {
-        background: #1d4ed8 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3) !important;
+        .lm-cart-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        }
+
+    .lm-item-img {
+        width: 140px;
+        height: 140px;
+        border-radius: 16px;
+        object-fit: cover;
+        background: #f8f9fa;
+        flex-shrink: 0;
     }
 
-    .btn-checkout-primary:active {
-        transform: translateY(0);
+    .lm-item-info {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
     }
 
-    .btn-duration-qty {
-        width: 32px;
-        height: 32px;
+    .lm-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .lm-item-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #111827;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .lm-item-title:hover {
+            color: #4f6356;
+        }
+
+    .lm-item-total {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #111827;
+        white-space: nowrap;
+    }
+
+    .lm-item-date {
+        font-size: 0.88rem;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .lm-date-input {
+        padding: 4px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #111827;
+        outline: none;
+        background: #f9fafb;
+        transition: border-color 0.2s;
+    }
+
+        .lm-date-input:focus {
+            border-color: #4f6356;
+        }
+
+    .lm-item-sub {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-bottom: 16px;
+    }
+
+        .lm-item-sub strong {
+            color: #6b7280;
+        }
+
+    .lm-item-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid #f3f4f6;
+    }
+
+    .lm-price-badge {
+        background: #ffedd5;
+        color: #c2410c;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .lm-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .lm-qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f3f4f6;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+        .lm-qty-controls button {
+            background: none;
+            border: none;
+            color: #4b5563;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+            .lm-qty-controls button:hover {
+                background: #e5e7eb;
+                color: #111827;
+            }
+
+        .lm-qty-controls span {
+            font-weight: 700;
+            font-size: 0.95rem;
+            min-width: 20px;
+            text-align: center;
+            color: #111827;
+        }
+
+    .lm-delete-btn {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 1.15rem;
+        transition: 0.2s;
+        padding: 4px;
+    }
+
+        .lm-delete-btn:hover {
+            color: #ef4444;
+        }
+
+    .lm-checkout-single-btn {
+        background: #4f6356;
+        color: #fff;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+
+        .lm-checkout-single-btn:hover {
+            background: #3e4f44;
+            transform: translateY(-1px);
+        }
+
+    /* Suggestions Section */
+    .lm-suggestions-section {
+        margin-top: 8px;
+    }
+
+    .lm-sugg-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #111827;
+    }
+
+    .lm-sugg-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .lm-sugg-card {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 24px 16px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        border: 1px solid #f3f4f6;
+    }
+
+    .lm-sugg-img {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 16px auto;
         border-radius: 50%;
-        border: 1px solid #cbd5e1;
-        background: #f8fafc;
+        overflow: hidden;
+        background: #f8f9fa;
+    }
+
+        .lm-sugg-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .lm-sugg-card h4 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .lm-sugg-card p {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 16px;
+        font-weight: 500;
+    }
+
+    .lm-btn-sugg {
+        background: #4f6356;
+        color: white;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .lm-btn-sugg:hover {
+            background: #3e4f44;
+        }
+
+    /* Right Panel */
+    .lm-summary-card {
+        background: #ebe9e0;
+        border-radius: 24px;
+        padding: 32px;
+        position: sticky;
+        top: 100px;
+    }
+
+        .lm-summary-card h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+
+    .lm-summary-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #dcdad1;
+    }
+
+    .lm-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.95rem;
+        color: #4b5563;
+    }
+
+        .lm-summary-row strong {
+            color: #111827;
+            font-weight: 700;
+        }
+
+    .lm-summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+        .lm-summary-total span {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .lm-summary-total strong {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+    .lm-btn-primary {
+        width: 100%;
+        background: #4f6356;
+        color: #fff;
+        border: none;
+        padding: 18px;
+        border-radius: 16px;
+        font-size: 1.05rem;
         font-weight: 700;
         cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
-        color: #475569;
+        gap: 8px;
     }
 
-    .btn-checkout-single:hover {
-        background: #1d4ed8 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25) !important;
+        .lm-btn-primary:hover {
+            background: #3e4f44;
+            transform: translateY(-1px);
+        }
+
+    .lm-trust-badge {
+        background: #f4f3ec;
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 16px;
     }
 
-    .btn-checkout-single:active {
-        transform: translateY(0);
+        .lm-trust-badge i {
+            color: #4f6356;
+            font-size: 1.1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .lm-trust-badge p {
+            font-size: 0.78rem;
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+    .lm-shipping-text {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #6b7280;
+        font-weight: 500;
     }
 
-    .btn-duration-qty:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-        border-color: #94a3b8;
+    /* Empty state */
+    .lm-empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: #fff;
+        border-radius: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
 
-    @@media (max-width: 968px) {
-        .cart-grid-container {
-            grid-template-columns: 1fr !important;
+    .lm-empty-icon {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 24px;
+    }
+
+    .lm-empty-state h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: #111827;
+    }
+
+    .lm-empty-state p {
+        color: #6b7280;
+        max-width: 500px;
+        margin: 0 auto 32px auto;
+        line-height: 1.6;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .lm-cart-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-sugg-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .lm-summary-card {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .lm-cart-item {
+            flex-direction: column;
+        }
+
+        .lm-item-img {
+            width: 100%;
+            height: 200px;
+        }
+
+        .lm-sugg-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-cart-title {
+            font-size: 1.75rem;
+        }
+
+        .lm-item-bottom {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
         }
     }
 </style>
@@ -197,7 +624,7 @@
         grid.style.display = 'grid';
         container.innerHTML = '';
 
-        cart.forEach((item, index) => {
+        cart.forEach((item) => {
             let unitText = "ngày";
             if (item.unit === 'Hour') unitText = "giờ";
             if (item.unit === 'Week') unitText = "tuần";
@@ -205,7 +632,6 @@
 
             const itemRentTotal = item.price * item.duration;
             const itemTotal = itemRentTotal + item.deposit;
-
             const formatter = new Intl.NumberFormat('vi-VN');
 
             // Format date readable
@@ -218,56 +644,46 @@
             }
 
             const itemHtml = `
-                <div class="cart-item-card" id="cart-item-${item.productId}">
-                    <!-- Product Image -->
-                    <img src="${item.imageUrl}" alt="${item.name}" style="width: 100px; height: 100px; border-radius: 14px; object-fit: cover; border: 1px solid #f1f5f9; background: #f8fafc;" />
-                    
-                    <!-- Content Panel -->
-                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <a href="/Product/Details/${item.productId}" style="font-size: 1.05rem; font-weight: 800; color: #1e293b; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#1e293b'">
-                                    ${item.name}
-                                </a>
-                                <button type="button" onclick="deleteCartItem(${item.productId})" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.1rem; transition: color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                            
-                            <!-- Date Selected info -->
-                            <div style="font-size: 0.82rem; color: #64748b; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
-                                <i class="far fa-calendar-alt" style="color: #3b82f6;"></i>
-                                Nhận đồ: <strong>${dateStr}</strong>
-                            </div>
+                <div class="lm-cart-item" id="cart-item-${item.productId}">
+                    <img src="${item.imageUrl}" alt="${item.name}" class="lm-item-img"
+                         onerror="this.src='https://via.placeholder.com/140x140/8B5E3C/ffffff?text=Product'" />
+
+                    <div class="lm-item-info">
+                        <div class="lm-item-top">
+                            <a href="/Product/Details/${item.productId}" class="lm-item-title">${item.name}</a>
+                            <button type="button" class="lm-delete-btn" onclick="deleteCartItem(${item.productId})" title="Xóa">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
                         </div>
 
-                        <!-- Bottom panel: duration adjust & totals -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid #f1f5f9; padding-top: 0.85rem;">
-                            
-                            <!-- Duration Adjuster -->
-                            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Thời lượng:</span>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; background: #f8fafc; padding: 0.25rem; border-radius: 999px; border: 1px solid #e2e8f0;">
-                                    <button type="button" class="btn-duration-qty" onclick="adjustItemDuration(${item.productId}, -1)">−</button>
-                                    <span style="font-size: 0.95rem; font-weight: 800; color: #1e293b; min-width: 24px; text-align: center;">${item.duration}</span>
-                                    <button type="button" class="btn-duration-qty" onclick="adjustItemDuration(${item.productId}, 1)">+</button>
-                                </div>
-                                <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">${unitText}</span>
-                            </div>
+                        <div class="lm-item-date">
+                            <i class="far fa-calendar-alt" style="color: #4f6356;"></i>
+                            <span>Nhận đồ lúc:</span>
+                            <input type="datetime-local" class="lm-date-input"
+                                   value="${item.startDate || ''}"
+                                   onchange="updateCartItemDate(${item.productId}, this.value)" />
+                        </div>
 
-                            <!-- Cost Totals & Single Checkout -->
-                            <div style="display: flex; align-items: center; gap: 1.25rem;">
-                                <div style="text-align: right;">
-                                    <div style="font-size: 0.78rem; color: #94a3b8;">Tiền thuê: <strong style="color: #475569;">${formatter.format(itemRentTotal)} đ</strong></div>
-                                    <div style="font-size: 0.78rem; color: #94a3b8;">Tiền cọc cọc: <strong style="color: #475569;">+ ${formatter.format(item.deposit)} đ</strong></div>
-                                    <div style="font-size: 1rem; font-weight: 850; color: #2563eb; margin-top: 0.15rem;">${formatter.format(itemTotal)} đ</div>
-                                </div>
+                        <div class="lm-item-sub">
+                            Tiền thuê: <strong>${formatter.format(itemRentTotal)}đ</strong>
+                            &nbsp;|&nbsp;
+                            Tiền cọc: <strong>+${formatter.format(item.deposit)}đ</strong>
+                        </div>
 
-                                <button type="button" onclick="checkoutSingleItem(${item.productId})" class="btn-checkout-single" style="border: none; background: #2563eb; color: white; padding: 0.6rem 1.25rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);">
+                        <div class="lm-item-bottom">
+                            <span class="lm-price-badge">${formatter.format(item.price)}đ / ${unitText}</span>
+
+                            <div class="lm-item-actions">
+                                <div class="lm-qty-controls">
+                                    <button type="button" onclick="adjustItemDuration(${item.productId}, -1)"><i class="fas fa-minus"></i></button>
+                                    <span>${item.duration} ${unitText}</span>
+                                    <button type="button" onclick="adjustItemDuration(${item.productId}, 1)"><i class="fas fa-plus"></i></button>
+                                </div>
+                                <div class="lm-item-total">${formatter.format(itemTotal)}đ</div>
+                                <button type="button" class="lm-checkout-single-btn" onclick="checkoutSingleItem(${item.productId})">
                                     Đặt thuê
                                 </button>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -291,10 +707,10 @@
         const grandTotal = totalRent + totalDeposit;
         const formatter = new Intl.NumberFormat('vi-VN');
 
-        document.getElementById('summary-total-qty').innerText = `${totalQty} sản phẩm`;
-        document.getElementById('summary-total-rent').innerText = formatter.format(totalRent) + ' đ';
-        document.getElementById('summary-total-deposit').innerText = '+ ' + formatter.format(totalDeposit) + ' đ';
-        document.getElementById('summary-grand-total').innerText = formatter.format(grandTotal) + ' đ';
+        document.getElementById('summary-total-qty').innerText = `(${totalQty} món)`;
+        document.getElementById('summary-total-rent').innerText = formatter.format(totalRent) + 'đ';
+        document.getElementById('summary-total-deposit').innerText = formatter.format(totalDeposit) + 'đ';
+        document.getElementById('summary-grand-total').innerText = formatter.format(grandTotal) + 'đ';
     }
 
     function adjustItemDuration(productId, change) {
@@ -302,9 +718,17 @@
         if (itemIndex > -1) {
             cart[itemIndex].duration += change;
             if (cart[itemIndex].duration < 1) cart[itemIndex].duration = 1;
-            
             localStorage.setItem('uterent_cart', JSON.stringify(cart));
             loadCart();
+        }
+    }
+
+    function updateCartItemDate(productId, newDate) {
+        let itemIndex = cart.findIndex(item => item.productId === productId);
+        if (itemIndex > -1) {
+            cart[itemIndex].startDate = newDate;
+            localStorage.setItem('uterent_cart', JSON.stringify(cart));
+            calculateCartTotals();
         }
     }
 
@@ -312,27 +736,16 @@
         if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
             cart = cart.filter(item => item.productId !== productId);
             localStorage.setItem('uterent_cart', JSON.stringify(cart));
-            
-            // Sync with navbar layout badge
-            if (typeof updateLayoutCartBadge === 'function') {
-                updateLayoutCartBadge();
-            }
-
+            if (typeof updateLayoutCartBadge === 'function') updateLayoutCartBadge();
             loadCart();
         }
     }
 
     async function checkoutCartAll() {
-        if (cart.length === 0) {
-            alert("Giỏ hàng rỗng!");
-            return;
-        }
+        if (cart.length === 0) { alert("Giỏ hàng rỗng!"); return; }
 
-        if (!confirm("Bạn có chắc chắn muốn đặt thuê tất cả sản phẩm trong giỏ hàng?\nHệ thống sẽ tạm khóa tổng số tiền thuê và cọc trong ví ký quỹ để bảo vệ giao dịch.")) {
-            return;
-        }
+        if (!confirm("Bạn có chắc chắn muốn đặt thuê tất cả sản phẩm trong giỏ hàng?\nHệ thống sẽ tạm khóa tổng số tiền thuê và cọc trong ví ký quỹ để bảo vệ giao dịch.")) return;
 
-        // Structure checkout model data
         const checkoutData = cart.map(item => ({
             productId: item.productId,
             rentalUnit: item.unit,
@@ -343,10 +756,7 @@
         try {
             const response = await fetch('/Product/CheckoutCart', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify(checkoutData)
             });
 
@@ -354,14 +764,8 @@
 
             if (result.success) {
                 alert("🎉 " + result.message);
-                
-                // Clear cart on success
                 localStorage.removeItem('uterent_cart');
-                if (typeof updateLayoutCartBadge === 'function') {
-                    updateLayoutCartBadge();
-                }
-
-                // Redirect to renter dashboard to check orders
+                if (typeof updateLayoutCartBadge === 'function') updateLayoutCartBadge();
                 window.location.href = '/Home/RenterDashboard';
             } else {
                 alert("❌ Giao dịch thất bại: " + result.message + "\nVui lòng nạp thêm tiền vào ví để đảm bảo số dư ký quỹ!");
@@ -378,11 +782,8 @@
 
         const item = cart[itemIndex];
 
-        if (!confirm(`Bạn có chắc chắn muốn đặt thuê sản phẩm "${item.name}"?\nHệ thống sẽ tạm khóa khoản tiền thuê và tiền cọc của sản phẩm này trong ví ký quỹ.`)) {
-            return;
-        }
+        if (!confirm(`Bạn có chắc chắn muốn đặt thuê sản phẩm "${item.name}"?\nHệ thống sẽ tạm khóa khoản tiền thuê và tiền cọc của sản phẩm này trong ví ký quỹ.`)) return;
 
-        // Structure single checkout data array
         const checkoutData = [{
             productId: item.productId,
             rentalUnit: item.unit,
@@ -393,10 +794,7 @@
         try {
             const response = await fetch('/Product/CheckoutCart', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify(checkoutData)
             });
 
@@ -404,16 +802,9 @@
 
             if (result.success) {
                 alert("🎉 " + result.message);
-                
-                // Remove only this product from cart
                 cart = cart.filter(x => x.productId !== productId);
                 localStorage.setItem('uterent_cart', JSON.stringify(cart));
-                
-                if (typeof updateLayoutCartBadge === 'function') {
-                    updateLayoutCartBadge();
-                }
-
-                // Redirect to renter dashboard to check orders
+                if (typeof updateLayoutCartBadge === 'function') updateLayoutCartBadge();
                 window.location.href = '/Home/RenterDashboard';
             } else {
                 alert("❌ Đặt thuê thất bại: " + result.message + "\nVui lòng kiểm tra số dư ví ký quỹ!");
@@ -424,6 +815,5 @@
         }
     }
 
-    // Load cart on DOM load
     window.addEventListener('DOMContentLoaded', loadCart);
 </script>

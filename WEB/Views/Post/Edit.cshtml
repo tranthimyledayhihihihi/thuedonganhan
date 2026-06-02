@@ -1,0 +1,779 @@
+@model WEB.Models.CreateProductRequest
+@{
+    ViewData["Title"] = "Chỉnh Sửa Tin Đăng";
+    var categories = ViewBag.Categories as List<WEB.Models.CategoryViewModel> ?? new List<WEB.Models.CategoryViewModel>();
+}
+
+<!-- Thêm Flatpickr cho calendar -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Thêm FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<div class="lendmodern-wrapper">
+    <div class="post-create-container">
+
+        <!-- Header -->
+        <div class="post-header">
+            <h1>Chỉnh sửa tin đăng</h1>
+            <p>Cập nhật thông tin chi tiết, hình ảnh và lịch thuê cho sản phẩm của bạn.</p>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                ❌ @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <form asp-action="Edit" asp-route-id="@ViewBag.ProductId" method="post" class="post-form-grid" id="postForm">
+            @Html.AntiForgeryToken()
+
+            <!-- CỘT TRÁI: Hình ảnh & Mẹo -->
+            <div class="form-column-left">
+                <!-- Box Hình ảnh -->
+                <div class="ui-card">
+                    <div class="card-title-small">
+                        <i class="far fa-image"></i> Hình ảnh sản phẩm
+                    </div>
+
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <div class="image-upload-placeholder" id="uploadPlaceholder">
+                            <div class="icon-circle">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <p class="fw-bold text-dark mt-2 mb-1">Kéo thả ảnh vào đây</p>
+                            <p class="text-muted small">Hoặc nhấp để chọn tệp (Tối đa 5 ảnh)</p>
+                        </div>
+                        <input type="file" id="imageUpload" name="images" multiple accept="image/*" style="display: none;" />
+                        <input type="hidden" id="imageUrlInput" name="ImageUrl" value="@Model.ImageUrl" />
+                        <input type="hidden" id="productImagesInput" name="ProductImagesJson" />
+                    </div>
+
+                    <!-- Lưới preview ảnh -->
+                    <div class="image-preview-grid" id="imagePreviewGrid">
+                        <!-- Images will be added here dynamically by JS -->
+                    </div>
+                </div>
+
+                <!-- Box Mẹo -->
+                <div class="tips-box">
+                    <div class="tips-title">
+                        <i class="fas fa-leaf"></i> Mẹo chỉnh sửa tin hiệu quả
+                    </div>
+                    <ul class="tips-list">
+                        <li>Cập nhật hình ảnh rõ nét để tăng tỷ lệ thuê.</li>
+                        <li>Chỉnh sửa giá thuê hợp lý so với thị trường.</li>
+                        <li>Chặn các ngày bận trên lịch để tránh bị huỷ đơn.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: Form nhập liệu -->
+            <div class="form-column-right">
+                <div class="ui-card">
+
+                    <!-- THÔNG TIN CƠ BẢN -->
+                    <div class="form-section">
+                        <h3 class="section-title">Thông tin cơ bản</h3>
+
+                        <div class="form-group">
+                            <label class="form-label">Tên sản phẩm *</label>
+                            <input type="text" name="ProductName" class="form-control pill-input" placeholder="Ví dụ: Máy ảnh Sony A7III..." value="@Model.ProductName" required />
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Danh mục *</label>
+                                <select name="CategoryId" class="form-control pill-input" required>
+                                    <option value="">Chọn danh mục</option>
+                                    @foreach (var category in categories)
+                                    {
+                                        if (Model.CategoryId == category.CategoryId)
+                                        {
+                                            <option value="@category.CategoryId" selected>@category.CategoryName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@category.CategoryId">@category.CategoryName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Số lượng *</label>
+                                <input type="number" name="Quantity" class="form-control pill-input" value="@Model.Quantity" min="1" required />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mô tả chi tiết *</label>
+                            <textarea name="Description" class="form-control box-input" rows="5" placeholder="Mô tả công dụng, lưu ý..." required>@Model.Description</textarea>
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <!-- GIÁ & ĐỊA ĐIỂM -->
+                    <div class="form-section">
+                        <h3 class="section-title">Giá & Địa điểm</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Giá thuê theo ngày *</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="number" name="PricePerDay" placeholder="200000" min="1000" step="1000" value="@Convert.ToInt64(Model.PricePerDay)" required />
+                                    <span class="suffix-text">VNĐ / ngày</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Khu vực *</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="text" name="Location" placeholder="Quận 1, TP. Hồ Chí Minh" value="@Model.Location" required />
+                                    <i class="fas fa-map-marker-alt suffix-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Tiền cọc (Tuỳ chọn)</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="number" name="Deposit" placeholder="500000" min="0" step="10000" value="@(Model.Deposit.HasValue ? Convert.ToInt64(Model.Deposit.Value) : "")" />
+                                    <span class="suffix-text">VNĐ</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Giá thuê theo giờ (Tuỳ chọn)</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="number" name="PricePerHour" placeholder="20000" min="0" step="1000" value="@(Model.PricePerHour.HasValue ? Convert.ToInt64(Model.PricePerHour.Value) : "")" />
+                                    <span class="suffix-text">VNĐ / giờ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Giá thuê theo tuần (Tuỳ chọn)</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="number" name="PricePerWeek" placeholder="1000000" min="0" step="10000" value="@(Model.PricePerWeek.HasValue ? Convert.ToInt64(Model.PricePerWeek.Value) : "")" />
+                                    <span class="suffix-text">VNĐ / tuần</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Giá thuê theo tháng (Tuỳ chọn)</label>
+                                <div class="input-with-suffix pill-input">
+                                    <input type="number" name="PricePerMonth" placeholder="3500000" min="0" step="10000" value="@(Model.PricePerMonth.HasValue ? Convert.ToInt64(Model.PricePerMonth.Value) : "")" />
+                                    <span class="suffix-text">VNĐ / tháng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <!-- LỊCH TRỐNG -->
+                    <div class="form-section">
+                        <h3 class="section-title">Lịch không cho thuê (Tuỳ chọn)</h3>
+                        <p class="sub-label mb-3">Chọn các ngày bạn cần dùng đồ hoặc không muốn cho thuê.</p>
+
+                        <div class="calendar-wrapper">
+                            <input type="text" id="unavailableDatesInput" name="UnavailableDates" value="@Model.UnavailableDates" hidden />
+                            <div id="calendar"></div>
+                            <div id="selectedDatesList"></div>
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <!-- NÚT SUBMIT -->
+                    <div class="submit-section">
+                        <button type="submit" class="btn-submit-modern">
+                            Cập nhật tin đăng
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    :root {
+        --bg-color: #f7f5f2;
+        --card-bg: #ffffff;
+        --primary-green: #3f5947;
+        --primary-green-hover: #324738;
+        --tips-bg: #eaf1ec;
+        --input-bg: #f4f5f4;
+        --text-main: #2b3a30;
+        --text-muted: #8b9690;
+        --border-radius-card: 24px;
+        --border-radius-pill: 50px;
+    }
+
+    /* Base Layout */
+    .lendmodern-wrapper {
+        background-color: var(--bg-color);
+        min-height: 100vh;
+        padding: 40px 20px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .post-create-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .post-header {
+        text-align: left;
+        margin-bottom: 30px;
+    }
+
+        .post-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .post-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+    /* Grid Layout */
+    .post-form-grid {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    /* UI Cards */
+    .ui-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius-card);
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        border: 1px solid #eee;
+    }
+
+    .card-title-small {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Image Upload Section */
+    .image-upload-area {
+        border: 1px dashed #d0d7d2;
+        border-radius: 20px;
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafbfa;
+    }
+
+        .image-upload-area:hover, .image-upload-area.dragover {
+            background: #f0f4f1;
+            border-color: var(--primary-green);
+        }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        background-color: #fbe6db;
+        color: #d97746;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 15px;
+    }
+
+    .fw-bold {
+        font-weight: 600;
+    }
+
+    .text-dark {
+        color: var(--text-main);
+    }
+
+    .small {
+        font-size: 0.85rem;
+    }
+
+    /* Image Previews */
+    .image-preview-grid {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .image-preview-item {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 1px solid #eee;
+    }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .image-remove-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+
+    /* Tips Box */
+    .tips-box {
+        background-color: var(--tips-bg);
+        border-radius: 20px;
+        padding: 24px;
+        margin-top: 20px;
+    }
+
+    .tips-title {
+        color: var(--primary-green);
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tips-list {
+        padding-left: 0;
+        list-style: none;
+        margin: 0;
+    }
+
+        .tips-list li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+            .tips-list li::before {
+                content: "•";
+                color: var(--primary-green);
+                position: absolute;
+                left: 0;
+                top: 0;
+                font-weight: bold;
+            }
+
+    /* Form Fields */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+
+    .sub-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .form-control {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid transparent;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #d1d9d4;
+            background: #fff;
+        }
+
+    .pill-input {
+        border-radius: var(--border-radius-pill);
+        padding: 14px 20px;
+    }
+
+    .box-input {
+        border-radius: 16px;
+        padding: 16px 20px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Input with Suffix (VNĐ, icons) */
+    .input-with-suffix {
+        display: flex;
+        align-items: center;
+        background: var(--input-bg);
+        overflow: hidden;
+    }
+
+        .input-with-suffix input {
+            border: none;
+            background: transparent;
+            flex: 1;
+            padding: 0;
+            outline: none;
+            color: var(--text-main);
+        }
+
+    .suffix-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        white-space: nowrap;
+        margin-left: 10px;
+    }
+
+    .suffix-icon {
+        color: var(--text-muted);
+        margin-left: 10px;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid #f0f0f0;
+        margin: 35px 0;
+    }
+
+    /* Flatpickr Calendar Styling overrides */
+    .calendar-wrapper {
+        background: #fafbfa;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+    }
+
+    .flatpickr-calendar {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+        margin: 0 auto;
+    }
+
+    .flatpickr-day.selected {
+        background: var(--primary-green) !important;
+        border-color: var(--primary-green) !important;
+    }
+
+    #selectedDatesList {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .selected-date-tag {
+        background-color: #f0f3f1;
+        color: var(--primary-green);
+        border: 1px solid #d9e2db;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 550;
+    }
+
+        .selected-date-tag button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 0 2px 0;
+        }
+
+            .selected-date-tag button:hover {
+                color: #c0392b;
+            }
+
+    /* Submit Section */
+    .submit-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-submit-modern {
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-pill);
+        padding: 16px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(63, 89, 71, 0.2);
+    }
+
+        .btn-submit-modern:hover {
+            background-color: var(--primary-green-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(63, 89, 71, 0.3);
+        }
+
+    .alert-danger {
+        background-color: #fdf2f2;
+        border: 1px solid #fde8e8;
+        color: #c81e1e;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    @@media (max-width: 900px) {
+        .post-form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-column-left {
+            order: 2;
+        }
+
+        .form-column-right {
+            order: 1;
+        }
+
+        .btn-submit-modern {
+            width: 100%;
+            margin-top: 20px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // ========== XỬ LÝ HÌNH ẢNH ==========
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    
+    // Load ảnh cũ đã có từ ViewBag truyền qua
+    let uploadedImages = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ExistingImages ?? new List<string>()));
+    
+    // Khởi tạo hiển thị ảnh cũ
+    renderImagePreviews();
+    updateProductImagesInput();
+
+    imageUploadArea.addEventListener('click', (e) => {
+        if(e.target.closest('.image-remove-btn')) return;
+        imageUpload.click();
+    });
+
+    imageUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        imageUploadArea.classList.add('dragover');
+    });
+
+    imageUploadArea.addEventListener('dragleave', () => {
+        imageUploadArea.classList.remove('dragover');
+    });
+
+    imageUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        imageUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    imageUpload.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        if (uploadedImages.length + files.length > 5) {
+            alert('Bạn chỉ có thể upload tối đa 5 ảnh!');
+            return;
+        }
+
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) {
+                alert('Chỉ chấp nhận file ảnh!');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước ảnh không được vượt quá 5MB!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                uploadedImages.push(imageData);
+                renderImagePreviews();
+                updateProductImagesInput();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function renderImagePreviews() {
+        imagePreviewGrid.innerHTML = '';
+        uploadedImages.forEach((imageData, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${imageData}" alt="Preview ${index + 1}" />
+                <button type="button" class="image-remove-btn" onclick="removeImage(${index}, event)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            imagePreviewGrid.appendChild(previewItem);
+        });
+    }
+
+    function removeImage(index, event) {
+        event.stopPropagation();
+        uploadedImages.splice(index, 1);
+        renderImagePreviews();
+        updateProductImagesInput();
+    }
+
+    function updateProductImagesInput() {
+        if (uploadedImages.length > 0) {
+            imageUrlInput.value = uploadedImages[0];
+        } else {
+            imageUrlInput.value = '';
+        }
+        document.getElementById('productImagesInput').value = JSON.stringify(uploadedImages);
+    }
+
+
+    // ========== XỬ LÝ LỊCH TRỐNG (CALENDAR) ==========
+    let selectedDates = [];
+    
+    // Phục hồi các ngày bận đã có
+    @if (!string.IsNullOrEmpty(Model.UnavailableDates))
+    {
+        <text>
+        try {
+            selectedDates = JSON.parse('@Html.Raw(Model.UnavailableDates)');
+        } catch (e) {
+            console.error("Lỗi phục hồi ngày bận", e);
+        }
+        </text>
+    }
+
+    const calendar = flatpickr("#calendar", {
+        inline: true,
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        defaultDate: selectedDates,
+        onChange: function(selectedDatesArray, dateStr, instance) {
+            selectedDates = selectedDatesArray.map(date => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            });
+
+            updateSelectedDatesList();
+            updateUnavailableDatesInput();
+        }
+    });
+
+    function updateSelectedDatesList() {
+        const listContainer = document.getElementById('selectedDatesList');
+
+        if (selectedDates.length === 0) {
+            listContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Chưa chọn ngày nào.</p>';
+            return;
+        }
+
+        listContainer.innerHTML = selectedDates.map(date => `
+            <div class="selected-date-tag">
+                <i class="far fa-calendar-times"></i>
+                ${formatDate(date)}
+                <button type="button" onclick="removeDate('${date}')">×</button>
+            </div>
+        `).join('');
+    }
+
+    function removeDate(dateStr) {
+        selectedDates = selectedDates.filter(d => d !== dateStr);
+        calendar.setDate(selectedDates.map(d => new Date(d)), false);
+        updateSelectedDatesList();
+        updateUnavailableDatesInput();
+    }
+
+    function updateUnavailableDatesInput() {
+        document.getElementById('unavailableDatesInput').value = JSON.stringify(selectedDates);
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    updateSelectedDatesList();
+</script>

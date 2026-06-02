@@ -1,0 +1,574 @@
+@model WEB.Models.CreateComplaintRequest
+@{
+    ViewData["Title"] = "Gửi khiếu nại";
+}
+
+<div class="lm-complaint-bg">
+    <div class="lm-container">
+
+        <!-- Header -->
+        <div class="lm-page-header">
+            <a href="javascript:history.back()" class="lm-back-link">
+                <i class="fas fa-arrow-left"></i> Trở về trang Chi tiết Đơn
+            </a>
+            <h1 class="lm-page-title">Báo cáo Vấn đề</h1>
+            <p class="lm-page-subtitle">Rất tiếc vì sự cố bạn đang gặp phải. Vui lòng cung cấp chi tiết dưới đây để đội ngũ hỗ trợ của chúng tôi xử lý nhanh chóng.</p>
+        </div>
+
+        <div class="lm-layout-grid">
+
+            <!-- Cột trái: Form Báo cáo -->
+            <div class="lm-main-col">
+                <form asp-action="Create" method="post" enctype="multipart/form-data" class="lm-form-wrapper">
+                    <input type="hidden" asp-for="RentalId" />
+                    <input type="hidden" asp-for="IsOwner" />
+                    <div asp-validation-summary="ModelOnly" class="lm-validation-error"></div>
+
+                    <!-- Card thông tin đơn (Header thẻ mô phỏng) -->
+                    <div class="lm-rental-summary-card">
+                        <div class="lm-rsc-img">
+                            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=150" alt="Product" onerror="this.src='/images/placeholder.png'" />
+                        </div>
+                        <div class="lm-rsc-info">
+                            <span class="lm-badge lm-badge-green">ĐANG HOẠT ĐỘNG</span>
+                            <h3>Báo cáo khiếu nại cho Đơn hàng</h3>
+                            <p><i class="far fa-file-alt"></i> Mã đơn: #LM-@Model.RentalId.ToString("D5")</p>
+                        </div>
+                    </div>
+
+                    <!-- Phần 1: Chọn lý do -->
+                    <div class="lm-form-section">
+                        <label class="lm-form-label">Vấn đề chính của bạn là gì? <span class="text-danger">*</span></label>
+                        <select asp-for="Reason" class="lm-select-box" required>
+                            <option value="" disabled selected>-- Chọn loại vấn đề --</option>
+                            @if (Model.IsOwner)
+                            {
+                                <option value="Khách làm hỏng đồ">Khách làm hỏng đồ (Functional/Aesthetic damage)</option>
+                                <option value="Khách trả đồ trễ">Khách trả đồ trễ hẹn</option>
+                                <option value="Khách không trả đồ">Khách không trả đồ / Làm mất</option>
+                                <option value="Khách sử dụng sai mục đích">Khách sử dụng sai mục đích</option>
+                            }
+                            else
+                            {
+                                <option value="Hàng không đúng mô tả">Hàng không đúng mô tả (Item not as described)</option>
+                                <option value="Hàng bị hỏng trước khi nhận">Bị hỏng lúc nhận (Damaged upon arrival)</option>
+                                <option value="Chủ đồ không giao hàng">Thiếu phụ kiện (Missing accessories)</option>
+                                <option value="Chủ đồ giao trễ">Chủ đồ giao trễ hẹn (Delivery issue)</option>
+                            }
+                            <option value="Lý do khác">Lý do khác...</option>
+                        </select>
+                        <span asp-validation-for="Reason" class="lm-validation-message"></span>
+                    </div>
+
+                    <!-- Phần 2: Mô tả chi tiết -->
+                    <div class="lm-form-section">
+                        <label class="lm-form-label">Cung cấp thêm chi tiết <span class="text-danger">*</span></label>
+                        <textarea asp-for="Description" class="lm-textarea" rows="6" placeholder="Mô tả chi tiết vấn đề. Nếu thiết bị bị hỏng, vui lòng giải thích hỏng ở đâu và như thế nào..." required></textarea>
+                        <span asp-validation-for="Description" class="lm-validation-message"></span>
+                    </div>
+
+                    <!-- Phần 3: Upload Hình ảnh -->
+                    <div class="lm-form-section">
+                        <label class="lm-form-label">Tải lên bằng chứng (Hình ảnh/Video) <span class="text-danger">*</span></label>
+
+                        @if (Model.IsOwner)
+                        {
+                            <!-- Owner UI -->
+                            <div class="lm-upload-group">
+                                <label class="lm-sub-label">Ảnh sản phẩm từ lúc bắt đầu cho thuê</label>
+                                <div class="lm-upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Nhấp hoặc kéo thả file vào đây để tải lên</p>
+                                    <span>PNG, JPG hoặc MP4 (Max 25MB)</span>
+                                    <input asp-for="RentingOutEvidenceFile" type="file" accept="image/*" class="lm-file-input" required />
+                                </div>
+                                <span asp-validation-for="RentingOutEvidenceFile" class="lm-validation-message"></span>
+                            </div>
+
+                            <div class="lm-upload-group" style="margin-top: 20px;">
+                                <label class="lm-sub-label">Ảnh/Video tình trạng lúc nhận lại đồ lỗi</label>
+                                <div class="lm-upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Nhấp hoặc kéo thả file vào đây để tải lên</p>
+                                    <span>PNG, JPG hoặc MP4 (Max 25MB)</span>
+                                    <input asp-for="RetrievalEvidenceFile" type="file" accept="image/*,video/*" class="lm-file-input" required />
+                                </div>
+                                <span asp-validation-for="RetrievalEvidenceFile" class="lm-validation-message"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Renter UI -->
+                            <div class="lm-upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Nhấp hoặc kéo thả file vào đây để tải lên</p>
+                                <span>PNG, JPG hoặc MP4 (Max 25MB)</span>
+                                <input asp-for="EvidenceFile" type="file" accept="image/*,video/*" class="lm-file-input" required />
+                            </div>
+                            <span asp-validation-for="EvidenceFile" class="lm-validation-message"></span>
+                        }
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="lm-form-actions">
+                        <button type="submit" class="lm-btn-submit">Gửi Khiếu Nại</button>
+                        <a href="javascript:history.back()" class="lm-btn-cancel">Hủy bỏ</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Cột phải: Info Sidebar -->
+            <div class="lm-side-col">
+                <!-- Quy trình giải quyết -->
+                <div class="lm-side-card lm-protocol-card">
+                    <div class="lm-protocol-header">
+                        <i class="fas fa-shield-alt"></i> Quy trình giải quyết
+                    </div>
+
+                    <div class="lm-protocol-steps">
+                        <div class="lm-ps-item">
+                            <span class="step-num">01</span>
+                            <div class="step-text">
+                                <h4>Kiểm duyệt ban đầu</h4>
+                                <p>Đội ngũ của chúng tôi sẽ xem xét yêu cầu và bằng chứng của bạn trong vòng 24 giờ làm việc.</p>
+                            </div>
+                        </div>
+                        <div class="lm-ps-item">
+                            <span class="step-num">02</span>
+                            <div class="step-text">
+                                <h4>Liên hệ các bên</h4>
+                                <p>Chúng tôi sẽ kết nối với cả Người thuê và Chủ đồ để thảo luận và xác minh thông tin.</p>
+                            </div>
+                        </div>
+                        <div class="lm-ps-item">
+                            <span class="step-num">03</span>
+                            <div class="step-text">
+                                <h4>Đưa ra phán quyết</h4>
+                                <p>Kết quả giải quyết bồi thường sẽ được gửi vào Email của bạn để chốt phương án cuối cùng.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lm-protocol-note">
+                        "Tại LendModern, chúng tôi đảm bảo mọi giao dịch đều minh bạch. Nếu sản phẩm gặp vấn đề, chúng tôi sẽ xử lý triệt để để bảo vệ cộng đồng."
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="lm-side-card lm-faq-card">
+                    <h3 class="lm-faq-title">Câu hỏi thường gặp</h3>
+                    <div class="lm-faq-list">
+                        <div class="lm-faq-item">
+                            <span>Mất bao lâu để tôi nhận lại tiền?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="lm-faq-item">
+                            <span>Nếu hư hỏng chỉ là lỗi nhỏ thì sao?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --bg-body: #fcfaf6;
+        --card-bg: #ffffff;
+        --text-main: #1a1a1a;
+        --text-muted: #8b8b8b;
+        --primary-green: #4a6754;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --border-color: #f0ebe1;
+        --input-bg: #f5f4ef;
+        --protocol-bg: #eef3ea;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+    }
+
+    .lm-complaint-bg {
+        background-color: var(--bg-body);
+        min-height: calc(100vh - 70px);
+        padding: 40px 20px 80px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .lm-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .lm-page-header {
+        margin-bottom: 35px;
+    }
+
+    .lm-back-link {
+        display: inline-block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 15px;
+        transition: color 0.2s;
+    }
+
+        .lm-back-link:hover {
+            color: var(--primary-brown);
+        }
+
+    .lm-page-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 10px 0;
+    }
+
+    .lm-page-subtitle {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 0;
+    }
+
+    /* Layout Grid */
+    .lm-layout-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 40px;
+        align-items: start;
+    }
+
+    /* Left Column - Form */
+    .lm-form-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .lm-validation-error {
+        color: #dc2626;
+        font-size: 0.9rem;
+        background: #fee2e2;
+        padding: 10px 15px;
+        border-radius: 8px;
+    }
+
+    .lm-rental-summary-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .lm-rsc-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .lm-rsc-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .lm-rsc-info h3 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin: 10px 0 5px;
+        color: var(--text-main);
+    }
+
+    .lm-rsc-info p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .lm-badge {
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+
+    .lm-badge-green {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+    }
+
+    .lm-form-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lm-form-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 12px;
+    }
+
+    .text-danger {
+        color: #dc2626;
+    }
+
+    .lm-select-box, .lm-textarea {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 15px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        outline: none;
+        transition: border 0.2s;
+    }
+
+        .lm-select-box:focus, .lm-textarea:focus {
+            border-color: var(--primary-brown);
+            background: #ffffff;
+        }
+
+    .lm-textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* Upload Area */
+    .lm-sub-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .lm-upload-area {
+        position: relative;
+        background: var(--card-bg);
+        border: 2px dashed #d1d5db;
+        border-radius: 16px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+        .lm-upload-area:hover {
+            border-color: var(--primary-brown);
+            background: #fdfaf6;
+        }
+
+        .lm-upload-area i {
+            font-size: 2.5rem;
+            color: #d1d5db;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .lm-upload-area p {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 5px 0;
+        }
+
+        .lm-upload-area span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+    .lm-file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .lm-validation-message {
+        font-size: 0.85rem;
+        color: #dc2626;
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* Buttons */
+    .lm-form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+        align-items: center;
+    }
+
+    .lm-btn-submit {
+        background: var(--primary-brown);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .lm-btn-submit:hover {
+            background: var(--primary-brown-hover);
+        }
+
+    .lm-btn-cancel {
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        padding: 14px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--border-color);
+        transition: 0.2s;
+    }
+
+        .lm-btn-cancel:hover {
+            background: #f5f5f5;
+        }
+
+    /* Right Column - Sidebars */
+    .lm-side-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .lm-side-card {
+        border-radius: 20px;
+        padding: 25px;
+    }
+
+    .lm-protocol-card {
+        background: var(--protocol-bg);
+    }
+
+    .lm-protocol-header {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .lm-protocol-header i {
+            font-size: 1.2rem;
+            color: var(--primary-green);
+        }
+
+    .lm-protocol-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .lm-ps-item {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .step-num {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: var(--primary-green);
+    }
+
+    .step-text h4 {
+        font-size: 0.95rem;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+        color: var(--text-main);
+    }
+
+    .step-text p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .lm-protocol-note {
+        font-size: 0.85rem;
+        font-style: italic;
+        color: var(--primary-green);
+        border-top: 1px solid rgba(74, 103, 84, 0.2);
+        padding-top: 20px;
+        line-height: 1.5;
+    }
+
+    .lm-faq-card {
+        background: white;
+        border: 1px solid var(--border-color);
+    }
+
+    .lm-faq-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin: 0 0 20px 0;
+        color: var(--text-main);
+    }
+
+    .lm-faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .lm-faq-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+    }
+
+        .lm-faq-item:last-child {
+            border: none;
+            padding-bottom: 0;
+        }
+
+        .lm-faq-item:hover {
+            color: var(--primary-brown);
+        }
+
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .lm-layout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

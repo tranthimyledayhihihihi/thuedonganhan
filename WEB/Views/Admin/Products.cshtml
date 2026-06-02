@@ -171,6 +171,10 @@
     </div>
 </div>
 
+<!-- ✅ FIX: Các form Approve/Delete phải nằm NGOÀI bulkForm vì HTML không cho phép lồng <form> -->
+<!-- Các form này sẽ được render ở đây, JS sẽ submit chúng -->
+<div id="productFormsContainer"></div>
+
 <!-- Bulk delete form wraps the whole table -->
 <form id="bulkForm" method="post" asp-action="DeleteBulkProducts">
     @Html.AntiForgeryToken()
@@ -291,30 +295,22 @@
                                     <div class="pm-actions">
                                         @if (!product.IsApproved)
                                         {
-                                            <form method="post" asp-action="ApproveProduct" asp-route-productId="@product.ProductId" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="search" value="@search" />
-                                                <input type="hidden" name="filterCat" value="@filterCat" />
-                                                <button type="submit" class="pm-btn pm-btn-sm pm-btn-approve" title="Duyệt">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
+                                            <!-- ✅ FIX: Nút Approve - submit form nằm ngoài bulkForm qua JS -->
+                                            <button type="button" class="pm-btn pm-btn-sm pm-btn-approve" title="Duyệt"
+                                                    onclick="submitApproveForm(@product.ProductId)">
+                                                <i class="fas fa-check"></i>
+                                            </button>
                                         }
                                         <!-- Edit button -->
                                         <button type="button" class="pm-btn pm-btn-sm pm-btn-edit" title="Chỉnh sửa"
-                                                onclick="openEditModal(@product.ProductId,'@Html.Raw(product.ProductName.Replace("'","\\'"  ))','@product.PricePerDay','@product.Deposit','@product.Quantity','@Html.Raw((product.Location??"").Replace("'","\\'"))','@Html.Raw((product.Description??"").Replace("'","\\'"))')">
+                                                onclick="openEditModal(@product.ProductId,'@Html.Raw(product.ProductName.Replace("'","\\'"))','@product.PricePerDay','@product.Deposit','@product.Quantity','@Html.Raw((product.Location??"").Replace("'","\\'"))','@Html.Raw((product.Description??"").Replace("'","\\'"))')">
                                             <i class="fas fa-pen"></i>
                                         </button>
-                                        <!-- Delete single -->
-                                        <form method="post" asp-action="DeleteProduct" asp-route-productId="@product.ProductId" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="search" value="@search" />
-                                            <input type="hidden" name="filterCat" value="@filterCat" />
-                                            <button type="submit" class="pm-btn pm-btn-sm pm-btn-danger" title="Xóa"
-                                                    onclick="return confirm('Xóa sản phẩm này?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <!-- ✅ FIX: Nút Delete - submit form nằm ngoài bulkForm qua JS -->
+                                        <button type="button" class="pm-btn pm-btn-sm pm-btn-danger" title="Xóa"
+                                                onclick="if(confirm('Xóa sản phẩm này?')) submitDeleteForm(@product.ProductId)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -496,5 +492,88 @@ document.getElementById('editModal').addEventListener('click', function(e) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeEditModal();
 });
+
+// ── ✅ FIX: Approve & Delete Forms (tạo động ngoài bulkForm) ─────
+// Lấy antiforgery token từ bulkForm để dùng lại
+function getAntiForgeryToken() {
+    const tokenInput = document.querySelector('#bulkForm input[name="__RequestVerificationToken"]');
+    return tokenInput ? tokenInput.value : '';
+}
+
+function submitApproveForm(productId) {
+    // Tạo form tạm thời bên ngoài bulkForm
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '@Url.Action("ApproveProduct", "Admin")';
+    form.style.display = 'none';
+
+    // Antiforgery token
+    const token = document.createElement('input');
+    token.type = 'hidden';
+    token.name = '__RequestVerificationToken';
+    token.value = getAntiForgeryToken();
+    form.appendChild(token);
+
+    // productId
+    const pid = document.createElement('input');
+    pid.type = 'hidden';
+    pid.name = 'productId';
+    pid.value = productId;
+    form.appendChild(pid);
+
+    // search & filterCat
+    const search = document.createElement('input');
+    search.type = 'hidden';
+    search.name = 'search';
+    search.value = '@search';
+    form.appendChild(search);
+
+    const filterCat = document.createElement('input');
+    filterCat.type = 'hidden';
+    filterCat.name = 'filterCat';
+    filterCat.value = '@filterCat';
+    form.appendChild(filterCat);
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function submitDeleteForm(productId) {
+    // Tạo form tạm thời bên ngoài bulkForm
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '@Url.Action("DeleteProduct", "Admin")';
+    form.style.display = 'none';
+
+    // Antiforgery token
+    const token = document.createElement('input');
+    token.type = 'hidden';
+    token.name = '__RequestVerificationToken';
+    token.value = getAntiForgeryToken();
+    form.appendChild(token);
+
+    // productId
+    const pid = document.createElement('input');
+    pid.type = 'hidden';
+    pid.name = 'productId';
+    pid.value = productId;
+    form.appendChild(pid);
+
+    // search & filterCat
+    const search = document.createElement('input');
+    search.type = 'hidden';
+    search.name = 'search';
+    search.value = '@search';
+    form.appendChild(search);
+
+    const filterCat = document.createElement('input');
+    filterCat.type = 'hidden';
+    filterCat.name = 'filterCat';
+    filterCat.value = '@filterCat';
+    form.appendChild(filterCat);
+
+    document.body.appendChild(form);
+    form.submit();
+}
 </script>
 }

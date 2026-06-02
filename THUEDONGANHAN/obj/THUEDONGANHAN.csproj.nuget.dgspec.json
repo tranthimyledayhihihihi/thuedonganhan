@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj": {}
+    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj": {}
   },
   "projects": {
-    "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj": {
+    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj",
+        "projectUniqueName": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj",
         "projectName": "THUEDONGANHAN",
-        "projectPath": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj",
+        "projectPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\THUEDONGANHAN\\THUEDONGANHAN.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\THUEDONGANHAN\\obj\\",
+        "outputPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\THUEDONGANHAN\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -84,7 +84,7 @@
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
-              "version": "[7.0.3, )"
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

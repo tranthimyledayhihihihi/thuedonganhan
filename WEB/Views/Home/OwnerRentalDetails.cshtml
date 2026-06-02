@@ -5,316 +5,301 @@
     var product = rental.Product;
     var renter = rental.Renter;
 
-    var statusText = rental.Status == "Pending" ? "Đang chờ chủ nhà xác nhận đơn" : 
-                    (rental.Status == "Confirmed" ? "Đã xác nhận đơn - Chờ bàn giao đồ" : 
-                    (rental.Status == "Active" ? "Khách hàng đang thuê đồ" : 
-                    (rental.Status == "Completed" ? "Đơn thuê đã hoàn thành thành công" : 
+    var statusText = rental.Status == "Pending" ? "Đang chờ chủ đồ xác nhận đơn" :
+                    (rental.Status == "Confirmed" ? "Đã xác nhận đơn - Chờ bàn giao đồ" :
+                    (rental.Status == "Active" ? "Khách hàng đang thuê đồ" :
+                    (rental.Status == "Completed" ? "Đơn thuê đã hoàn thành thành công" :
                     (rental.Status == "Cancelled" ? "Đơn thuê đã bị hủy" : rental.Status))));
-    
-    var statusBadgeText = rental.Status == "Pending" ? "CHỜ XÁC NHẬN" : 
-                         (rental.Status == "Confirmed" ? "CHỜ BÀN GIAO" : 
-                         (rental.Status == "Active" ? "ĐANG THUÊ" : 
+
+    var statusBadgeText = rental.Status == "Pending" ? "CHỜ XÁC NHẬN" :
+                         (rental.Status == "Confirmed" ? "CHỜ BÀN GIAO" :
+                         (rental.Status == "Active" ? "ĐANG THUÊ" :
                          (rental.Status == "Completed" ? "HOÀN THÀNH" : rental.Status.ToUpper())));
+
+    var statusBadgeClass = rental.Status == "Pending" ? "lm-badge-yellow" :
+                          (rental.Status == "Confirmed" ? "lm-badge-blue" :
+                          (rental.Status == "Active" ? "lm-badge-green" :
+                          (rental.Status == "Completed" ? "lm-badge-light-green" : "lm-badge-gray")));
+
     var daysUntilReturn = (rental.EndDate - DateTime.Now).Days;
-    
     var duration = (rental.EndDate - rental.StartDate).Days;
     if (duration == 0) duration = 1;
-    
-    // Giả định bảo hiểm và vận chuyển
+
     var insuranceFee = 250000m;
     var shippingFee = 0m;
     var totalAmount = rental.TotalPrice + rental.DepositAmount + insuranceFee + shippingFee;
 }
 
-<div class="owner-layout">
-    <!-- Sidebar -->
-    <aside class="owner-sidebar">
-        <div class="sidebar-brand">
-            <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-label">Management Suite</div>
-                <div class="sidebar-sub">The Atelier</div>
+<div class="lm-app-layout">
+    <aside class="lm-sidebar">
+        <div class="lm-sidebar-brand">
+            <div class="lm-sidebar-avatar">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=8b5a3c&color=fff" alt="Admin" />
+            </div>
+            <div class="lm-sidebar-user-info">
+                <div class="lm-sidebar-label">Trung tâm điều khiển</div>
+                <div class="lm-sidebar-sub">Quản lý Cửa hàng</div>
             </div>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/" class="snav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-            <a href="/Home/OwnerDashboard" class="snav-item active"><i class="fas fa-sync-alt"></i><span>Active Rentals</span></a>
-            <a href="#" class="snav-item"><i class="fas fa-box"></i><span>Inventory</span></a>
-            <a href="#" class="snav-item"><i class="fas fa-users"></i><span>Customer Records</span></a>
-            <a href="#" class="snav-item"><i class="fas fa-wallet"></i><span>Financials</span></a>
+
+        <nav class="lm-sidebar-nav">
+            <a href="/" class="lm-snav-item"><i class="fas fa-home"></i><span>Trang chủ</span></a>
+            <a href="/Home/RenterDashboard" class="lm-snav-item"><i class="fas fa-shopping-bag"></i><span>Người thuê</span></a>
+            <a href="/Home/OwnerDashboard" class="lm-snav-item active"><i class="fas fa-store"></i><span>Người cho thuê</span></a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="#" class="snav-item"><i class="far fa-question-circle"></i><span>Support</span></a>
-            <a href="#" class="snav-item text-red"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+
+        <div class="lm-sidebar-footer">
+            <a href="/Post/Create" class="lm-btn-add-post">
+                <i class="fas fa-plus"></i> Đăng sản phẩm mới
+            </a>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="owner-main">
-        <div class="page-header">
-            <div class="ph-breadcrumbs">
-                <a href="/Home/OwnerDashboard">Active Rentals</a>
-                <span class="ph-sep"><i class="fas fa-chevron-right"></i></span>
-                <span class="ph-current">Order #RT-@rental.RentalId</span>
-            </div>
-            <div class="ph-title-row">
-                <h1 class="ph-title">Order Details</h1>
-                <div class="ph-actions">
-                    <button class="icon-btn"><i class="fas fa-print"></i></button>
-                    <button class="icon-btn"><i class="fas fa-share-alt"></i></button>
+    <main class="lm-main">
+        <div class="lm-container">
+
+            <div class="lm-page-header">
+                <div class="lm-breadcrumbs">
+                    <a href="/Home/OwnerDashboard">Người cho thuê</a>
+                    <span class="lm-sep"><i class="fas fa-chevron-right"></i></span>
+                    <span class="lm-current">Đơn hàng #RT-@rental.RentalId</span>
+                </div>
+                <div class="lm-header-flex">
+                    <h1 class="lm-page-title">Chi tiết đơn thuê</h1>
+                    <div class="lm-header-actions">
+                        <button class="lm-btn-icon-outline" title="In hóa đơn"><i class="fas fa-print"></i></button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="details-grid">
-            <!-- Left Column -->
-            <div class="dg-left">
-                <!-- Status Banner -->
-                <div class="status-banner">
-                    <div class="sb-info">
-                        <span class="badge badge-blue"><i class="fas fa-circle"></i> @statusBadgeText</span>
-                        <h2 class="sb-title">@statusText</h2>
-                        <div class="sb-sub">Due back in @daysUntilReturn days (@rental.EndDate.ToString("MMMM dd, yyyy"))</div>
-                    </div>
-                    <div class="sb-actions">
-                        @if (rental.Status == "Pending")
-                        {
-                            <form asp-controller="Home" asp-action="ConfirmRental" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-check"></i> Xác nhận chấp nhận đơn thuê
-                                </button>
-                            </form>
-                            <form asp-controller="Home" asp-action="CancelRental" method="post" style="display:inline; margin-left: 0.5rem;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
-                                <button type="submit" class="btn btn-light text-red" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
-                                    <i class="fas fa-times"></i> Từ chối đơn thuê
-                                </button>
-                            </form>
-                        }
-                        else if (rental.Status == "Confirmed")
-                        {
-                            <form asp-controller="Home" asp-action="ConfirmDelivery" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-truck"></i> Xác nhận bàn giao đồ
-                                </button>
-                            </form>
-                            <form asp-controller="Home" asp-action="CancelRental" method="post" style="display:inline; margin-left: 0.5rem;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
-                                <button type="submit" class="btn btn-light text-red" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
-                                    <i class="fas fa-times"></i> Hủy đơn thuê
-                                </button>
-                            </form>
-                        }
-                        else if (rental.Status == "Active")
-                        {
-                            <form asp-controller="Home" asp-action="ConfirmReturn" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="rentalId" value="@rental.RentalId" />
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-check-double"></i> Xác nhận đã nhận trả đồ & Hoàn cọc
-                                </button>
-                            </form>
-                        }
-                        else if (rental.Status == "Completed")
-                        {
-                            <div style="color: #10b981; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; background: rgba(16, 185, 129, 0.1); padding: 0.75rem 1.25rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2); font-size: 0.9rem;">
-                                <i class="fas fa-check-circle"></i> Đơn thuê đã hoàn thành & Ví chủ thuê và Admin đã được cộng tiền!
-                            </div>
-                        }
-                        else if (rental.Status == "Cancelled")
-                        {
-                            <div style="color: #ef4444; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; background: rgba(239, 68, 68, 0.1); padding: 0.75rem 1.25rem; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.9rem;">
-                                <i class="fas fa-times-circle"></i> Đơn thuê đã bị hủy & Tiền đã được hoàn trả lại cho khách!
-                            </div>
-                        }
-                    </div>
-                </div>
+            <div class="lm-detail-grid">
+                <div class="lm-dg-left">
 
-                <!-- Customer Info Row -->
-                <div class="info-row">
-                    <!-- Customer Card -->
-                    <div class="customer-card">
-                        <div class="cc-header">
-                            <div class="cc-avatar">@(renter?.FullName?.Substring(0, 2).ToUpper() ?? "KH")</div>
-                            <div class="cc-name-wrap">
-                                <div class="cc-name">@(renter?.FullName ?? "Khách hàng")</div>
-                                <div class="cc-type">Premium Member</div>
-                            </div>
-                        </div>
-                        <div class="cc-contact">
-                            <div class="cc-item">
-                                <i class="fas fa-phone-alt"></i>
-                                <span>@(renter?.PhoneNumber ?? "+84 905 123 456")</span>
-                            </div>
-                            <div class="cc-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>@(renter?.Email ?? "123 Trần Phú, Hải Châu, Đà Nẵng")</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rental History Summary -->
-                    <div class="history-summary">
-                        <h3 class="hs-title">LỊCH SỬ THUÊ NGẮN GỌN</h3>
-                        <div class="hs-stat">
-                            <span class="hs-label">Tổng đơn hàng</span>
-                            <span class="hs-val text-blue">12</span>
-                        </div>
-                        <div class="hs-stat">
-                            <span class="hs-label">Tỉ lệ trả đúng hạn</span>
-                            <span class="hs-val text-green">98%</span>
-                        </div>
-                        <div class="hs-stat">
-                            <span class="hs-label">Xếp hạng</span>
-                            <span class="hs-stars">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    <div class="lm-status-banner">
+                        <div class="lm-sb-content">
+                            <span class="lm-badge @statusBadgeClass" style="margin-bottom: 15px;">
+                                <i class="fas fa-circle" style="font-size: 8px;"></i> @statusBadgeText
                             </span>
+                            <h2 class="lm-sb-title">@statusText</h2>
+                            <p class="lm-sb-sub">
+                                @if (rental.Status == "Active" || rental.Status == "Confirmed")
+                                {
+                                    <text>Hạn trả đồ trong @daysUntilReturn ngày (@rental.EndDate.ToString("dd/MM/yyyy"))</text>
+                                }
+                                else
+                                {
+                                    <text>Cập nhật lần cuối: @rental.CreatedAt.ToString("dd/MM/yyyy HH:mm")</text>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="lm-sb-actions">
+                            @if (rental.Status == "Pending")
+                            {
+                                <form asp-controller="Home" asp-action="ConfirmRental" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                    <button type="submit" class="lm-btn-primary"><i class="fas fa-check"></i> Xác nhận đơn</button>
+                                </form>
+                                <form asp-controller="Home" asp-action="CancelRental" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                    <button type="submit" class="lm-btn-danger"><i class="fas fa-times"></i> Từ chối</button>
+                                </form>
+                            }
+                            else if (rental.Status == "Confirmed")
+                            {
+                                <form asp-controller="Home" asp-action="ConfirmDelivery" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                    <button type="submit" class="lm-btn-primary"><i class="fas fa-truck"></i> Xác nhận đã giao</button>
+                                </form>
+                                <form asp-controller="Home" asp-action="CancelRental" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                    <button type="submit" class="lm-btn-danger"><i class="fas fa-times"></i> Hủy đơn</button>
+                                </form>
+                            }
+                            else if (rental.Status == "Active")
+                            {
+                                <div class="lm-info-alert">
+                                    <i class="fas fa-info-circle"></i> Khách hàng đang dùng đồ. Chờ khách bấm "Đã trả đồ" trên hệ thống.
+                                </div>
+                            }
+                            else if (rental.Status == "Returned")
+                            {
+                                <form asp-controller="Home" asp-action="ConfirmReturn" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                    <button type="submit" class="lm-btn-primary" style="background-color: #16a34a;"><i class="fas fa-check-double"></i> Nhận đồ & Hoàn cọc</button>
+                                </form>
+                            }
+                            else if (rental.Status == "Completed")
+                            {
+                                <div class="lm-success-alert">
+                                    <i class="fas fa-check-circle"></i> Đơn đã hoàn thành & Ví được cộng tiền!
+                                </div>
+                            }
+                            else if (rental.Status == "Cancelled")
+                            {
+                                <div class="lm-error-alert">
+                                    <i class="fas fa-times-circle"></i> Đơn đã bị hủy & Tiền hoàn lại cho khách!
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="lm-info-row">
+                        <div class="lm-card">
+                            <div class="lm-customer-header">
+                                <div class="lm-c-avatar">@(renter?.FullName?.Substring(0, 2).ToUpper() ?? "KH")</div>
+                                <div>
+                                    <div class="lm-c-name">@(renter?.FullName ?? "Khách hàng")</div>
+                                    <div class="lm-c-type">Thành viên thân thiết</div>
+                                </div>
+                            </div>
+                            <div class="lm-customer-contact">
+                                <div><i class="fas fa-phone-alt"></i> @(renter?.PhoneNumber ?? "+84 905 123 456")</div>
+                                <div><i class="fas fa-map-marker-alt"></i> @(renter?.Email ?? "Đà Nẵng")</div>
+                            </div>
+                        </div>
+
+                        <div class="lm-card">
+                            <h3 class="lm-card-title-sm">LỊCH SỬ THUÊ (NGẮN GỌN)</h3>
+                            <div class="lm-stat-line">
+                                <span>Tổng đơn hàng</span>
+                                <span class="lm-text-green">12 đơn</span>
+                            </div>
+                            <div class="lm-stat-line">
+                                <span>Tỉ lệ trả đúng hạn</span>
+                                <span class="lm-text-green">98%</span>
+                            </div>
+                            <div class="lm-stat-line">
+                                <span>Đánh giá khách</span>
+                                <span class="lm-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lm-card lm-product-detail-card">
+                        <div class="lm-pdc-img">
+                            <img src="@(product?.ImageUrl)" alt="@(product?.ProductName)" onerror="this.src='https://via.placeholder.com/300x400/e2e8f0/94a3b8?text=No+Image'">
+                        </div>
+                        <div class="lm-pdc-info">
+                            <div class="lm-pdc-header">
+                                <span class="lm-cat-tag">@(product?.Category?.CategoryName ?? "SẢN PHẨM")</span>
+                                <div class="lm-pdc-price">
+                                    <span class="val">@((product?.PricePerDay ?? 0).ToString("N0"))đ</span>
+                                    <span class="unit">/ ngày</span>
+                                </div>
+                            </div>
+                            <h3 class="lm-pdc-name">@(product?.ProductName ?? "Sản phẩm")</h3>
+                            <p class="lm-pdc-id">Mã SP: #PRD-@product?.ProductId</p>
+
+                            <div class="lm-specs-grid">
+                                <div class="lm-spec-box">
+                                    <div class="lbl">SỐ LƯỢNG THUÊ</div>
+                                    <div class="val">1 sản phẩm</div>
+                                </div>
+                                <div class="lm-spec-box">
+                                    <div class="lbl">TÌNH TRẠNG</div>
+                                    <div class="val">Tốt (95%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lm-card">
+                        <h3 class="lm-card-title">Lịch trình thuê</h3>
+                        <div class="lm-timeline">
+                            <div class="lm-tl-item">
+                                <div class="lm-tl-icon active"><i class="fas fa-arrow-right"></i></div>
+                                <div class="lm-tl-content">
+                                    <div class="lbl">NGÀY BẮT ĐẦU</div>
+                                    <div class="val">@rental.StartDate.ToString("dd Tháng MM, yyyy")</div>
+                                    <div class="desc">Bàn giao tại địa chỉ của khách hàng.</div>
+                                </div>
+                            </div>
+
+                            <div class="lm-tl-duration">
+                                <i class="far fa-clock"></i> Tổng thời gian thuê: @(duration) ngày
+                            </div>
+
+                            <div class="lm-tl-item">
+                                <div class="lm-tl-icon"><i class="fas fa-arrow-left"></i></div>
+                                <div class="lm-tl-content">
+                                    <div class="lbl">NGÀY TRẢ DỰ KIẾN</div>
+                                    <div class="val">@rental.EndDate.ToString("dd Tháng MM, yyyy")</div>
+                                    <div class="desc">Kiểm tra kỹ tình trạng sản phẩm khi nhận lại.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Product Card -->
-                <div class="product-detail-card">
-                    <div class="pdc-img">
-                        <img src="@(product?.ImageUrl)" alt="@(product?.ProductName)" onerror="this.src='https://via.placeholder.com/300x400/e2e8f0/94a3b8?text=No+Image'">
-                    </div>
-                    <div class="pdc-info">
-                        <div class="pdc-top">
-                            <div class="pdc-cat">@(product?.Category?.CategoryName ?? "COLLECTION")</div>
-                            <div class="pdc-price">
-                                <span class="val">@((product?.PricePerDay ?? 0).ToString("N0"))đ</span>
-                                <span class="unit">/ ngày thuê</span>
-                            </div>
-                        </div>
-                        <h3 class="pdc-name">@(product?.ProductName ?? "Sản phẩm")</h3>
-                        <div class="pdc-id">Mã SP: AD-SILK-2024-W</div>
-                        
-                        <div class="pdc-specs">
-                            <div class="spec-box">
-                                <div class="spec-lbl">CHẤT LIỆU</div>
-                                <div class="spec-val">Lụa tơ tằm Bảo Lộc</div>
-                            </div>
-                            <div class="spec-box">
-                                <div class="spec-lbl">KÍCH CỠ</div>
-                                <div class="spec-val">Size M (Customized)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="lm-dg-right">
 
-                <!-- Timeline -->
-                <div class="timeline-section">
-                    <h3 class="ts-title">Lịch trình thuê</h3>
-                    <div class="timeline-track">
-                        <div class="tl-item">
-                            <div class="tl-icon blue"><i class="fas fa-arrow-right"></i></div>
-                            <div class="tl-content">
-                                <div class="tl-lbl">NGÀY NHẬN ĐỒ</div>
-                                <div class="tl-date">@rental.StartDate.ToString("dd Tháng MM, yyyy")</div>
-                                <div class="tl-desc">Đã bàn giao tại cửa hàng</div>
-                            </div>
+                    <div class="lm-card">
+                        <h3 class="lm-card-title">Tóm tắt thanh toán</h3>
+
+                        <div class="lm-bill-row">
+                            <span>Giá thuê (@(duration) ngày)</span>
+                            <span class="val">@rental.TotalPrice.ToString("N0")đ</span>
                         </div>
-                        
-                        <div class="tl-duration-badge">
-                            <i class="far fa-clock"></i> Thời hạn thuê: @(duration) ngày
+                        <div class="lm-bill-row">
+                            <span>Tiền đặt cọc</span>
+                            <span class="val">@rental.DepositAmount.ToString("N0")đ</span>
+                        </div>
+                        <div class="lm-bill-row">
+                            <span>Phí bảo hiểm đồ</span>
+                            <span class="val">@insuranceFee.ToString("N0")đ</span>
+                        </div>
+                        <div class="lm-bill-row">
+                            <span>Phí vận chuyển</span>
+                            <span class="val">0đ</span>
                         </div>
 
-                        <div class="tl-item">
-                            <div class="tl-icon empty"><i class="fas fa-arrow-left"></i></div>
-                            <div class="tl-content">
-                                <div class="tl-lbl">NGÀY TRẢ DỰ KIẾN</div>
-                                <div class="tl-date">@rental.EndDate.ToString("dd Tháng MM, yyyy")</div>
-                                <div class="tl-desc">Yêu cầu kiểm tra kỹ phần tà áo</div>
-                            </div>
+                        <div class="lm-bill-total">
+                            <span>TỔNG CỘNG</span>
+                            <span class="total-val">@totalAmount.ToString("N0")đ</span>
+                        </div>
+
+                        <div class="lm-payment-status">
+                            <div class="head"><i class="fas fa-check-circle"></i> Đã thanh toán 100%</div>
+                            <div class="desc">Chuyển khoản Vietcombank lúc @rental.CreatedAt.ToString("HH:mm - dd/MM/yyyy"). Tiền đang được giữ trong ví hệ thống.</div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Right Column -->
-            <div class="dg-right">
-                <!-- Payment Summary -->
-                <div class="payment-card">
-                    <h3 class="pc-title">Tóm tắt thanh toán</h3>
-                    
-                    <div class="pc-row">
-                        <span class="pc-lbl">Giá thuê (@(duration) ngày)</span>
-                        <span class="pc-val">@rental.TotalPrice.ToString("N0")đ</span>
-                    </div>
-                    <div class="pc-row">
-                        <span class="pc-lbl">Tiền đặt cọc</span>
-                        <span class="pc-val">@rental.DepositAmount.ToString("N0")đ</span>
-                    </div>
-                    <div class="pc-row">
-                        <span class="pc-lbl">Phí bảo hiểm lụa</span>
-                        <span class="pc-val">@insuranceFee.ToString("N0")đ</span>
-                    </div>
-                    <div class="pc-row">
-                        <span class="pc-lbl">Vận chuyển</span>
-                        <span class="pc-val">Free</span>
-                    </div>
-                    
-                    <div class="pc-total">
-                        <span class="lbl">TỔNG CỘNG</span>
-                        <span class="val">@totalAmount.ToString("N0")đ</span>
-                    </div>
-                    
-                    <div class="pc-status-box">
-                        <div class="pcs-head">
-                            <i class="fas fa-check-circle"></i> Đã thanh toán hết
+                    <div class="lm-card">
+                        <div class="lm-card-header-flex">
+                            <h3 class="lm-card-title">Lịch sử & Ghi chú</h3>
+                            <a href="#" class="lm-link-brown">Thêm</a>
                         </div>
-                        <div class="pcs-desc">Giao dịch hoàn tất qua Chuyển khoản Vietcombank vào lúc 14:20 - @rental.CreatedAt.ToString("dd/MM/yyyy").</div>
-                    </div>
-                </div>
 
-                <!-- History & Notes -->
-                <div class="notes-card">
-                    <div class="nc-header">
-                        <h3 class="nc-title">Lịch sử & Ghi chú</h3>
-                        <a href="#" class="nc-more">Thêm</a>
-                    </div>
-                    
-                    <div class="nc-timeline">
-                        <div class="nct-item">
-                            <div class="dot dark"></div>
-                            <div class="content">
+                        <div class="lm-notes-list">
+                            <div class="lm-note-item">
+                                <div class="dot active"></div>
                                 <div class="time">@rental.StartDate.ToString("dd/MM - HH:mm")</div>
-                                <div class="evt">Đã giao đồ cho khách</div>
-                                <div class="desc">"Khách đã kiểm tra tà, không có vết bẩn."</div>
+                                <div class="title">Đã chuẩn bị đồ xong</div>
+                                <div class="desc">"Đã đóng gói cẩn thận, dán tem niêm phong."</div>
                             </div>
-                        </div>
-                        <div class="nct-item">
-                            <div class="dot light"></div>
-                            <div class="content">
-                                <div class="time">@rental.CreatedAt.AddHours(2).ToString("dd/MM - HH:mm")</div>
-                                <div class="evt">Đã đóng gói Editorial Box</div>
-                                <div class="desc">Chuẩn bị sẵn sàng tại quầy lễ tân.</div>
-                            </div>
-                        </div>
-                        <div class="nct-item pb-0">
-                            <div class="dot light"></div>
-                            <div class="content">
+                            <div class="lm-note-item">
+                                <div class="dot"></div>
                                 <div class="time">@rental.CreatedAt.ToString("dd/MM - HH:mm")</div>
-                                <div class="evt">Xác nhận đặt đơn thành công</div>
-                                <div class="desc">Hệ thống tự động xác nhận thanh toán.</div>
+                                <div class="title">Hệ thống ghi nhận đơn</div>
+                                <div class="desc">Chờ chủ đồ duyệt yêu cầu.</div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <textarea class="nc-input" placeholder="Nhập ghi chú nội bộ..."></textarea>
-                </div>
 
-                <!-- Support Card -->
-                <div class="support-promo">
-                    <h4 class="sp-title">Cần hỗ trợ?</h4>
-                    <p class="sp-desc">Gặp sự cố với đơn hàng lụa cao cấp? Liên hệ chuyên viên bảo quản ngay.</p>
-                    <a href="#" class="sp-link">KẾT NỐI NGAY <i class="fas fa-headset"></i></a>
+                        <textarea class="lm-textarea" placeholder="Thêm ghi chú riêng cho đơn hàng này..."></textarea>
+                    </div>
+
+                    <div class="lm-support-banner">
+                        <h4>Cần hỗ trợ?</h4>
+                        <p>Nếu khách hàng làm hỏng đồ hoặc có tranh chấp, vui lòng liên hệ Admin để được giải quyết.</p>
+                        <a href="#" class="lm-btn-outline-white">Kết nối Admin <i class="fas fa-headset"></i></a>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -322,660 +307,868 @@
 </div>
 
 <style>
-    .owner-layout {
-        display: flex;
-        min-height: calc(100vh - 70px);
-        background: #f8fafc;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
+    :root {
+        --bg-body: #f7f5f2;
+        --card-bg: #ffffff;
+        --text-main: #2b3a30;
+        --text-muted: #8b9690;
+        --primary-green: #3f5947;
+        --primary-green-hover: #324738;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --border-color: #f0ebe1;
+        --sidebar-width: 240px;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+        --badge-yellow-bg: #fdf3e7;
+        --badge-yellow-text: #b86e24;
+        --badge-blue-bg: #e0f2fe;
+        --badge-blue-text: #0284c7;
+        --badge-light-green: #dcfce7;
+        --badge-light-green-text: #16a34a;
+        --badge-gray: #f1f5f9;
+        --badge-gray-text: #64748b;
     }
 
-    /* Sidebar */
-    .owner-sidebar {
-        width: 250px;
+    .lm-app-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: var(--bg-body);
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* === SIDEBAR (Dùng chung với trang trước) === */
+    .lm-sidebar {
+        width: var(--sidebar-width);
         background: #fff;
-        border-right: 1px solid #e2e8f0;
+        border-right: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
         display: flex;
         flex-direction: column;
-        padding: 2rem 0;
-        z-index: 10;
+        padding-top: 1rem;
+        z-index: 50;
     }
 
-    .sidebar-brand {
-        padding: 0 2rem 2rem;
-    }
-    
-    .sidebar-label {
-        font-weight: 800;
-        font-size: 1.1rem;
-        color: #1e293b;
-    }
-    
-    .sidebar-sub {
-        font-size: .8rem;
-        color: #94a3b8;
-    }
-    
-    .sidebar-avatar { display: none; }
-    
-    .sidebar-nav {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: .25rem;
-    }
-    
-    .snav-item {
+    .lm-sidebar-brand {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: .85rem 2rem;
-        color: #64748b;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: .95rem;
-        transition: all .2s;
-        border-right: 4px solid transparent;
+        gap: 12px;
+        padding: 0 1.5rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 1rem;
     }
-    
-    .snav-item i {
-        font-size: 1.1rem;
-        width: 20px;
-        text-align: center;
-    }
-    
-    .snav-item:hover {
-        background: #f1f5f9;
-        color: #2563eb;
-    }
-    
-    .snav-item.active {
-        color: #2563eb;
-        background: #eff6ff;
-        border-right-color: #2563eb;
-    }
-    
-    .sidebar-footer {
-        padding-top: 1rem;
-        border-top: 1px solid #f1f5f9;
-    }
-    
-    .text-red { color: #ef4444 !important; }
 
-    /* Main Area */
-    .owner-main {
+    .lm-sidebar-avatar img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .lm-sidebar-label {
+        font-size: 0.75rem;
+        color: var(--primary-green);
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .lm-sidebar-sub {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .lm-sidebar-nav {
         flex: 1;
-        padding: 2rem 3rem;
-        overflow-y: auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .lm-snav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: 0.2s;
+    }
+
+        .lm-snav-item i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .lm-snav-item:hover {
+            background: #fcfaf6;
+            color: var(--text-main);
+        }
+
+        .lm-snav-item.active {
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
+        }
+
+    .lm-sidebar-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .lm-btn-add-post {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: var(--primary-brown);
+        color: white;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .lm-btn-add-post:hover {
+            background: var(--primary-brown-hover);
+        }
+
+    /* === MAIN AREA === */
+    .lm-main {
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        padding: 2rem 0 4rem;
+    }
+
+    .lm-container {
+        padding: 0 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     /* Header */
-    .page-header {
+    .lm-page-header {
         margin-bottom: 2rem;
     }
-    
-    .ph-breadcrumbs {
-        font-size: .85rem;
-        color: #64748b;
-        margin-bottom: .5rem;
+
+    .lm-breadcrumbs {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
         font-weight: 500;
     }
-    
-    .ph-breadcrumbs a { color: #64748b; text-decoration: none; }
-    .ph-sep { margin: 0 .5rem; font-size: .7rem; }
-    .ph-current { color: #1e293b; font-weight: 700; }
-    
-    .ph-title-row {
+
+        .lm-breadcrumbs a {
+            color: var(--primary-brown);
+            text-decoration: none;
+        }
+
+    .lm-sep {
+        margin: 0 8px;
+        font-size: 0.75rem;
+    }
+
+    .lm-current {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
+    .lm-header-flex {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    
-    .ph-title {
-        font-size: 1.8rem;
+
+    .lm-page-title {
+        font-size: 2rem;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--text-main);
         margin: 0;
     }
-    
-    .ph-actions {
-        display: flex;
-        gap: .75rem;
-    }
-    
-    .icon-btn {
+
+    .lm-btn-icon-outline {
         width: 42px;
         height: 42px;
         border-radius: 50%;
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        color: #475569;
+        border: 1px solid var(--border-color);
+        background: white;
+        color: var(--text-muted);
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all .2s;
+        font-size: 1rem;
+        transition: 0.2s;
     }
-    
-    .icon-btn:hover { background: #f1f5f9; color: #0f172a; }
 
-    /* Grid Layout */
-    .details-grid {
+        .lm-btn-icon-outline:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+    /* Grid */
+    .lm-detail-grid {
         display: grid;
-        grid-template-columns: 1fr 340px;
-        gap: 2rem;
+        grid-template-columns: 1fr 360px;
+        gap: 25px;
         align-items: start;
     }
-    
-    .dg-left {
+
+    .lm-dg-left {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .dg-right {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+        gap: 20px;
     }
 
-    /* Shared Card Styles */
-    .card-base {
-        background: #fff;
+    .lm-dg-right {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Cards */
+    .lm-card {
+        background: white;
         border-radius: 20px;
-        padding: 1.75rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,.03);
+        padding: 25px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .lm-card-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 20px;
+    }
+
+    .lm-card-title-sm {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
     }
 
     /* Status Banner */
-    .status-banner {
-        background: #f5f9ff;
+    .lm-status-banner {
+        background: var(--badge-green-bg);
         border-radius: 24px;
-        padding: 2rem;
+        padding: 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border: 1px solid #dce8df;
     }
-    
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        padding: .4rem .8rem;
-        border-radius: 20px;
-        font-size: .75rem;
-        font-weight: 800;
-        letter-spacing: .5px;
-        margin-bottom: 1rem;
-    }
-    
-    .badge-blue { background: #2563eb; color: #fff; }
-    .badge-blue i { font-size: .5rem; }
-    
-    .sb-title {
+
+    .lm-sb-title {
         font-size: 1.6rem;
         font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 .5rem 0;
+        color: var(--primary-green);
+        margin: 0 0 5px 0;
     }
-    
-    .sb-sub {
-        font-size: .95rem;
-        color: #475569;
-    }
-    
-    .sb-actions {
-        display: flex;
-        gap: 1rem;
-    }
-    
-    .btn {
-        padding: .85rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: .95rem;
-        cursor: pointer;
-        border: none;
-        transition: all .2s;
-    }
-    
-    .btn-light {
-        background: #e2e8f0;
-        color: #475569;
-    }
-    
-    .btn-light:hover { background: #cbd5e1; }
-    
-    .btn-primary {
-        background: #2563eb;
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(37,99,235,.3);
-    }
-    
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,99,235,.4); }
 
-    /* Info Row */
-    .info-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
+    .lm-sb-sub {
+        font-size: 0.95rem;
+        color: var(--primary-green);
+        opacity: 0.8;
+        margin: 0;
     }
-    
-    .customer-card, .history-summary {
-        background: #f8fafc;
-        border-radius: 20px;
-        padding: 1.75rem;
+
+    .lm-sb-actions {
+        display: flex;
+        gap: 10px;
     }
-    
-    .cc-header {
+
+    /* Buttons */
+    .lm-btn-primary {
+        padding: 12px 20px;
+        background: var(--primary-green);
+        color: white;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .lm-btn-primary:hover {
+            background: var(--primary-green-hover);
+            transform: translateY(-2px);
+        }
+
+    .lm-btn-danger {
+        padding: 12px 20px;
+        background: #fee2e2;
+        color: #dc2626;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .lm-btn-danger:hover {
+            background: #fecaca;
+        }
+
+    /* Alerts */
+    .lm-info-alert {
+        background: #e0f2fe;
+        color: #0284c7;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        gap: 8px;
     }
-    
-    .cc-avatar {
-        width: 52px;
-        height: 52px;
+
+    .lm-success-alert {
+        background: #dcfce7;
+        color: #16a34a;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lm-error-alert {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Badges */
+    .lm-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .lm-badge-green {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+    }
+
+    .lm-badge-light-green {
+        background: var(--badge-light-green);
+        color: var(--badge-light-green-text);
+    }
+
+    .lm-badge-yellow {
+        background: var(--badge-yellow-bg);
+        color: var(--badge-yellow-text);
+    }
+
+    .lm-badge-blue {
+        background: var(--badge-blue-bg);
+        color: var(--badge-blue-text);
+    }
+
+    .lm-badge-gray {
+        background: var(--badge-gray);
+        color: var(--badge-gray-text);
+    }
+
+    /* Info Row (Customer & Stats) */
+    .lm-info-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .lm-customer-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .lm-c-avatar {
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        background: #dbeafe;
-        color: #2563eb;
+        background: var(--widget-bg);
+        color: var(--primary-brown);
+        font-weight: 800;
+        font-size: 1.2rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 800;
-        font-size: 1.1rem;
     }
-    
-    .cc-name {
+
+    .lm-c-name {
         font-size: 1.1rem;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--text-main);
     }
-    
-    .cc-type {
-        font-size: .8rem;
-        color: #64748b;
-        margin-top: .2rem;
+
+    .lm-c-type {
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
-    
-    .cc-contact {
+
+    .lm-customer-contact {
         display: flex;
         flex-direction: column;
-        gap: .85rem;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: var(--text-main);
     }
-    
-    .cc-item {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        font-size: .9rem;
-        color: #334155;
-    }
-    
-    .cc-item i { color: #2563eb; width: 16px; }
 
-    .hs-title {
-        font-size: .8rem;
-        font-weight: 800;
-        color: #64748b;
-        letter-spacing: .5px;
-        margin: 0 0 1.25rem 0;
-    }
-    
-    .hs-stat {
+        .lm-customer-contact i {
+            color: var(--primary-brown);
+            width: 20px;
+        }
+
+    .lm-stat-line {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px dashed #e2e8f0;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed var(--border-color);
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
     }
-    
-    .hs-stat:last-child { margin-bottom: 0; padding-bottom: 0; border: none; }
-    
-    .hs-label { font-size: .95rem; color: #475569; font-weight: 500; }
-    .hs-val { font-size: 1.05rem; font-weight: 800; }
-    .text-blue { color: #2563eb; }
-    .text-green { color: #10b981; }
-    
-    .hs-stars i { color: #6366f1; font-size: .9rem; margin-left: 2px; }
 
-    /* Product Card */
-    .product-detail-card {
-        background: #fff;
-        border-radius: 24px;
-        padding: 1.5rem;
-        display: flex;
-        gap: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,.04);
+        .lm-stat-line:last-child {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+    .lm-text-green {
+        color: var(--primary-green);
+        font-weight: 700;
     }
-    
-    .pdc-img {
-        width: 220px;
-        height: 280px;
+
+    .lm-stars i {
+        color: #f59e0b;
+        font-size: 0.85rem;
+    }
+
+    /* Product Detail Card */
+    .lm-product-detail-card {
+        display: flex;
+        gap: 25px;
+        padding: 20px;
+    }
+
+    .lm-pdc-img {
+        width: 200px;
+        height: 260px;
         border-radius: 16px;
         overflow: hidden;
         flex-shrink: 0;
     }
-    
-    .pdc-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+
+        .lm-pdc-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .lm-pdc-info {
+        flex: 1;
+        padding: 10px 0;
     }
-    
-    .pdc-info { flex: 1; padding: 1rem 0; }
-    
-    .pdc-top {
+
+    .lm-pdc-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: .5rem;
-    }
-    
-    .pdc-cat {
-        font-size: .75rem;
-        font-weight: 800;
-        color: #6366f1;
-        letter-spacing: 1px;
-    }
-    
-    .pdc-price { text-align: right; }
-    .pdc-price .val { display: block; font-size: 1.4rem; font-weight: 800; color: #2563eb; }
-    .pdc-price .unit { font-size: .8rem; color: #94a3b8; }
-    
-    .pdc-name {
-        font-size: 1.7rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 .5rem 0;
-        line-height: 1.2;
-        max-width: 80%;
-    }
-    
-    .pdc-id {
-        font-size: .85rem;
-        color: #64748b;
-        margin-bottom: 2rem;
-    }
-    
-    .pdc-specs {
-        display: flex;
-        gap: 1rem;
-    }
-    
-    .spec-box {
-        background: #f8fafc;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        flex: 1;
-    }
-    
-    .spec-lbl {
-        font-size: .7rem;
-        color: #64748b;
-        font-weight: 700;
-        margin-bottom: .4rem;
-    }
-    
-    .spec-val {
-        font-size: .95rem;
-        font-weight: 700;
-        color: #0f172a;
+        margin-bottom: 10px;
     }
 
-    /* Timeline Section */
-    .timeline-section {
-        background: #f8fafc;
-        border-radius: 20px;
-        padding: 2rem;
-    }
-    
-    .ts-title {
-        font-size: 1.2rem;
+    .lm-cat-tag {
+        font-size: 0.75rem;
+        color: var(--primary-brown);
         font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 2rem 0;
+        letter-spacing: 0.5px;
     }
-    
-    .timeline-track {
-        position: relative;
-        padding-left: 24px;
+
+    .lm-pdc-price {
+        text-align: right;
     }
-    
-    .timeline-track::before {
-        content: '';
-        position: absolute;
-        top: 10px;
-        bottom: 10px;
-        left: 35px;
-        width: 2px;
-        background: #cbd5e1;
-        z-index: 1;
+
+        .lm-pdc-price .val {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .lm-pdc-price .unit {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+    .lm-pdc-name {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 5px 0;
+        line-height: 1.3;
     }
-    
-    .tl-item {
+
+    .lm-pdc-id {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 25px;
+    }
+
+    .lm-specs-grid {
         display: flex;
-        gap: 1.5rem;
+        gap: 15px;
+    }
+
+    .lm-spec-box {
+        background: var(--bg-body);
+        border-radius: 12px;
+        padding: 15px;
+        flex: 1;
+        border: 1px solid var(--border-color);
+    }
+
+        .lm-spec-box .lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .lm-spec-box .val {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+    /* Timeline */
+    .lm-timeline {
+        padding-left: 20px;
+        position: relative;
+    }
+
+        .lm-timeline::before {
+            content: '';
+            position: absolute;
+            left: 32px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+    .lm-tl-item {
+        display: flex;
+        gap: 20px;
         position: relative;
         z-index: 2;
+        margin-bottom: 15px;
     }
-    
-    .tl-icon {
+
+    .lm-tl-icon {
         width: 26px;
         height: 26px;
         border-radius: 50%;
+        background: white;
+        border: 2px solid var(--border-color);
+        color: var(--text-muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: .7rem;
-        margin-top: 4px;
-        flex-shrink: 0;
+        font-size: 0.75rem;
+        margin-top: 5px;
     }
-    
-    .tl-icon.blue { background: #2563eb; color: #fff; }
-    .tl-icon.empty { background: #f8fafc; border: 2px solid #2563eb; color: #2563eb; }
-    
-    .tl-content { padding-bottom: 1rem; }
-    
-    .tl-lbl {
-        font-size: .75rem;
+
+        .lm-tl-icon.active {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+        }
+
+    .lm-tl-content .lbl {
+        font-size: 0.75rem;
         font-weight: 800;
-        color: #64748b;
-        margin-bottom: .3rem;
+        color: var(--text-muted);
+        margin-bottom: 5px;
     }
-    
-    .tl-date {
-        font-size: 1.2rem;
+
+    .lm-tl-content .val {
+        font-size: 1.1rem;
         font-weight: 800;
-        color: #0f172a;
-        margin-bottom: .3rem;
+        color: var(--text-main);
+        margin-bottom: 5px;
     }
-    
-    .tl-desc {
-        font-size: .9rem;
-        color: #64748b;
+
+    .lm-tl-content .desc {
+        font-size: 0.9rem;
+        color: var(--text-muted);
     }
-    
-    .tl-duration-badge {
+
+    .lm-tl-duration {
         display: inline-flex;
         align-items: center;
-        gap: .5rem;
-        background: #e2e8f0;
-        padding: .5rem 1rem;
-        border-radius: 8px;
-        font-size: .85rem;
+        gap: 8px;
+        background: var(--widget-bg);
+        color: var(--primary-brown);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #475569;
-        margin: 1.5rem 0 1.5rem 2.8rem;
+        margin: 5px 0 20px 50px;
         position: relative;
         z-index: 2;
     }
 
-    /* Right Column - Payment Card */
-    .payment-card {
-        background: #fff;
-        border-radius: 24px;
-        padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,.04);
-    }
-    
-    .pc-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 1.5rem 0;
-    }
-    
-    .pc-row {
+    /* Bill Box */
+    .lm-bill-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 1.25rem;
-        font-size: .95rem;
-    }
-    
-    .pc-lbl { color: #475569; font-weight: 500; }
-    .pc-val { font-weight: 700; color: #0f172a; }
-    
-    .pc-total {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 1.5rem;
-        margin-top: 1.5rem;
-        border-top: 2px dashed #e2e8f0;
-        margin-bottom: 1.5rem;
-    }
-    
-    .pc-total .lbl { font-size: .85rem; font-weight: 800; color: #64748b; }
-    .pc-total .val { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
-    
-    .pc-status-box {
-        background: #f5f9ff;
-        border-radius: 12px;
-        padding: 1.25rem;
-    }
-    
-    .pcs-head {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        font-size: .95rem;
-        font-weight: 800;
-        color: #334155;
-        margin-bottom: .5rem;
-    }
-    
-    .pcs-head i { color: #64748b; }
-    
-    .pcs-desc {
-        font-size: .85rem;
-        color: #64748b;
-        line-height: 1.5;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
     }
 
-    /* History & Notes */
-    .notes-card {
-        background: #fff;
-        border-radius: 24px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,.04);
-    }
-    
-    .nc-header {
+        .lm-bill-row .val {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+    .lm-bill-total {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        padding-top: 15px;
+        margin-top: 15px;
+        border-top: 2px dashed var(--border-color);
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: var(--text-muted);
     }
-    
-    .nc-title { font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0; }
-    .nc-more { font-size: .85rem; font-weight: 700; color: #2563eb; text-decoration: none; }
-    
-    .nc-timeline {
-        padding-left: 6px;
-        border-left: 2px solid #e2e8f0;
-        margin-left: 8px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .nct-item {
-        position: relative;
-        padding-left: 1.25rem;
-        padding-bottom: 1.5rem;
-    }
-    
-    .nct-item.pb-0 { padding-bottom: 0; }
-    
-    .nct-item .dot {
-        position: absolute;
-        left: -11px;
-        top: 4px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-    
-    .nct-item .dot.dark { background: #0f172a; border: 4px solid #f8fafc; width: 14px; height: 14px; left: -13px; }
-    .nct-item .dot.light { background: #cbd5e1; }
-    
-    .nct-item .time { font-size: .75rem; color: #64748b; margin-bottom: .2rem; }
-    .nct-item .evt { font-size: .9rem; font-weight: 700; color: #0f172a; margin-bottom: .2rem; }
-    .nct-item .desc { font-size: .85rem; color: #64748b; font-style: italic; }
-    
-    .nc-input {
-        width: 100%;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+
+        .lm-bill-total .total-val {
+            font-size: 1.6rem;
+            color: var(--primary-green);
+        }
+
+    .lm-payment-status {
+        background: var(--badge-green-bg);
+        padding: 15px;
         border-radius: 12px;
-        padding: 1rem;
-        font-family: inherit;
-        font-size: .9rem;
-        resize: none;
+    }
+
+        .lm-payment-status .head {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 5px;
+        }
+
+        .lm-payment-status .desc {
+            font-size: 0.8rem;
+            color: var(--primary-green);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+    /* Notes */
+    .lm-card-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .lm-card-header-flex .lm-card-title {
+            margin: 0;
+        }
+
+    .lm-link-brown {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--primary-brown);
+        text-decoration: none;
+    }
+
+    .lm-notes-list {
+        border-left: 2px solid var(--border-color);
+        margin-left: 10px;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+
+    .lm-note-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .lm-note-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .lm-note-item .dot {
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 8px;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 50%;
+        }
+
+            .lm-note-item .dot.active {
+                background: var(--primary-green);
+                box-shadow: 0 0 0 3px var(--badge-green-bg);
+            }
+
+        .lm-note-item .time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .lm-note-item .title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .lm-note-item .desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+    .lm-textarea {
+        width: 100%;
         height: 80px;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-body);
+        font-family: inherit;
+        font-size: 0.9rem;
+        resize: none;
         outline: none;
     }
-    
-    .nc-input:focus { border-color: #cbd5e1; }
 
-    /* Support Promo */
-    .support-promo {
-        background: #3b82f6;
-        border-radius: 24px;
-        padding: 2rem;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
+        .lm-textarea:focus {
+            border-color: var(--primary-green);
+        }
+
+    /* Support Banner */
+    .lm-support-banner {
+        background: var(--primary-brown);
+        border-radius: 20px;
+        padding: 25px;
+        color: white;
     }
-    
-    .sp-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        margin: 0 0 .5rem 0;
-    }
-    
-    .sp-desc {
-        font-size: .85rem;
-        opacity: .9;
-        line-height: 1.5;
-        margin-bottom: 1.5rem;
-    }
-    
-    .sp-link {
-        display: inline-block;
-        font-size: .85rem;
-        font-weight: 800;
-        color: #fff;
+
+        .lm-support-banner h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .lm-support-banner p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+    .lm-btn-outline-white {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255,255,255,0.5);
+        padding: 10px 20px;
+        border-radius: 50px;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 700;
         text-decoration: none;
-        letter-spacing: 1px;
+        transition: 0.2s;
     }
-    
-    .sp-link i { margin-left: .5rem; }
+
+        .lm-btn-outline-white:hover {
+            background: white;
+            color: var(--primary-brown);
+        }
+
+    /* Responsive */
+    @@media (max-width: 1024px) {
+        .lm-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-status-banner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .lm-sidebar {
+            display: none;
+        }
+
+        .lm-main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+
+        .lm-container {
+            padding: 0;
+        }
+
+        .lm-info-row {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-product-detail-card {
+            flex-direction: column;
+        }
+
+        .lm-pdc-img {
+            width: 100%;
+            height: 200px;
+        }
+    }
 </style>
 
 <script>
     async function updateRentalStatus(rentalId, status) {
-        if (!confirm(`Bạn có chắc chắn muốn chuyển trạng thái đơn thuê sang: ${status == 'Active' ? 'Đang hoạt động (Bàn giao đồ)' : (status == 'Completed' ? 'Hoàn thành (Trả đồ & Giải ngân ví ký quỹ)' : 'Đã hủy đơn')}?`)) {
+        if (!confirm(`Bạn có chắc chắn muốn chuyển trạng thái đơn thuê sang: ${status == 'Active' ? 'Đang hoạt động (Bàn giao đồ)' : (status == 'Completed' ? 'Hoàn thành (Trả đồ & Giải ngân ví)' : 'Đã hủy đơn')}?`)) {
             return;
         }
 
@@ -992,7 +1185,6 @@
             const result = await response.json();
             if (response.ok && result.success) {
                 alert(result.message || "Cập nhật trạng thái thành công!");
-                // Cập nhật lại số dư navbar nếu có
                 if (typeof fetchNavbarWalletBalance === 'function') {
                     await fetchNavbarWalletBalance();
                 }

@@ -13,12 +13,18 @@ namespace WEB.Models
         public int Quantity { get; set; }
         public string? ImageUrl { get; set; }
         public string? Location { get; set; }
+        public string? UnavailableDates { get; set; }
         public bool IsAvailable { get; set; }
         public bool IsApproved { get; set; }
         public DateTime CreatedAt { get; set; }
         public int OwnerId { get; set; }
         public int CategoryId { get; set; }
-        
+
+        // ✅ Tính năng bán - đồng bộ với API ProductResponse
+        public string ProductType { get; set; } = "Rent"; // Rent | Sale | Both
+        public bool IsForSale { get; set; }
+        public decimal? SalePrice { get; set; }
+
         // Navigation properties
         public CategoryViewModel? Category { get; set; }
         public UserViewModel? Owner { get; set; }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using THUEDONGANHAN.Data;
@@ -6,13 +7,25 @@ namespace THUEDONGANHAN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")] // ✅ CHỈ ADMIN MỚI TRUY CẬP
     public class DebugController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public DebugController(AppDbContext context)
+        public DebugController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
+        }
+
+        /// <summary>
+        /// Kiểm tra xem controller có được enable không
+        /// </summary>
+        private bool IsDebugEnabled()
+        {
+            // ✅ CHỈ HOẠT ĐỘNG TRONG DEVELOPMENT MODE
+            return _environment.IsDevelopment();
         }
 
         /// <summary>
@@ -21,6 +34,9 @@ namespace THUEDONGANHAN.Controllers
         [HttpGet("test-bcrypt")]
         public IActionResult TestBCrypt([FromQuery] string password = "Admin@123")
         {
+            if (!IsDebugEnabled())
+                return NotFound(new { message = "Debug endpoints are disabled in production" });
+
             var hash = BCrypt.Net.BCrypt.HashPassword(password);
             var verify = BCrypt.Net.BCrypt.Verify(password, hash);
 
@@ -39,6 +55,9 @@ namespace THUEDONGANHAN.Controllers
         [HttpGet("check-admin")]
         public async Task<IActionResult> CheckAdmin()
         {
+            if (!IsDebugEnabled())
+                return NotFound(new { message = "Debug endpoints are disabled in production" });
+
             var admin = await _context.Users
                 .Where(u => u.Email == "admin@ute.udn.vn")
                 .Select(u => new
@@ -69,6 +88,9 @@ namespace THUEDONGANHAN.Controllers
         [HttpPost("test-admin-password")]
         public async Task<IActionResult> TestAdminPassword([FromQuery] string password = "Admin@123")
         {
+            if (!IsDebugEnabled())
+                return NotFound(new { message = "Debug endpoints are disabled in production" });
+
             var admin = await _context.Users.FirstOrDefaultAsync(u => u.Email == "admin@ute.udn.vn");
 
             if (admin == null)
@@ -94,6 +116,9 @@ namespace THUEDONGANHAN.Controllers
         [HttpPost("reset-admin-password")]
         public async Task<IActionResult> ResetAdminPassword([FromQuery] string newPassword = "Admin@123")
         {
+            if (!IsDebugEnabled())
+                return NotFound(new { message = "Debug endpoints are disabled in production" });
+
             var admin = await _context.Users.FirstOrDefaultAsync(u => u.Email == "admin@ute.udn.vn");
 
             if (admin == null)

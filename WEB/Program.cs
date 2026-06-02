@@ -19,6 +19,7 @@ builder.Services.AddHttpClient("BackendAPI", client =>
 builder.Services.AddScoped<WEB.Services.ApiService>();
 builder.Services.AddScoped<WEB.Services.ProductService>();
 builder.Services.AddScoped<WEB.Services.AuthService>();
+builder.Services.AddScoped<WEB.Services.ComplaintService>();
 
 // Add Session
 builder.Services.AddSession(options =>

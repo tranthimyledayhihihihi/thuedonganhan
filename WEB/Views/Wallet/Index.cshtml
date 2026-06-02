@@ -3,829 +3,740 @@
     ViewData["Title"] = "Ví ký quỹ tài khoản";
 }
 
-<div class="wallet-page-container">
-    <div class="wallet-layout">
-        <!-- Cột trái: Thông tin số dư và Thao tác nhanh -->
-        <div class="wallet-card-container">
-            <div class="glass-card main-wallet-card">
-                <div class="card-brand">
-                    <span class="brand-text">UTE Rent Escrow System</span>
-                    <i class="fas fa-shield-alt shield-icon" title="Hệ thống giao dịch ký quỹ an toàn"></i>
+<div class="wallet-container">
+    
+
+    <!-- Main Layout 2 cột -->
+    <div class="wallet-main-grid">
+        <!-- Cột trái: Thẻ thông tin + Nút hành động -->
+        <div class="wallet-left">
+            <!-- Card thông tin số dư -->
+            <div class="balance-card">
+                <div class="balance-row">
+                    <span class="balance-label">Số dư hiện tại</span>
+                    <span class="balance-amount">@Model.Balance.ToString("N0")đ</span>
                 </div>
-                <div class="card-chip"></div>
-                <div class="balance-display">
-                    <span class="balance-label">Số dư khả dụng</span>
-                    <h1 class="balance-amount">@Model.Balance.ToString("N0")<span class="currency">đ</span></h1>
-                </div>
-                <div class="card-footer-info">
-                    <div class="info-block">
-                        <span class="info-label">Chủ thẻ</span>
-                        <span class="info-value">@Context.Session.GetString("UserName")</span>
+                <div class="card-details">
+                    <div class="card-detail-item">
+                        <span class="detail-label">CHỦ THẺ</span>
+                        <span class="detail-value">@Context.Session.GetString("UserName")</span>
                     </div>
-                    <div class="info-block">
-                        <span class="info-label">Mã sinh viên</span>
-                        <span class="info-value">@Context.Session.GetString("UserEmail")?.Split('@')[0]</span>
+                    <div class="card-detail-item">
+                        <span class="detail-label">MÃ SINH VIÊN</span>
+                        <span class="detail-value">@Context.Session.GetString("UserEmail")?.Split('@')[0]</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Nút thao tác nhanh -->
-            <div class="wallet-actions">
-                <button class="btn-wallet action-deposit" onclick="openModal('depositModal')">
-                    <div class="action-icon bg-success-light">
-                        <i class="fas fa-arrow-down"></i>
-                    </div>
-                    <div class="action-text">
-                        <span class="action-title">Nạp tiền vào ví</span>
-                        <span class="action-desc">Nạp tiền giả lập nhanh chóng</span>
+            <!-- Nút hành động -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="openModal('depositModal')">
+                    <div class="action-icon deposit-icon">↓</div>
+                    <div class="action-info">
+                        <div class="action-title">Nạp tiền</div>
+                        <div class="action-desc">Thêm tiền vào ví</div>
                     </div>
                 </button>
-
-                <button class="btn-wallet action-withdraw" onclick="openModal('withdrawModal')">
-                    <div class="action-icon bg-warning-light">
-                        <i class="fas fa-arrow-up"></i>
-                    </div>
-                    <div class="action-text">
-                        <span class="action-title">Rút tiền về ngân hàng</span>
-                        <span class="action-desc">Rút tiền mặt ra tài khoản</span>
+                <button class="action-btn" onclick="openModal('withdrawModal')">
+                    <div class="action-icon withdraw-icon">↑</div>
+                    <div class="action-info">
+                        <div class="action-title">Rút tiền</div>
+                        <div class="action-desc">Chuyển về tài khoản ngân hàng</div>
                     </div>
                 </button>
-            </div>
-
-            <!-- Cam kết an toàn -->
-            <div class="escrow-badge">
-                <i class="fas fa-info-circle text-amber"></i>
-                <p>Tiền của bạn sẽ được giữ an toàn trên hệ thống ví ký quỹ (Escrow) của **UTE Rent** và chỉ thanh toán cho chủ sở hữu sau khi đơn thuê hoàn tất tốt đẹp.</p>
             </div>
         </div>
 
         <!-- Cột phải: Lịch sử giao dịch -->
-        <div class="transactions-container">
-            <h2 class="section-title">Lịch sử biến động số dư</h2>
-            <div class="glass-card transactions-card">
-                @if (Model.Transactions == null || !Model.Transactions.Any())
-                {
-                    <div class="empty-transactions">
-                        <div class="empty-icon-container">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <h3>Chưa có giao dịch nào</h3>
-                        <p>Mọi giao dịch nạp, rút, thanh toán ký quỹ sẽ xuất hiện tại đây.</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Mã GD</th>
-                                    <th>Loại giao dịch</th>
-                                    <th>Nội dung</th>
-                                    <th class="text-right">Số tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var tx in Model.Transactions)
+        <div class="wallet-right">
+            <h2 class="history-title">Lịch sử biến động số dư</h2>
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>THỜI GIAN</th>
+                            <th>MÃ GD</th>
+                            <th>LOẠI GIAO DỊCH</th>
+                            <th>NỘI DUNG</th>
+                            <th class="text-right">SỐ TIỀN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Transactions == null || !Model.Transactions.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="empty-history">Chưa có giao dịch nào</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var tx in Model.Transactions)
+                            {
+                                var isPositive = tx.Amount > 0;
+                                var typeText = tx.Type switch
                                 {
-                                    var isPositive = tx.Amount > 0;
-                                    var badgeClass = tx.Type switch
-                                    {
-                                        "Deposit" => "badge-success",
-                                        "Withdraw" => "badge-danger",
-                                        "Payment" => "badge-info",
-                                        "Refund" => "badge-warning",
-                                        "Commission" => "badge-primary",
-                                        _ => "badge-secondary"
-                                    };
-                                    var typeText = tx.Type switch
-                                    {
-                                        "Deposit" => "Nạp tiền",
-                                        "Withdraw" => "Rút tiền",
-                                        "Payment" => "Thanh toán",
-                                        "Refund" => "Hoàn tiền",
-                                        "Commission" => "Hoa hồng",
-                                        _ => tx.Type
-                                    };
-                                    <tr>
-                                        <td class="text-muted text-sm">@tx.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                        <td class="tx-id font-mono">#GD-@tx.TransactionId</td>
-                                        <td>
-                                            <span class="badge @badgeClass">@typeText</span>
-                                        </td>
-                                        <td class="tx-desc">@tx.Description</td>
-                                        <td class="text-right font-semibold @(isPositive ? "text-success" : "text-danger")">
-                                            @(isPositive ? "+" : "")@tx.Amount.ToString("N0")đ
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
+                                    "Deposit" => "NẠP TIỀN",
+                                    "Withdraw" => "RÚT TIỀN",
+                                    "Payment" => "THANH TOÁN",
+                                    "Refund" => "HOÀN TIỀN",
+                                    "Commission" => "HOA HỒNG",
+                                    _ => tx.Type.ToUpper()
+                                };
+                                <TR>
+                                    <td class="tx-time">@tx.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td class="tx-id">#@tx.TransactionId</td>
+                                    <td><span class="tx-type-badge @(isPositive ? "type-deposit" : "type-payment")">@typeText</span></td>
+                                    <td class="tx-desc">@tx.Description</td>
+                                    <td class="tx-amount text-right @(isPositive ? "amount-plus" : "amount-minus")">@(isPositive ? "+" : "")@tx.Amount.ToString("N0")đ</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tổng quan tháng này -->
+            <div class="summary-card">
+                <div class="summary-header">Tổng quan tháng này</div>
+                <div class="summary-row">
+                    <span class="summary-label">Tổng thu:</span>
+                    <span class="summary-value text-success">+4.200.000đ</span>
+                    <span class="summary-label" style="margin-left: 2rem;">Tổng chi:</span>
+                    <span class="summary-value text-danger">-1.850.000đ</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal Nạp Tiền -->
-<div id="depositModal" class="modal-backdrop">
-    <div class="modal-card scale-in">
+<div id="depositModal" class="modal-overlay">
+    <div class="modal-container">
         <div class="modal-header">
-            <h3 class="modal-title"><i class="fas fa-arrow-down text-success"></i> Nạp tiền vào ví</h3>
-            <button class="modal-close" onclick="closeModal('depositModal')">&times;</button>
+            <h3>↓ Nạp tiền vào ví</h3>
+            <button class="modal-close" onclick="closeModal('depositModal')">×</button>
         </div>
         <form asp-controller="Wallet" asp-action="Deposit" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-body">
-                <div class="form-group-modern">
-                    <label for="depositAmount">Số tiền cần nạp (đ)</label>
-                    <input type="number" id="depositAmount" name="amount" min="10000" max="100000000" step="10000" value="50000" required />
-                    <span class="form-help">Tối thiểu: 10.000đ | Tối đa: 100.000.000đ</span>
+                <div class="form-field">
+                    <label>Số tiền cần nạp (đ)</label>
+                    <input type="number" name="amount" id="depositAmount" min="10000" max="100000000" step="10000" value="50000" required />
+                    <div class="quick-btns">
+                        <button type="button" onclick="setAmount('depositAmount', 50000)">50k</button>
+                        <button type="button" onclick="setAmount('depositAmount', 100000)">100k</button>
+                        <button type="button" onclick="setAmount('depositAmount', 200000)">200k</button>
+                        <button type="button" onclick="setAmount('depositAmount', 500000)">500k</button>
+                        <button type="button" onclick="setAmount('depositAmount', 1000000)">1M</button>
+                    </div>
                 </div>
-                <div class="quick-amounts">
-                    <button type="button" class="btn-quick" onclick="setAmount('depositAmount', 50000)">50k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('depositAmount', 100000)">100k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('depositAmount', 200000)">200k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('depositAmount', 500000)">500k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('depositAmount', 1000000)">1M</button>
+                <div class="form-field">
+                    <label>Ghi chú</label>
+                    <input type="text" name="description" placeholder="Nạp tiền vào tài khoản" value="Nạp tiền ví UTE Rent" />
                 </div>
-                <div class="form-group-modern mt-3">
-                    <label for="depositDesc">Ghi chú giao dịch</label>
-                    <input type="text" id="depositDesc" name="description" placeholder="Nạp tiền ví UTE Rent" value="Nạp tiền vào tài khoản" />
-                </div>
-                
-                <div class="simulated-payment-info">
-                    <i class="fas fa-info-circle text-blue"></i>
-                    <p>Hệ thống đang chạy ở chế độ Demo sinh viên. Lệnh nạp tiền này sẽ được xử lý tự động và cộng tiền ảo ngay lập tức để phục vụ việc chấm bài đồ án.</p>
+                <div class="demo-note">
+                    <span>ℹ️</span> Hệ thống đang chạy chế độ Demo. Nạp tiền ảo, xử lý ngay lập tức.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('depositModal')">Hủy bỏ</button>
-                <button type="submit" class="btn-primary bg-success border-success">Xác nhận nạp tiền</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('depositModal')">Hủy</button>
+                <button type="submit" class="btn-confirm btn-deposit">Xác nhận nạp</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Rút Tiền -->
-<div id="withdrawModal" class="modal-backdrop">
-    <div class="modal-card scale-in">
+<div id="withdrawModal" class="modal-overlay">
+    <div class="modal-container">
         <div class="modal-header">
-            <h3 class="modal-title"><i class="fas fa-arrow-up text-warning"></i> Rút tiền về ngân hàng</h3>
-            <button class="modal-close" onclick="closeModal('withdrawModal')">&times;</button>
+            <h3>↑ Rút tiền về ngân hàng</h3>
+            <button class="modal-close" onclick="closeModal('withdrawModal')">×</button>
         </div>
         <form asp-controller="Wallet" asp-action="Withdraw" method="post">
             @Html.AntiForgeryToken()
             <div class="modal-body">
-                <div class="form-group-modern">
-                    <label for="withdrawAmount">Số tiền cần rút (đ)</label>
-                    <input type="number" id="withdrawAmount" name="amount" min="10000" max="@Model.Balance" step="10000" value="50000" required />
-                    <span class="form-help">Số dư khả dụng: <strong>@Model.Balance.ToString("N0")đ</strong></span>
+                <div class="form-field">
+                    <label>Số tiền cần rút (đ)</label>
+                    <input type="number" name="amount" id="withdrawAmount" min="10000" max="@Model.Balance" step="10000" value="50000" required />
+                    <div class="quick-btns">
+                        <button type="button" onclick="setAmount('withdrawAmount', 50000)">50k</button>
+                        <button type="button" onclick="setAmount('withdrawAmount', 100000)">100k</button>
+                        <button type="button" onclick="setAmount('withdrawAmount', 200000)">200k</button>
+                        <button type="button" onclick="setAmount('withdrawAmount', Math.min(500000, @Model.Balance))">500k</button>
+                        <button type="button" onclick="setAmount('withdrawAmount', @Model.Balance)">Rút hết</button>
+                    </div>
+                    <span class="balance-hint">Số dư khả dụng: @Model.Balance.ToString("N0")đ</span>
                 </div>
-                <div class="quick-amounts">
-                    <button type="button" class="btn-quick" onclick="setAmount('withdrawAmount', 50000)">50k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('withdrawAmount', 100000)">100k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('withdrawAmount', 200000)">200k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('withdrawAmount', Math.min(500000, @Model.Balance))">500k</button>
-                    <button type="button" class="btn-quick" onclick="setAmount('withdrawAmount', @Model.Balance)">Rút hết</button>
-                </div>
-                <div class="form-group-modern mt-3">
-                    <label for="withdrawBank">Tài khoản ngân hàng nhận tiền</label>
-                    <select id="withdrawBank" required>
-                        <option value="Vietcombank">Vietcombank - Ngân hàng Ngoại Thương</option>
-                        <option value="MBBank">MB Bank - Ngân hàng Quân Đội</option>
-                        <option value="Agribank">Agribank - Ngân hàng Nông Nghiệp</option>
-                        <option value="TPBank">TPBank - Ngân hàng Tiên Phong</option>
+                <div class="form-field">
+                    <label>Ngân hàng</label>
+                    <select name="bankName" required>
+                        <option>Vietcombank</option>
+                        <option>MB Bank</option>
+                        <option>Agribank</option>
+                        <option>TPBank</option>
                     </select>
                 </div>
-                <div class="form-group-modern mt-3">
-                    <label for="withdrawAccountNum">Số tài khoản nhận</label>
-                    <input type="text" id="withdrawAccountNum" placeholder="Ví dụ: 1023948576" required value="2311505312" />
+                <div class="form-field">
+                    <label>Số tài khoản</label>
+                    <input type="text" name="accountNumber" placeholder="Số tài khoản nhận" value="2311505312" required />
                 </div>
-                <div class="form-group-modern mt-3">
-                    <label for="withdrawDesc">Ghi chú giao dịch</label>
-                    <input type="text" id="withdrawDesc" name="description" placeholder="Rút tiền ví UTE Rent" value="Rút tiền về tài khoản ngân hàng" />
+                <div class="form-field">
+                    <label>Ghi chú</label>
+                    <input type="text" name="description" placeholder="Rút tiền ví UTE Rent" value="Rút tiền về ngân hàng" />
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('withdrawModal')">Hủy bỏ</button>
-                <button type="submit" class="btn-primary bg-warning border-warning">Xác nhận rút tiền</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('withdrawModal')">Hủy</button>
+                <button type="submit" class="btn-confirm btn-withdraw">Xác nhận rút</button>
             </div>
         </form>
     </div>
 </div>
 
 <style>
-    /* Styling cho Wallet Page cực kỳ premium theo phong cách Glassmorphism */
-    .wallet-page-container {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f0f2f8;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .wallet-container {
         max-width: 1200px;
         margin: 2rem auto;
-        padding: 0 1.5rem;
-        font-family: 'Inter', sans-serif;
+        padding: 0 24px;
     }
 
-    .wallet-layout {
+    /* Header */
+    .wallet-header {
+        margin-bottom: 24px;
+    }
+
+    .wallet-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .wallet-subtitle {
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    /* Tabs */
+    .wallet-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 28px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 8px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        border-radius: 20px;
+        transition: all 0.2s;
+    }
+
+        .tab-btn.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e2e8f0;
+        }
+
+    /* Grid 2 cột */
+    .wallet-main-grid {
         display: grid;
-        grid-template-columns: 1fr 1.8fr;
-        gap: 2.5rem;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 28px;
     }
 
-    @@media (max-width: 992px) {
-        .wallet-layout {
+    @@media (max-width: 800px) {
+        .wallet-main-grid {
             grid-template-columns: 1fr;
         }
     }
 
-    /* Glassmorphism Card base */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        padding: 2rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Thẻ Visa-style Card số dư */
-    .main-wallet-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Card số dư bên trái */
+    .balance-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 20px;
+        padding: 24px;
         color: white;
-        min-height: 240px;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+        margin-bottom: 24px;
     }
 
-    .main-wallet-card::before {
-        content: '';
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0) 70%);
-        top: -150px;
-        right: -150px;
-        pointer-events: none;
-    }
-
-    .card-brand {
+    .balance-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-    }
-
-    .card-brand .brand-text {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 700;
-    }
-
-    .shield-icon {
-        color: #f59e0b;
-        font-size: 1.5rem;
-    }
-
-    .card-chip {
-        width: 45px;
-        height: 35px;
-        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-        border-radius: 6px;
-        margin-top: 1rem;
-        position: relative;
-    }
-
-    .balance-display {
-        margin-top: 1.5rem;
+        align-items: baseline;
+        margin-bottom: 32px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
     }
 
     .balance-label {
-        font-size: 0.85rem;
-        color: rgba(255, 255, 255, 0.5);
-        display: block;
-        margin-bottom: 0.25rem;
+        font-size: 14px;
+        color: rgba(255,255,255,0.5);
     }
 
     .balance-amount {
-        font-size: 2.5rem;
-        font-weight: 800;
-        letter-spacing: -1px;
-        margin: 0;
-        display: flex;
-        align-items: baseline;
+        font-size: 28px;
+        font-weight: 700;
     }
 
-    .balance-amount .currency {
-        font-size: 1.5rem;
-        margin-left: 0.2rem;
-        color: #f59e0b;
-    }
-
-    .card-footer-info {
+    .card-details {
         display: flex;
         justify-content: space-between;
-        margin-top: 2rem;
+        gap: 20px;
+        flex-wrap: nowrap;
     }
 
-    .info-block {
+    .card-detail-item {
         display: flex;
         flex-direction: column;
+        gap: 4px;
     }
 
-    .info-label {
-        font-size: 0.7rem;
+    .detail-label {
+        font-size: 10px;
+        letter-spacing: 1px;
+        color: rgba(255,255,255,0.4);
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.4);
-        margin-bottom: 0.2rem;
     }
 
-    .info-value {
-        font-size: 0.95rem;
+    .detail-value {
+        font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
+        white-space: nowrap;
     }
 
-    /* Các nút thao tác */
-    .wallet-actions {
+    /* Nút hành động */
+    .action-buttons {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
-        margin-top: 1.5rem;
+        gap: 12px;
     }
 
-    .btn-wallet {
+    .action-btn {
         display: flex;
         align-items: center;
+        gap: 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px 20px;
         width: 100%;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        border-radius: 18px;
-        text-align: left;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s;
+        text-align: left;
     }
 
-    .btn-wallet:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-        border-color: rgba(245, 158, 11, 0.3);
-    }
+        .action-btn:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
+        }
 
     .action-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
-        margin-right: 1.25rem;
+        font-size: 22px;
+        font-weight: 700;
     }
 
-    .bg-success-light {
-        background: rgba(16, 185, 129, 0.1);
+    .deposit-icon {
+        background: #dcfce7;
         color: #10b981;
     }
 
-    .bg-warning-light {
-        background: rgba(245, 158, 11, 0.1);
-        color: #d97706;
+    .withdraw-icon {
+        background: #fef3c7;
+        color: #f59e0b;
     }
 
-    .action-text {
-        display: flex;
-        flex-direction: column;
+    .action-info {
+        flex: 1;
     }
 
     .action-title {
-        font-size: 1rem;
         font-weight: 700;
+        font-size: 16px;
         color: #1e293b;
     }
 
     .action-desc {
-        font-size: 0.8rem;
+        font-size: 13px;
         color: #64748b;
-        margin-top: 0.1rem;
     }
 
-    /* Ký quỹ Badge */
-    .escrow-badge {
-        display: flex;
-        gap: 0.75rem;
-        background: rgba(245, 158, 11, 0.06);
-        border: 1px dashed rgba(245, 158, 11, 0.3);
-        border-radius: 18px;
-        padding: 1.25rem;
-        margin-top: 1.5rem;
-        align-items: flex-start;
-    }
-
-    .escrow-badge p {
-        margin: 0;
-        font-size: 0.82rem;
-        line-height: 1.45;
-        color: #78350f;
-    }
-
-    .text-amber {
-        color: #d97706;
-        font-size: 1.1rem;
-        margin-top: 0.1rem;
-    }
-
-    /* Transactions list */
-    .transactions-container {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .section-title {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .transactions-card {
-        flex: 1;
-        overflow: hidden;
-        padding: 0;
-    }
-
-    /* Empty state */
-    .empty-transactions {
-        padding: 4rem 2rem;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .empty-icon-container {
-        width: 80px;
-        height: 80px;
-        border-radius: 9999px;
-        background: rgba(148, 163, 184, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: #94a3b8;
-        margin-bottom: 1.5rem;
-    }
-
-    .empty-transactions h3 {
-        font-size: 1.2rem;
+    /* Lịch sử giao dịch */
+    .history-title {
+        font-size: 18px;
         font-weight: 700;
-        color: #334155;
-        margin-bottom: 0.5rem;
+        color: #0f172a;
+        margin-bottom: 16px;
     }
 
-    .empty-transactions p {
-        color: #64748b;
-        font-size: 0.9rem;
-        max-width: 320px;
-    }
-
-    /* Table styles */
-    .table-responsive {
-        width: 100%;
+    .history-table-wrapper {
+        background: white;
+        border-radius: 16px;
         overflow-x: auto;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .table-modern {
+    .history-table {
         width: 100%;
         border-collapse: collapse;
-        text-align: left;
+        min-width: 600px;
     }
 
-    .table-modern th {
-        padding: 1.25rem 1.5rem;
-        font-weight: 700;
-        font-size: 0.85rem;
-        text-transform: uppercase;
+        .history-table th {
+            text-align: left;
+            padding: 16px 12px;
+            background: #f8fafc;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 14px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .history-table tr:hover td {
+            background: #faf9fe;
+        }
+
+    .tx-time {
+        font-size: 12px;
         color: #64748b;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        background: rgba(0, 0, 0, 0.01);
-    }
-
-    .table-modern td {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-        font-size: 0.9rem;
-        color: #334155;
-    }
-
-    .table-modern tr:hover td {
-        background: rgba(245, 158, 11, 0.02);
     }
 
     .tx-id {
         font-family: monospace;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .tx-type-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
         font-weight: 700;
-        color: #64748b;
+        letter-spacing: 0.3px;
+    }
+
+    .type-deposit {
+        background: #dcfce7;
+        color: #10b981;
+    }
+
+    .type-payment {
+        background: #fee2e2;
+        color: #ef4444;
     }
 
     .tx-desc {
-        max-width: 250px;
-        white-space: nowrap;
+        max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .tx-amount {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .amount-plus {
+        color: #10b981;
+    }
+
+    .amount-minus {
+        color: #ef4444;
     }
 
     .text-right {
         text-align: right;
     }
 
-    .font-semibold {
-        font-weight: 600;
+    .empty-history {
+        text-align: center;
+        padding: 48px;
+        color: #94a3b8;
     }
 
-    .font-mono {
-        font-family: monospace;
+    /* Tổng quan tháng này */
+    .summary-card {
+        background: white;
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-top: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    /* Badges */
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
+    .summary-header {
         font-weight: 700;
-        text-transform: uppercase;
+        color: #0f172a;
+        margin-bottom: 12px;
+        font-size: 14px;
     }
 
-    .badge-success {
-        background: rgba(16, 185, 129, 0.1);
-        color: #065f46;
+    .summary-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 8px;
     }
 
-    .badge-danger {
-        background: rgba(239, 68, 68, 0.1);
-        color: #991b1b;
+    .summary-label {
+        font-size: 13px;
+        color: #64748b;
+        white-space: nowrap;
     }
 
-    .badge-info {
-        background: rgba(59, 130, 246, 0.1);
-        color: #1e40af;
-    }
-
-    .badge-warning {
-        background: rgba(245, 158, 11, 0.1);
-        color: #92400e;
-    }
-
-    .badge-primary {
-        background: rgba(139, 92, 246, 0.1);
-        color: #5b21b6;
+    .summary-value {
+        font-weight: 700;
+        font-size: 14px;
+        white-space: nowrap;
     }
 
     .text-success {
-        color: #10b981 !important;
+        color: #10b981;
     }
 
     .text-danger {
-        color: #ef4444 !important;
+        color: #ef4444;
     }
 
-    /* Modal Backdrop */
-    .modal-backdrop {
+    /* Modal */
+    .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(15, 23, 42, 0.4);
-        backdrop-filter: blur(8px);
+        background: rgba(0,0,0,0.4);
+        backdrop-filter: blur(4px);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        padding: 1.5rem;
     }
 
-    .modal-backdrop.active {
-        display: flex;
-    }
+        .modal-overlay.active {
+            display: flex;
+        }
 
-    .modal-card {
+    .modal-container {
         background: white;
         border-radius: 24px;
-        max-width: 480px;
-        width: 100%;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        width: 90%;
+        max-width: 460px;
         overflow: hidden;
-        animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        animation: fadeIn 0.2s ease;
     }
 
-    @@keyframes scaleIn {
-        from { transform: scale(0.9); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.96);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem 2rem;
+        padding: 18px 24px;
         border-bottom: 1px solid #f1f5f9;
     }
 
-    .modal-title {
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
 
     .modal-close {
         background: none;
         border: none;
-        font-size: 1.5rem;
+        font-size: 26px;
         cursor: pointer;
         color: #94a3b8;
-        transition: color 0.2s;
-    }
-
-    .modal-close:hover {
-        color: #334155;
+        line-height: 1;
     }
 
     .modal-body {
-        padding: 1.5rem 2rem;
+        padding: 20px 24px;
     }
 
-    /* Form control premium */
-    .form-group-modern {
+    .form-field {
+        margin-bottom: 18px;
+    }
+
+        .form-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+            .form-field input:focus, .form-field select:focus {
+                border-color: #1e293b;
+                box-shadow: 0 0 0 3px rgba(30,41,59,0.1);
+            }
+
+    .quick-btns {
         display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+        gap: 8px;
+        margin-top: 10px;
+        flex-wrap: wrap;
     }
 
-    .form-group-modern label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #334155;
-    }
+        .quick-btns button {
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-    .form-group-modern input, .form-group-modern select {
-        padding: 0.85rem 1rem;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
-        font-size: 1rem;
-        color: #1e293b;
-        font-weight: 600;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
+            .quick-btns button:hover {
+                background: #e2e8f0;
+                color: #1e293b;
+            }
 
-    .form-group-modern input:focus, .form-group-modern select:focus {
-        border-color: #f59e0b;
-        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
-    }
-
-    .form-help {
-        font-size: 0.78rem;
+    .balance-hint {
+        display: block;
+        font-size: 11px;
         color: #64748b;
+        margin-top: 6px;
     }
 
-    /* Quick amounts */
-    .quick-amounts {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 0.5rem;
-        margin-top: 0.75rem;
-    }
-
-    .btn-quick {
-        padding: 0.5rem 0.25rem;
-        border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: #475569;
-        transition: all 0.2s;
-        text-align: center;
-    }
-
-    .btn-quick:hover {
-        background: rgba(245, 158, 11, 0.1);
-        border-color: #f59e0b;
-        color: #d97706;
-    }
-
-    .mt-3 {
-        margin-top: 1rem;
-    }
-
-    .simulated-payment-info {
-        display: flex;
-        gap: 0.5rem;
-        background: rgba(59, 130, 246, 0.05);
-        border: 1px dashed rgba(59, 130, 246, 0.3);
-        padding: 0.75rem;
+    .demo-note {
+        background: #fef9e6;
         border-radius: 12px;
-        margin-top: 1.25rem;
-    }
-
-    .simulated-payment-info p {
-        font-size: 0.75rem;
-        line-height: 1.4;
-        margin: 0;
-        color: #1e3a8a;
-    }
-
-    .text-blue {
-        color: #2563eb;
-        margin-top: 0.1rem;
+        padding: 10px 12px;
+        font-size: 11px;
+        color: #b45309;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 8px;
     }
 
     .modal-footer {
-        padding: 1.25rem 2rem;
-        border-top: 1px solid #f1f5f9;
         display: flex;
         justify-content: flex-end;
-        gap: 0.75rem;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid #f1f5f9;
+        background: #fafbfc;
+    }
+
+    .btn-cancel {
+        padding: 10px 20px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .btn-confirm {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 13px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-deposit {
+        background: #10b981;
+    }
+
+    .btn-withdraw {
+        background: #f59e0b;
+    }
+
+    .btn-cancel:hover {
         background: #f8fafc;
     }
 
-    .btn-secondary {
-        padding: 0.75rem 1.5rem;
-        border: 1px solid #cbd5e1;
-        background: white;
-        color: #475569;
-        border-radius: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-        background: #f1f5f9;
-    }
-
-    .btn-primary {
-        padding: 0.75rem 1.5rem;
-        background: #1e293b;
-        color: white;
-        border: 1px solid #1e293b;
-        border-radius: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .btn-primary:hover {
+    .btn-confirm:hover {
         opacity: 0.9;
-        transform: translateY(-1px);
     }
-    
-    .bg-success { background-color: #10b981 !important; }
-    .border-success { border-color: #10b981 !important; }
-    .bg-warning { background-color: #f59e0b !important; }
-    .border-warning { border-color: #f59e0b !important; }
 </style>
 
-@section Scripts {
-    <script>
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
+<script>
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+    }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
 
-        function setAmount(inputId, value) {
-            document.getElementById(inputId).value = value;
-        }
+    function setAmount(inputId, value) {
+        document.getElementById(inputId).value = value;
+    }
 
-        // Close modal if clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target.classList.contains('modal-backdrop')) {
-                event.target.classList.remove('active');
-            }
-        });
-    </script>
-}
+    window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.classList.remove('active');
+        }
+    });
+</script>

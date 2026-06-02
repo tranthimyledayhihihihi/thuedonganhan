@@ -14,6 +14,7 @@ namespace THUEDONGANHAN.Controllers
     public class SaleOrderController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private const decimal COMMISSION_RATE = 0.05m;
 
         public SaleOrderController(AppDbContext context)
         {
@@ -39,15 +40,24 @@ namespace THUEDONGANHAN.Controllers
         {
             try
             {
-                // ✅ FIX: Thêm pagination
                 if (page < 1) page = 1;
                 if (pageSize < 1) pageSize = 10;
                 if (pageSize > 100) pageSize = 100;
 
+                var currentUserId = GetCurrentUserId();
+                var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+                // ✅ BUG #9 FIX: Chỉ Admin xem tất cả, user thường chỉ xem đơn của mình
                 var query = _context.SaleOrders
                     .Include(so => so.Product)
                     .Include(so => so.Buyer)
-                    .OrderByDescending(so => so.CreatedAt);
+                    .AsQueryable();
+
+                if (role != "Admin" && currentUserId.HasValue)
+                    query = query.Where(so => so.BuyerId == currentUserId.Value
+                                          || so.Product.OwnerId == currentUserId.Value);
+
+                query = query.OrderByDescending(so => so.CreatedAt);
 
                 var totalItems = await query.CountAsync();
                 var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -57,7 +67,6 @@ namespace THUEDONGANHAN.Controllers
                     .Take(pageSize)
                     .ToListAsync();
 
-                // ✅ FIX: Dùng DTO thay vì raw model
                 var response = orders.Select(o => MapToSaleOrderResponse(o)).ToList();
 
                 var result = new
@@ -74,7 +83,7 @@ namespace THUEDONGANHAN.Controllers
                     }
                 };
 
-                return Ok(ApiResponse<object>.SuccessResponse(result, 
+                return Ok(ApiResponse<object>.SuccessResponse(result,
                     $"Lấy danh sách đơn bán thành công (Trang {page}/{totalPages})"));
             }
             catch (Exception ex)
@@ -199,28 +208,88 @@ namespace THUEDONGANHAN.Controllers
                     return BadRequest(ApiResponse<SaleOrder>.ErrorResponse("Sản phẩm này không bán"));
                 }
 
-                // ✅ TẠO ĐỚN BÁN
-                order.BuyerId = currentUserId.Value;
-                order.SalePrice = product.SalePrice.Value; // ✅ FIX: Dùng SalePrice thay vì UnitPrice
-                order.Status = "Pending";
-                order.CreatedAt = DateTime.UtcNow;
-
-                _context.SaleOrders.Add(order);
-
-                // ✅ TRỪ SỐ LƯỢNG SẢN PHẨM (mặc định mua 1)
-                product.Quantity -= 1;
-                if (product.Quantity == 0)
+                // ✅ TẠO ĐƠN BÁN & GIAO DỊCH VÍ TRONG DB TRANSACTION
+                using var dbTransaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    product.IsAvailable = false;
-                    product.IsForSale = false;
-                }
+                    var buyer = await _context.Users.FindAsync(currentUserId.Value);
+                    if (buyer == null)
+                    {
+                        return NotFound(ApiResponse<SaleOrder>.ErrorResponse("Người mua không tồn tại"));
+                    }
 
-                await _context.SaveChangesAsync();
+                    // ✅ BUG #10 FIX: Chặn tài khoản bị ban mua hàng
+                    if (!buyer.IsActive)
+                        return BadRequest(ApiResponse<SaleOrder>.ErrorResponse("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ Admin."));
+                    if (!buyer.IsVerified)
+                        return BadRequest(ApiResponse<SaleOrder>.ErrorResponse("Tài khoản chưa xác thực email trường."));
+
+                    if (buyer.Balance < product.SalePrice.Value)
+                    {
+                        return BadRequest(ApiResponse<SaleOrder>.ErrorResponse($"Số dư không đủ. Cần {product.SalePrice.Value:N0}đ, số dư hiện tại: {buyer.Balance:N0}đ."));
+                    }
+
+                    // 1. Trừ tiền ví người mua
+                    buyer.Balance -= product.SalePrice.Value;
+
+                    // 2. Tạo đơn bán
+                    order.BuyerId = currentUserId.Value;
+                    order.SalePrice = product.SalePrice.Value;
+                    order.Status = "Pending";
+                    order.CreatedAt = DateTime.UtcNow;
+
+                    _context.SaleOrders.Add(order);
+                    await _context.SaveChangesAsync(); // Lưu để có SaleOrderId
+
+                    // 3. Ghi lịch sử giao dịch trừ tiền
+                    _context.Transactions.Add(new Transaction
+                    {
+                        UserId = buyer.UserId,
+                        Type = "Payment",
+                        Amount = -order.SalePrice,
+                        ReferenceId = order.SaleOrderId,
+                        Description = $"Thanh toán mua sản phẩm #{product.ProductName} (Đơn #{order.SaleOrderId})",
+                        CreatedAt = DateTime.Now
+                    });
+
+                    // 4. Trừ số lượng sản phẩm (mặc định mua 1)
+                    product.Quantity -= 1;
+                    if (product.Quantity == 0)
+                    {
+                        product.IsAvailable = false;
+                        product.IsForSale = false;
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await dbTransaction.CommitAsync();
+                }
+                catch
+                {
+                    await dbTransaction.RollbackAsync();
+                    throw;
+                }
 
                 var createdOrder = await _context.SaleOrders
                     .Include(so => so.Product)
                     .Include(so => so.Buyer)
                     .FirstOrDefaultAsync(so => so.SaleOrderId == order.SaleOrderId);
+
+                // ✅ Tạo thông báo cho người bán
+                if (createdOrder != null)
+                {
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = product.OwnerId,
+                        Title = "Đơn mua hàng mới",
+                        Body = $"Sinh viên {createdOrder.Buyer.FullName} đã đặt mua sản phẩm '{product.ProductName}' của bạn.",
+                        Type = "SaleOrderCreated",
+                        ReferenceId = order.SaleOrderId,
+                        ReferenceType = "Product",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                    await _context.SaveChangesAsync();
+                }
 
                 // ✅ FIX: Dùng DTO thay vì raw model
                 var response = MapToSaleOrderResponse(createdOrder!);
@@ -263,8 +332,26 @@ namespace THUEDONGANHAN.Controllers
                     return Forbid();
                 }
 
+                // ✅ BUG #11 FIX: Chỉ xác nhận khi đơn đang Pending
+                if (order.Status != "Pending")
+                    return BadRequest(ApiResponse<SaleOrder>.ErrorResponse(
+                        $"Không thể xác nhận đơn ở trạng thái '{order.Status}'. Chỉ xác nhận đơn đang 'Pending'."));
+
                 order.Status = "Confirmed";
                 order.UpdatedAt = DateTime.Now;
+
+                // ✅ Tạo thông báo cho người mua
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = order.BuyerId,
+                    Title = "Đơn mua hàng được xác nhận",
+                    Body = $"Người bán đã xác nhận đơn hàng mua sản phẩm '{order.Product.ProductName}' của bạn.",
+                    Type = "SaleOrderConfirmed",
+                    ReferenceId = order.SaleOrderId,
+                    ReferenceType = "Product",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                });
 
                 await _context.SaveChangesAsync();
 
@@ -307,10 +394,75 @@ namespace THUEDONGANHAN.Controllers
                     return Forbid();
                 }
 
-                order.Status = "Completed";
-                order.UpdatedAt = DateTime.Now;
+                // ✅ BUG #12 FIX: Chỉ hoàn thành khi đơn đang Confirmed
+                if (order.Status != "Confirmed")
+                    return BadRequest(ApiResponse<SaleOrder>.ErrorResponse(
+                        $"Chỉ có thể hoàn thành đơn khi ở trạng thái 'Confirmed'. Trạng thái hiện tại: {order.Status}"));
 
-                await _context.SaveChangesAsync();
+                // ✅ HOÀN THÀNH ĐƠN BÁN & CHUYỂN TIỀN TRONG DB TRANSACTION
+                using var dbTransaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    decimal commission = Math.Round(order.SalePrice * COMMISSION_RATE, 2);
+                    decimal sellerPayout = order.SalePrice - commission;
+
+                    // 1. Cộng tiền cho người bán (đã trừ 5% hoa hồng)
+                    var seller = await _context.Users.FindAsync(order.Product.OwnerId);
+                    if (seller != null)
+                    {
+                        seller.Balance += sellerPayout;
+                        _context.Transactions.Add(new Transaction
+                        {
+                            UserId = seller.UserId,
+                            Type = "Payment",
+                            Amount = sellerPayout,
+                            ReferenceId = order.SaleOrderId,
+                            Description = $"Nhận tiền bán sản phẩm #{order.Product.ProductName} (Đơn #{order.SaleOrderId} - 5% hoa hồng: -{commission:N0}đ = +{sellerPayout:N0}đ)",
+                            CreatedAt = DateTime.Now
+                        });
+                    }
+
+                    // 2. Cộng 5% hoa hồng cho ví Admin
+                    var adminUser = await _context.Users.FirstOrDefaultAsync(u => u.Role == "Admin");
+                    if (adminUser != null)
+                    {
+                        adminUser.Balance += commission;
+                        _context.Transactions.Add(new Transaction
+                        {
+                            UserId = adminUser.UserId,
+                            Type = "Commission",
+                            Amount = commission,
+                            ReferenceId = order.SaleOrderId,
+                            Description = $"Hoa hồng 5% từ đơn bán #{order.SaleOrderId} (SP: {order.Product.ProductName}) +{commission:N0}đ",
+                            CreatedAt = DateTime.Now
+                        });
+                    }
+
+                    // 3. Cập nhật trạng thái đơn
+                    order.Status = "Completed";
+                    order.UpdatedAt = DateTime.Now;
+
+                    // 4. Tạo thông báo cho người mua
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = order.BuyerId,
+                        Title = "Đơn mua hàng hoàn thành",
+                        Body = $"Đơn mua sản phẩm '{order.Product.ProductName}' đã hoàn thành. Sản phẩm hiện thuộc sở hữu của bạn.",
+                        Type = "SaleCompleted",
+                        ReferenceId = order.SaleOrderId,
+                        ReferenceType = "Product",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+
+                    await _context.SaveChangesAsync();
+                    await dbTransaction.CommitAsync();
+                }
+                catch
+                {
+                    await dbTransaction.RollbackAsync();
+                    throw;
+                }
 
                 // ✅ FIX: Dùng DTO thay vì raw model
                 var response = MapToSaleOrderResponse(order);
@@ -357,15 +509,59 @@ namespace THUEDONGANHAN.Controllers
                     return BadRequest(ApiResponse<SaleOrder>.ErrorResponse("Không thể hủy đơn hàng ở trạng thái này"));
                 }
 
-                order.Status = "Cancelled";
-                order.UpdatedAt = DateTime.Now;
+                // ✅ HỦY ĐƠN & HOÀN TIỀN TRONG DB TRANSACTION
+                using var dbTransaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // 1. Hoàn lại 100% tiền cho người mua
+                    var buyer = await _context.Users.FindAsync(order.BuyerId);
+                    if (buyer != null)
+                    {
+                        buyer.Balance += order.SalePrice;
+                        _context.Transactions.Add(new Transaction
+                        {
+                            UserId = buyer.UserId,
+                            Type = "Refund",
+                            Amount = order.SalePrice,
+                            ReferenceId = order.SaleOrderId,
+                            Description = $"Hoàn tiền hủy đơn mua #{order.SaleOrderId} (+{order.SalePrice:N0}đ)",
+                            CreatedAt = DateTime.Now
+                        });
+                    }
 
-                // ✅ HOÀN LẠI SỐ LƯỢNG SẢN PHẨM
-                var product = order.Product;
-                product.Quantity += 1; // Mặc định mua 1
-                product.IsAvailable = true;
+                    // 2. Cập nhật trạng thái
+                    order.Status = "Cancelled";
+                    order.UpdatedAt = DateTime.Now;
 
-                await _context.SaveChangesAsync();
+                    // 3. Hoàn lại số lượng sản phẩm vào kho
+                    var product = order.Product;
+                    product.Quantity += 1; // Mặc định mua 1
+                    product.IsAvailable = true;
+
+                    // 4. Tạo thông báo cho đối phương
+                    int targetNotifyUserId = (currentUserId.Value == order.BuyerId) ? order.Product.OwnerId : order.BuyerId;
+                    string notifierRoleName = (currentUserId.Value == order.BuyerId) ? "Người mua" : "Người bán";
+
+                    _context.Notifications.Add(new Notification
+                    {
+                        UserId = targetNotifyUserId,
+                        Title = "Đơn mua hàng đã bị hủy",
+                        Body = $"{notifierRoleName} đã hủy đơn mua #{order.SaleOrderId} cho sản phẩm '{product.ProductName}'. Tiền đã được hoàn.",
+                        Type = "RentalCancelled", // Dùng type này vì constraint CK_Notifications_Type
+                        ReferenceId = order.SaleOrderId,
+                        ReferenceType = "Product",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+
+                    await _context.SaveChangesAsync();
+                    await dbTransaction.CommitAsync();
+                }
+                catch
+                {
+                    await dbTransaction.RollbackAsync();
+                    throw;
+                }
 
                 // ✅ FIX: Dùng DTO thay vì raw model
                 var response = MapToSaleOrderResponse(order);

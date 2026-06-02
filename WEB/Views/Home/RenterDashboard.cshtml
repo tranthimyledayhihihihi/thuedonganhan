@@ -1,7 +1,11 @@
 @{
-    ViewData["Title"] = "Người thuê";
+    ViewData["Title"] = "Người thuê - Đơn của tôi";
     var allProducts = ViewBag.AllProducts as List<WEB.Models.ProductViewModel> ?? new List<WEB.Models.ProductViewModel>();
+    var myRentals = ViewBag.MyRentals as List<WEB.Models.RentalViewModel> ?? new List<WEB.Models.RentalViewModel>();
     var userName = Context.Session.GetString("UserName") ?? "Sinh viên UTE";
+
+    var activeRentals = myRentals.Where(r => r.Status == "Pending" || r.Status == "Confirmed" || r.Status == "InProgress" || r.Status == "Active").ToList();
+    var historyRentals = myRentals.Where(r => r.Status == "Returned" || r.Status == "Completed" || r.Status == "Cancelled").ToList();
 }
 
 @functions {
@@ -9,671 +13,1256 @@
     {
         if (product == null) return "/images/placeholder.png";
         var cardImageUrl = product.ImageUrl;
-        
-        // We only override if it's a seed placeholder (contains unsplash or is null/empty)
         bool isPlaceholder = string.IsNullOrEmpty(cardImageUrl) || cardImageUrl.Contains("unsplash.com");
-        if (!isPlaceholder)
-        {
-            return cardImageUrl;
-        }
+        if (!isPlaceholder) return cardImageUrl;
 
         var pName = product.ProductName?.ToLower() ?? "";
         var cName = product.Category?.CategoryName?.ToLower() ?? "";
 
-        // Perfect overrides for mock data placeholders
-        if (pName.Contains("áo dài") || cName.Contains("áo dài"))
-        {
-            return "/images/aodai.png";
-        }
-        if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp"))
-        {
-            return "/images/dototnghiep.png";
-        }
-        if (pName.Contains("vest") || pName.Contains("suit"))
-        {
-            return "/images/vestnam.png";
-        }
-        if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4"))
-        {
-            return "/images/tainghe.png";
-        }
-        if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu"))
-        {
-            return "/images/maychieu.png";
-        }
-        if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ"))
-        {
-            return "/images/guitar.png";
-        }
-        if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike"))
-        {
-            return "/images/xedap.png";
-        }
-        if (pName.Contains("ipad") || pName.Contains("tablet"))
-        {
-            return "/images/ipad.png";
-        }
-        if (pName.Contains("macbook") || pName.Contains("laptop"))
-        {
-            return "/images/mac.png";
-        }
-        if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh"))
-        {
-            return "/images/mayanh.png";
-        }
-        if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ"))
-        {
-            return "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
-        }
-        if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách"))
-        {
-            return "/images/giaitich1.png";
-        }
+        if (pName.Contains("áo dài") || cName.Contains("áo dài")) return "/images/aodai.png";
+        if (pName.Contains("lễ phục") || pName.Contains("tốt nghiệp")) return "/images/dototnghiep.png";
+        if (pName.Contains("vest") || pName.Contains("suit")) return "/images/vestnam.png";
+        if (pName.Contains("tai nghe") || pName.Contains("headphone") || cName.Contains("âm thanh") || pName.Contains("sony wh-1000xm4")) return "/images/tainghe.png";
+        if (pName.Contains("máy chiếu") || pName.Contains("projector") || cName.Contains("trình chiếu")) return "/images/maychieu.png";
+        if (pName.Contains("guitar") || pName.Contains("đàn") || cName.Contains("nhạc cụ")) return "/images/guitar.png";
+        if (pName.Contains("xe đạp") || pName.Contains("giant") || pName.Contains("bike")) return "/images/xedap.png";
+        if (pName.Contains("ipad") || pName.Contains("tablet")) return "/images/ipad.png";
+        if (pName.Contains("macbook") || pName.Contains("laptop")) return "/images/mac.png";
+        if (pName.Contains("máy ảnh") || pName.Contains("camera") || cName.Contains("máy ảnh")) return "/images/mayanh.png";
+        if (pName.Contains("xe máy") || pName.Contains("wave") || cName.Contains("xe cộ")) return "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800";
+        if (cName.Contains("sách") || cName.Contains("giáo trình") || pName.Contains("sách")) return "/images/giaitich1.png";
 
         return cardImageUrl;
     }
 }
 
-<div class="renter-layout">
-    <!-- Sidebar -->
-    <aside class="renter-sidebar">
-        <div class="sidebar-brand">
-            <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-label">Trung tâm điều khiển</div>
-                <div class="sidebar-sub">Chào mừng bạn quay lại</div>
+<div class="lm-app-layout">
+    <aside class="lm-sidebar">
+        <div class="lm-sidebar-brand">
+            <div class="lm-sidebar-avatar">
+                <img src="https://ui-avatars.com/api/?name=@userName&background=8b5a3c&color=fff" alt="@userName" />
+            </div>
+            <div class="lm-sidebar-user-info">
+                <div class="lm-sidebar-label">Trung tâm điều khiển</div>
+                <div class="lm-sidebar-sub">Xin chào, @userName</div>
             </div>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/" class="snav-item"><i class="fas fa-home"></i><span>Trang chủ</span></a>
-            <a href="/Home/RenterDashboard" class="snav-item active"><i class="fas fa-shopping-cart"></i><span>Người thuê</span></a>
-            <a href="/Home/OwnerDashboard" class="snav-item"><i class="fas fa-th-large"></i><span>Người cho thuê</span></a>
+
+        <nav class="lm-sidebar-nav">
+            <a href="/" class="lm-snav-item"><i class="fas fa-home"></i><span>Trang chủ</span></a>
+            <a href="/Home/RenterDashboard" class="lm-snav-item active"><i class="fas fa-shopping-bag"></i><span>Người thuê</span></a>
+            <a href="/Home/OwnerDashboard" class="lm-snav-item"><i class="fas fa-store"></i><span>Người cho thuê</span></a>
         </nav>
-        <div class="sidebar-add-wrap">
-            <a href="/Post/Create" class="sidebar-add-btn">
-                <i class="fas fa-plus-circle"></i> Đăng sản phẩm mới
+
+        <div class="lm-sidebar-footer">
+            <a href="/Post/Create" class="lm-btn-add-post">
+                <i class="fas fa-plus"></i> Đăng sản phẩm mới
             </a>
         </div>
     </aside>
 
-    <main class="renter-main">
-        <!-- Hero Banner -->
-        <div class="renter-hero">
-            <div class="renter-hero-content">
-                <h1>Chào mừng trở lại, Sinh viên UTE!</h1>
+    <main class="lm-main">
+
+        <div class="lm-hero">
+            <div class="lm-hero-content">
+                <h1>Chào mừng trở lại, @userName!</h1>
                 <p>Hôm nay bạn cần tìm thuê thiết bị gì cho đồ án hay muốn chia sẻ vật dụng để kiếm thêm thu nhập?</p>
-                <div class="hero-actions">
-                    <a href="/Product" class="hero-btn hero-btn--outline">Xem đơn thuê mới</a>
-                    <a href="/Home/OwnerDashboard" class="hero-btn hero-btn--outline">Quản lý đồ dùng</a>
+                <div class="lm-hero-actions">
+                    <a href="/Product" class="lm-btn-hero-outline">Khám phá đồ thuê</a>
+                    <a href="/Home/OwnerDashboard" class="lm-btn-hero-outline">Quản lý đồ của tôi</a>
                 </div>
             </div>
+            <div class="lm-hero-deco"><i class="fab fa-envira"></i></div>
         </div>
 
-        <!-- Content Row: products -->
-        <div class="renter-content-row">
-            <!-- Products Area -->
-            <div class="renter-products-area">
-                <!-- Section Header -->
-                <div class="rpa-header">
-                    <div>
-                        <h2 class="rpa-title">Gợi ý dành riêng cho bạn</h2>
-                        <p class="rpa-sub">Dựa trên các tìm kiếm và ngành học của bạn</p>
+        <div class="lm-container">
+            <div class="lm-header-section">
+                <h2 class="lm-page-title">Đơn thuê của tôi</h2>
+                <div class="lm-controls">
+                    <div class="lm-tabs">
+                        <button class="lm-tab active">Tất cả</button>
+                        <button class="lm-tab">Đang thuê</button>
+                        <button class="lm-tab">Đã trả</button>
                     </div>
-                    <div class="rpa-tabs">
-                        <button class="rpa-tab active" onclick="filterTab(this,'all')">Tất cả</button>
-                        <button class="rpa-tab" onclick="filterTab(this,'Điện tử')">Điện tử</button>
-                        <button class="rpa-tab" onclick="filterTab(this,'Giáo trình')">Giáo trình</button>
+                    <div class="lm-search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm đơn hàng..." />
+                    </div>
+                </div>
+            </div>
+
+            <div class="lm-grid-layout">
+
+                <div class="lm-main-col">
+                    <div class="lm-section-header">
+                        <h3>Đơn thuê hiện tại</h3>
+                        <span class="lm-badge lm-badge-light-green">@activeRentals.Count ĐANG HOẠT ĐỘNG</span>
+                    </div>
+
+                    <div class="lm-cards-list">
+                        @if (activeRentals.Any())
+                        {
+                            foreach (var rental in activeRentals)
+                            {
+                                var daysLeft = (rental.EndDate - DateTime.Now).Days;
+                                var timeLeftStr = daysLeft >= 0 ? $"Còn {daysLeft} ngày" : "Quá hạn";
+                                var isOverdue = daysLeft < 0;
+
+                                var statusText = rental.Status == "Pending" ? "Chờ xác nhận" :
+                                (rental.Status == "Confirmed" ? "Chờ giao" :
+                                (rental.Status == "InProgress" ? "Chờ bạn nhận" : "Đang thuê"));
+                                var statusBadgeClass = rental.Status == "Pending" ? "lm-badge-yellow" : "lm-badge-green";
+
+                                <div class="lm-card active-rental-card">
+                                    <div class="lm-card-img">
+                                        <img src="@GetPerfectCardImage(rental.Product)" alt="@(rental.Product?.ProductName)" />
+                                    </div>
+                                    <div class="lm-card-info">
+                                        <div class="lm-card-top-row">
+                                            <h4 class="lm-item-name">@(rental.Product?.ProductName ?? "Sản phẩm")</h4>
+                                            <div class="lm-time-indicator @(isOverdue ? "overdue" : "")">
+                                                <i class="far fa-clock"></i> @timeLeftStr
+                                            </div>
+                                        </div>
+                                        <p class="lm-item-desc">Chủ đồ: @(rental.Product?.Owner?.FullName ?? "Đang cập nhật") | <i class="fas fa-map-marker-alt"></i> @(rental.Product?.Location ?? "Chưa rõ")</p>
+
+                                        <div class="lm-card-meta">
+                                            <span class="lm-badge @statusBadgeClass">@statusText</span>
+                                            <span class="lm-order-id">#LM-@rental.RentalId.ToString("D5")</span>
+                                            <span class="lm-order-price">@rental.TotalPrice.ToString("N0")đ</span>
+                                        </div>
+
+                                        <div class="lm-card-actions">
+                                            @if (rental.Status == "Pending" || rental.Status == "Confirmed")
+                                            {
+                                                <form asp-controller="Home" asp-action="CancelRental" method="post" style="margin:0;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                                    <button type="submit" class="lm-btn lm-btn-danger" onclick="return confirm('Xác nhận hủy đơn? Tiền sẽ được hoàn lại.');">Hủy đơn</button>
+                                                </form>
+                                            }
+                                            else if (rental.Status == "InProgress")
+                                            {
+                                                <form asp-controller="Home" asp-action="ReceiveRental" method="post" style="margin:0;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                                    <button type="submit" class="lm-btn lm-btn-primary"><i class="fas fa-check"></i> Đã nhận đồ</button>
+                                                </form>
+                                                <a href="/Complaint/Create?rentalId=@rental.RentalId" class="lm-btn lm-btn-warning" title="Khiếu nại"><i class="fas fa-exclamation-triangle"></i></a>
+                                            }
+                                            else if (rental.Status == "Active")
+                                            {
+                                                <form asp-controller="Home" asp-action="ReturnRental" method="post" style="margin:0;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="rentalId" value="@rental.RentalId" />
+                                                    <button type="submit" class="lm-btn lm-btn-primary"><i class="fas fa-undo"></i> Trả đồ cho chủ</button>
+                                                </form>
+                                                <a href="/Complaint/Create?rentalId=@rental.RentalId" class="lm-btn lm-btn-warning" title="Khiếu nại"><i class="fas fa-exclamation-triangle"></i></a>
+                                            }
+
+                                            <a href="/Product/Details/@rental.ProductId" class="lm-btn-icon" title="Xem chi tiết">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="lm-empty-state">
+                                <p>Bạn không có đơn thuê nào đang hoạt động.</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="lm-section-header" style="margin-top: 2.5rem;">
+                        <h3>Lịch sử thuê đồ</h3>
+                        <a href="#" class="lm-view-all">Xem tất cả</a>
+                    </div>
+
+                    <div class="lm-cards-list">
+                        @if (historyRentals.Any())
+                        {
+                            foreach (var rental in historyRentals)
+                            {
+                                var totalDays = (rental.EndDate - rental.StartDate).Days;
+                                if (totalDays <= 0) totalDays = 1;
+                                var isCompleted = rental.Status == "Completed" || rental.Status == "Returned";
+
+                                <div class="lm-card history-rental-card">
+                                    <div class="lm-card-img-small">
+                                        <img src="@GetPerfectCardImage(rental.Product)" alt="@(rental.Product?.ProductName)" />
+                                    </div>
+                                    <div class="lm-history-info">
+                                        <h4 class="lm-item-name">@(rental.Product?.ProductName ?? "Sản phẩm")</h4>
+                                        <p class="lm-item-date">Đã trả: @rental.EndDate.ToString("dd/MM/yyyy") | @totalDays ngày</p>
+                                    </div>
+
+                                    <div class="lm-history-price-col">
+                                        <div class="lm-price">@rental.TotalPrice.ToString("N0")đ</div>
+                                        <span class="lm-badge @(isCompleted ? "lm-badge-light-green" : "lm-badge-gray")">
+                                            @(isCompleted ? "HOÀN THÀNH" : "ĐÃ HỦY")
+                                        </span>
+                                    </div>
+
+                                    <div class="lm-history-actions">
+                                        <a href="/Product/Details/@rental.ProductId" class="lm-btn-outline">Chi tiết</a>
+                                        <a href="/Product/Details/@rental.ProductId" class="lm-btn-brown">Thuê lại</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="lm-empty-state">
+                                <p>Chưa có lịch sử thuê đồ.</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="lm-pagination-row">
+                        <span class="lm-showing-text">Hiển thị @myRentals.Count đơn thuê</span>
+                        <div class="lm-pagination-controls">
+                            <button disabled><i class="fas fa-chevron-left"></i></button>
+                            <button><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="lm-side-col">
+                    <div class="lm-impact-widget">
+                        <div class="lm-impact-header">
+                            <div class="lm-impact-icon"><i class="fab fa-envira"></i></div>
+                            <h3>Tác động tích cực</h3>
+                        </div>
+                        <p class="lm-impact-text">Bạn đã giúp giảm thiểu <strong>12.5kg CO2</strong> bằng cách sử dụng dịch vụ thuê chung thay vì mua mới trong tháng này.</p>
+                        <div class="lm-progress-container">
+                            <div class="lm-progress-bar"><div class="lm-progress-fill" style="width: 65%;"></div></div>
+                            <span class="lm-progress-label">65% mục tiêu tháng của bạn</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <div class="lm-recommend-section">
+                <div class="lm-recommend-header">
+                    <div>
+                        <h2 class="lm-section-title">Gợi ý dành riêng cho bạn</h2>
+                        <p class="lm-section-sub">Dựa trên các tìm kiếm và ngành học của bạn</p>
+                    </div>
+                    <div class="lm-recommend-tabs">
+                        <button class="lm-rtab active" onclick="filterTab(this,'all')">Tất cả</button>
+                        <button class="lm-rtab" onclick="filterTab(this,'Điện tử')">Điện tử</button>
+                        <button class="lm-rtab" onclick="filterTab(this,'Giáo trình')">Giáo trình</button>
                     </div>
                 </div>
 
                 @{
                     var featured = allProducts.FirstOrDefault();
-                    var rest = allProducts.Skip(1).Take(5).ToList();
+                    var rest = allProducts.Skip(1).Take(4).ToList();
                 }
+
                 @if (allProducts.Any())
                 {
-                    <!-- Featured product (first one, large) -->
-                    <div class="rpa-grid">
-                        <!-- Featured card -->
-                        <div class="rpc rpc--featured" data-cat="@(featured.Category?.CategoryName ?? "Khác")">
-                            <div class="rpc-img-wrap">
-                                <span class="rpc-hot">Hot Item</span>
-                                <a href="/Product/Details/@featured.ProductId" style="display: block; width: 100%; height: 100%;">
-                                    <img src="@GetPerfectCardImage(featured)" alt="@featured.ProductName"
-                                         onerror="this.src='https://via.placeholder.com/600x380/dbeafe/2563eb?text=Product'">
+                    <div class="lm-recommend-grid">
+                        <div class="lm-product-card featured-card" data-cat="@(featured.Category?.CategoryName ?? "Khác")">
+                            <div class="card-img-wrapper">
+                                <span class="hot-badge">Hot Item</span>
+                                <a href="/Product/Details/@featured.ProductId">
+                                    <img src="@featured.ImageUrl" alt="@featured.ProductName" onerror="this.src='https://via.placeholder.com/600x380/dbeafe/2563eb?text=Product'">
                                 </a>
                             </div>
-                            <div class="rpc-body">
-                                <div class="rpc-cat">@(featured.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
-                                <div class="rpc-rating">
-                                    <i class="fas fa-star" style="color:#f59e0b;font-size:.8rem;"></i> 4.9 (12 đánh giá)
-                                </div>
-                                <a href="/Product/Details/@featured.ProductId" style="text-decoration: none; color: inherit;">
-                                    <h3 class="rpc-name">@featured.ProductName</h3>
+                            <div class="card-body">
+                                <div class="card-cat">@(featured.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
+                                <div class="card-rating"><i class="fas fa-star"></i> 4.9 (12 đánh giá)</div>
+                                <a href="/Product/Details/@featured.ProductId" class="card-link">
+                                    <h3 class="card-title">@featured.ProductName</h3>
                                 </a>
-                                <p class="rpc-desc">@(featured.Description?.Length > 100 ? featured.Description.Substring(0, 100) + "..." : featured.Description)</p>
-                                <div class="rpc-footer">
-                                    <div class="rpc-price">@featured.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
-                                    <a href="/Product/Details/@featured.ProductId" class="rpc-rent-btn">Thuê ngay</a>
+                                <p class="card-desc">@(featured.Description?.Length > 80 ? featured.Description.Substring(0, 80) + "..." : featured.Description)</p>
+                                <div class="card-footer">
+                                    <div class="card-price">@featured.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
+                                    <a href="/Product/Details/@featured.ProductId" class="lm-btn-primary lm-btn-sm">Thuê ngay</a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right column cards -->
-                        <div class="rpa-right-col">
+                        <div class="small-cards-grid">
                             @foreach (var product in rest)
                             {
-                                <div class="rpc rpc--small" data-cat="@(product.Category?.CategoryName ?? "Khác")">
-                                    <div class="rpc-small-img">
-                                        <a href="/Product/Details/@product.ProductId" style="display: block; width: 100%; height: 100%;">
-                                            <img src="@GetPerfectCardImage(product)" alt="@product.ProductName"
-                                                 onerror="this.src='https://via.placeholder.com/200x140/e2e8f0/94a3b8?text=No+Image'">
+                                <div class="lm-product-card small-card" data-cat="@(product.Category?.CategoryName ?? "Khác")">
+                                    <div class="card-img-wrapper">
+                                        <a href="/Product/Details/@product.ProductId">
+                                            <img src="@product.ImageUrl" alt="@product.ProductName" onerror="this.src='https://via.placeholder.com/200x140/e2e8f0/94a3b8?text=No'">
                                         </a>
                                     </div>
-                                    <div class="rpc-small-body">
-                                        <div class="rpc-cat">@(product.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
-                                        <a href="/Product/Details/@product.ProductId" style="text-decoration: none; color: inherit;">
-                                            <div class="rpc-name rpc-name--sm">@product.ProductName</div>
+                                    <div class="card-body">
+                                        <div class="card-cat">@(product.Category?.CategoryName?.ToUpper() ?? "KHÁC")</div>
+                                        <a href="/Product/Details/@product.ProductId" class="card-link">
+                                            <h4 class="card-title-sm">@product.ProductName</h4>
                                         </a>
-                                        <div class="rpc-footer">
-                                             <div class="rpc-price rpc-price--sm">@product.PricePerDay.ToString("N0")đ <span>/ngày</span></div>
-                                             <a href="/Product/Details/@product.ProductId" class="rpc-rent-btn-sm">Thuê</a>
-                                         </div>
+                                        <div class="card-footer-sm">
+                                            <div class="card-price-sm">@product.PricePerDay.ToString("N0")đ<span>/ngày</span></div>
+                                            <a href="/Product/Details/@product.ProductId" class="card-save-btn"><i class="far fa-bookmark"></i></a>
+                                        </div>
                                     </div>
                                 </div>
                             }
                         </div>
                     </div>
 
-                    <div style="text-align:center;margin-top:1.5rem;">
-                        <a href="/Product" class="rpa-more-btn">Xem thêm sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    <div class="lm-view-more-container">
+                        <a href="/Product" class="lm-btn-outline-more">Xem thêm sản phẩm <i class="fas fa-chevron-down"></i></a>
                     </div>
                 }
                 else
                 {
-                    <div class="rpa-empty">
-                        <i class="fas fa-box-open"></i>
-                        <h3>Chưa có sản phẩm nào</h3>
-                        <p>Hãy quay lại sau để xem các sản phẩm mới</p>
+                    <div class="lm-empty-state" style="padding: 3rem;">
+                        <i class="fas fa-box-open" style="font-size: 2.5rem; color:#d0d0d0; margin-bottom:15px;"></i>
+                        <p style="font-size: 1.1rem; color: var(--text-main); font-weight:600;">Chưa có sản phẩm nào</p>
+                        <p>Hãy quay lại sau để xem các sản phẩm mới nhé.</p>
                     </div>
                 }
             </div>
+
         </div>
     </main>
 </div>
 
 <style>
-    .renter-layout {
+    :root {
+        --bg-body: #f7f5f2;
+        --card-bg: #ffffff;
+        --text-main: #2b3a30;
+        --text-muted: #8b9690;
+        --primary-green: #3f5947;
+        --primary-green-hover: #324738;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --border-color: #f0ebe1;
+        --sidebar-width: 240px;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+        --badge-yellow-bg: #fdf3e7;
+        --badge-yellow-text: #b86e24;
+        --badge-light-green: #dcfce7;
+        --badge-light-green-text: #16a34a;
+        --badge-gray: #f1f5f9;
+        --badge-gray-text: #64748b;
+        --widget-bg: #fdf1e5;
+    }
+
+    .lm-app-layout {
         display: flex;
-        min-height: calc(100vh - 68px);
-        background: var(--bg-page);
+        min-height: 100vh;
+        background-color: var(--bg-body);
         font-family: 'Inter', sans-serif;
     }
 
-    .renter-sidebar {
-        width: 220px;
-        background: var(--bg-card);
-        border-right: 1px solid var(--border);
+    /* === SIDEBAR === */
+    .lm-sidebar {
+        width: var(--sidebar-width);
+        background: #fff;
+        border-right: 1px solid var(--border-color);
         position: fixed;
-        top: 68px;
+        top: 0;
         left: 0;
         bottom: 0;
         display: flex;
         flex-direction: column;
-        padding: 1.5rem 0 1rem;
-        z-index: 100;
-        overflow-y: auto;
+        padding-top: 1rem;
+        z-index: 50;
     }
 
-    .sidebar-brand {
+    .lm-sidebar-brand {
         display: flex;
         align-items: center;
-        gap: .75rem;
-        padding: 0 1.25rem 1.25rem;
-        border-bottom: 1px solid var(--border);
+        gap: 12px;
+        padding: 0 1.5rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 1rem;
     }
 
-    .sidebar-avatar {
-        width: 42px;
-        height: 42px;
+    .lm-sidebar-avatar img {
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
+        object-fit: cover;
+    }
+
+    .lm-sidebar-label {
+        font-size: 0.75rem;
+        color: var(--primary-green);
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .lm-sidebar-sub {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .lm-sidebar-nav {
+        flex: 1;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .lm-snav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 15px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+        .lm-snav-item i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+
+        .lm-snav-item:hover {
+            background: #fcfaf6;
+            color: var(--text-main);
+        }
+
+        .lm-snav-item.active {
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
+        }
+
+    .lm-sidebar-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .lm-btn-add-post {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-
-    .sidebar-label {
-        font-size: .78rem;
-        color: var(--primary);
-        font-weight: 700;
-    }
-
-    .sidebar-sub {
-        font-size: .72rem;
-        color: var(--text-muted);
-        margin-top: .15rem;
-    }
-
-    .sidebar-nav {
-        padding: .75rem 0;
-        flex: 1;
-    }
-
-    .snav-item {
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-        padding: .7rem 1.25rem;
-        color: var(--text-secondary);
+        gap: 8px;
+        background: var(--primary-brown);
+        color: white;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
         text-decoration: none;
-        font-size: .88rem;
-        font-weight: 500;
-        transition: all .2s;
+        transition: 0.2s;
     }
 
-    .snav-item i {
-        font-size: .95rem;
-        width: 18px;
-    }
+        .lm-btn-add-post:hover {
+            background: var(--primary-brown-hover);
+        }
 
-    .snav-item:hover {
-        color: var(--primary-dark);
-        background: var(--primary-light);
-    }
-
-    .snav-item.active {
-        color: var(--primary-dark);
-        background: var(--primary-light);
-        font-weight: 700;
-        border-left: 3px solid var(--primary);
-    }
-
-    .sidebar-add-wrap {
-        padding: 0 1rem;
-    }
-
-    .sidebar-add-btn {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        padding: .7rem 1rem;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: #fff;
-        border-radius: 10px;
-        text-decoration: none;
-        font-size: .82rem;
-        font-weight: 700;
-        transition: opacity .2s;
-    }
-
-    .sidebar-add-btn:hover {
-        opacity: .9;
-        color: #fff;
-    }
-
-    /* Main */
-    .renter-main {
-        margin-left: 220px;
+    /* === MAIN CONTENT === */
+    .lm-main {
+        margin-left: var(--sidebar-width);
         flex: 1;
-        padding: 0 0 3rem;
+        padding-bottom: 3rem;
     }
 
     /* Hero Banner */
-    .renter-hero {
-        background: linear-gradient(135deg, var(--primary) 0%, #134e4a 100%);
-        padding: 2.5rem 2.5rem 2.25rem;
-        color: #fff;
+    .lm-hero {
+        background: var(--primary-green);
+        padding: 3rem 4rem;
+        position: relative;
+        overflow: hidden;
     }
 
-    .renter-hero-content h1 {
-        font-size: 1.65rem;
-        font-weight: 800;
-        margin-bottom: .75rem;
+    .lm-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
     }
 
-    .renter-hero-content p {
-        font-size: .88rem;
-        opacity: .85;
-        margin-bottom: 1.5rem;
-        line-height: 1.55;
-    }
-
-    .hero-actions {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .hero-btn {
-        padding: .65rem 1.4rem;
-        border-radius: 8px;
-        font-size: .85rem;
+    .lm-hero h1 {
+        font-size: 1.8rem;
+        color: white;
+        margin-bottom: 10px;
         font-weight: 700;
-        text-decoration: none;
-        transition: all .2s;
     }
 
-    .hero-btn--outline {
-        border: 2px solid rgba(255,255,255,.7);
-        color: #fff;
+    .lm-hero p {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        line-height: 1.5;
     }
 
-    .hero-btn--outline:hover {
-        background: rgba(255,255,255,.15);
-        color: #fff;
-    }
-
-    /* Content row */
-    .renter-content-row {
+    .lm-hero-actions {
         display: flex;
-        gap: 1.5rem;
-        padding: 1.75rem 2rem;
+        gap: 15px;
     }
 
-    /* Products area */
-    .renter-products-area {
+    .lm-btn-hero-outline {
+        border: 1px solid rgba(255,255,255,0.4);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .lm-btn-hero-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+    .lm-hero-deco {
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12rem;
+        color: rgba(255,255,255,0.05);
+        z-index: 1;
+    }
+
+    /* Container chung */
+    .lm-container {
+        padding: 2rem 3rem;
+        max-width: 1200px;
+    }
+
+    /* Header Phần Đơn Thuê */
+    .lm-page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 20px;
+    }
+
+    .lm-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    .lm-tabs {
+        display: flex;
+        gap: 20px;
+    }
+
+    .lm-tab {
+        background: none;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding-bottom: 10px;
+        position: relative;
+    }
+
+        .lm-tab.active {
+            color: var(--text-main);
+        }
+
+            .lm-tab.active::after {
+                content: '';
+                position: absolute;
+                bottom: -16px;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background-color: var(--primary-brown);
+                border-radius: 3px 3px 0 0;
+            }
+
+    .lm-search-box {
+        position: relative;
+        width: 250px;
+    }
+
+        .lm-search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .lm-search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 38px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+    /* Layout 2 Cột Đơn Thuê */
+    .lm-grid-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .lm-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .lm-section-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+    .lm-view-all {
+        font-size: 0.85rem;
+        color: var(--primary-brown);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    /* Cards Danh sách Đơn */
+    .lm-cards-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .lm-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .active-rental-card .lm-card-img {
+        width: 140px;
+        height: 140px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+        .active-rental-card .lm-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .lm-card-info {
         flex: 1;
-        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    .rpa-header {
+    .lm-card-top-row {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 1.25rem;
-        flex-wrap: wrap;
-        gap: .75rem;
     }
 
-    .rpa-title {
-        font-size: 1.15rem;
-        font-weight: 800;
-        color: #1e293b;
-        margin-bottom: .2rem;
+    .lm-item-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 6px;
     }
 
-    .rpa-sub {
-        font-size: .78rem;
-        color: #94a3b8;
-    }
-
-    .rpa-tabs {
-        display: flex;
-        gap: .5rem;
-    }
-
-    .rpa-tab {
-        padding: .4rem .9rem;
-        border: 1.5px solid var(--border);
-        border-radius: 8px;
-        background: var(--bg-card);
-        color: var(--text-secondary);
-        font-size: .78rem;
+    .lm-time-indicator {
+        background: #fcf4f4;
+        color: #d9534f;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
         font-weight: 600;
-        cursor: pointer;
-        transition: all .2s;
     }
 
-    .rpa-tab:hover {
-        border-color: var(--primary);
-        color: var(--primary);
+    .lm-item-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 10px;
     }
 
-    .rpa-tab.active {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: #fff;
+    .lm-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
     }
 
-    /* Products Grid */
-    .rpa-grid {
-        display: grid;
-        grid-template-columns: 1fr 260px;
-        gap: 1rem;
+    .lm-order-id {
+        font-size: 0.8rem;
+        color: var(--text-muted);
     }
 
-    .rpa-right-col {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: .85rem;
+    .lm-order-price {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary-brown);
+        margin-left: auto;
     }
 
-    /* Featured Card */
-    .rpc--featured {
-        background: #fff;
-        border-radius: 14px;
+    .lm-card-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .history-rental-card {
+        padding: 15px;
+        align-items: center;
+    }
+
+    .lm-card-img-small {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        flex-shrink: 0;
     }
 
-        .rpc--featured .rpc-img-wrap {
-            position: relative;
-            height: 240px;
-            overflow: hidden;
+        .lm-card-img-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-            .rpc--featured .rpc-img-wrap img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+    .lm-history-info {
+        flex: 1.5;
+    }
+
+    .lm-item-date {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    .lm-history-price-col {
+        flex: 1;
+        text-align: center;
+    }
+
+    .lm-price {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 6px;
+    }
+
+    .lm-history-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    /* Badges & Buttons */
+    .lm-badge {
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .lm-badge-light-green {
+        background: var(--badge-light-green);
+        color: var(--badge-light-green-text);
+    }
+
+    .lm-badge-green {
+        background: var(--badge-green-bg);
+        color: var(--badge-green-text);
+    }
+
+    .lm-badge-yellow {
+        background: var(--badge-yellow-bg);
+        color: var(--badge-yellow-text);
+    }
+
+    .lm-badge-gray {
+        background: var(--badge-gray);
+        color: var(--badge-gray-text);
+    }
+
+    .lm-btn {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .lm-btn-primary {
+        background: var(--primary-green);
+        color: white;
+    }
+
+        .lm-btn-primary:hover {
+            background: var(--primary-green-hover);
+        }
+
+    .lm-btn-danger {
+        background: #fdf3e7;
+        color: #d9534f;
+    }
+
+    .lm-btn-warning {
+        background: #f59e0b;
+        color: white;
+        padding: 8px 12px;
+    }
+
+    .lm-btn-brown {
+        padding: 8px 16px;
+        border-radius: 50px;
+        background: var(--primary-brown);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .lm-btn-outline {
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1px solid #e0e0e0;
+        color: var(--text-main);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .lm-btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        text-decoration: none;
+    }
+
+    /* Phân trang (Pagination) */
+    .lm-pagination-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .lm-showing-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .lm-pagination-controls {
+        display: flex;
+        gap: 8px;
+    }
+
+        .lm-pagination-controls button {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+            .lm-pagination-controls button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
 
-    .rpc-hot {
+    /* Widget Tác động */
+    .lm-impact-widget {
+        background: var(--widget-bg);
+        border-radius: 20px;
+        padding: 25px;
+    }
+
+    .lm-impact-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .lm-impact-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-green);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lm-impact-header h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .lm-impact-text {
+        font-size: 0.85rem;
+        color: var(--text-main);
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+    .lm-progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 10px;
+        margin-bottom: 8px;
+    }
+
+    .lm-progress-fill {
+        height: 100%;
+        background: var(--primary-green);
+        border-radius: 10px;
+    }
+
+    .lm-progress-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* === GỢI Ý DÀNH RIÊNG CHO BẠN === */
+    .lm-recommend-section {
+        margin-top: 20px;
+        border-top: 1px solid var(--border-color);
+        padding-top: 40px;
+    }
+
+    .lm-recommend-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .lm-section-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 5px;
+    }
+
+    .lm-section-sub {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .lm-recommend-tabs {
+        display: flex;
+        gap: 10px;
+    }
+
+    .lm-rtab {
+        padding: 6px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        background: white;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .lm-rtab.active {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+        }
+
+    .lm-recommend-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 20px;
+    }
+
+    .lm-product-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .card-img-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
+    .hot-badge {
         position: absolute;
-        top: .75rem;
-        left: .75rem;
+        top: 12px;
+        left: 12px;
         background: #ef4444;
-        color: #fff;
-        padding: .28rem .7rem;
-        border-radius: 6px;
-        font-size: .7rem;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.7rem;
         font-weight: 700;
         z-index: 2;
     }
 
-    .rpc--featured .rpc-body {
-        padding: 1.1rem 1.25rem 1.25rem;
+    .card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
     }
 
-    .rpc-cat {
-        font-size: .68rem;
-        color: var(--primary);
+    .card-cat {
+        font-size: 0.7rem;
+        color: var(--primary-green);
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        margin-bottom: .3rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
     }
 
-    .rpc-price {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--primary);
-    }
-
-    .rpc-price--sm {
-        font-size: .9rem;
-        font-weight: 800;
-        color: var(--primary);
-    }
-
-    .rpc-price span, .rpc-price--sm span {
-        font-size: .72rem;
-        font-weight: 500;
+    .card-rating {
+        font-size: 0.8rem;
         color: var(--text-muted);
+        margin-bottom: 8px;
     }
 
-    .rpc-rent-btn {
-        padding: .6rem 1.25rem;
-        background: var(--primary);
-        color: #fff;
-        border-radius: 8px;
+        .card-rating i {
+            color: #f59e0b;
+        }
+
+    .card-link {
         text-decoration: none;
-        font-size: .82rem;
-        font-weight: 700;
-        transition: background .2s;
+        color: var(--text-main);
     }
 
-    .rpc-rent-btn:hover {
-        background: var(--primary-dark);
-        color: #fff;
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 10px;
     }
 
-    .rpc-footer {
+    .card-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 20px;
+        flex: 1;
+    }
+
+    .card-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: auto;
     }
 
-    .rpc-rent-btn-sm {
-        padding: .3rem .6rem;
-        background: var(--primary);
-        color: #fff;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: .75rem;
-        font-weight: 700;
-        transition: all .2s;
-        white-space: nowrap;
+    .card-price {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--primary-green);
     }
 
-    .rpc-rent-btn-sm:hover {
-        background: var(--primary-dark);
-        color: #fff;
-        transform: translateY(-1px);
-    }
-
-    .rpc-save-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        border: 1.5px solid var(--border);
-        background: var(--bg-card);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-secondary);
-        text-decoration: none;
-        font-size: .9rem;
-        transition: all .2s;
-    }
-
-    .rpc-save-btn:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    /* Small cards */
-    .rpc--small {
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 1px 4px rgba(0,0,0,.06);
-        display: flex;
-    }
-
-    .rpc-small-img {
-        width: 120px;
-        flex-shrink: 0;
-        overflow: hidden;
-    }
-
-        .rpc-small-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .card-price span {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
         }
 
-    .rpc-small-body {
-        flex: 1;
-        padding: .85rem .75rem;
+    .lm-btn-sm {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        border-radius: 50px;
+        text-decoration: none;
     }
 
-    /* More button */
-    .rpa-more-btn {
+    .featured-card .card-img-wrapper {
+        height: 260px;
+    }
+
+    .small-cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .small-card .card-img-wrapper {
+        height: 130px;
+    }
+
+    .small-card .card-body {
+        padding: 15px;
+    }
+
+    .card-title-sm {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        line-height: 1.3;
+        height: 38px;
+        overflow: hidden;
+    }
+
+    .card-footer-sm {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    .card-price-sm {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--primary-green);
+    }
+
+        .card-price-sm span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+    .card-save-btn {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        text-decoration: none;
+    }
+
+        .card-save-btn:hover {
+            color: var(--primary-brown);
+        }
+
+    .lm-view-more-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .lm-btn-outline-more {
         display: inline-flex;
         align-items: center;
-        gap: .5rem;
-        padding: .65rem 1.5rem;
-        border: 2px solid var(--border);
-        border-radius: 10px;
-        color: var(--primary);
-        font-size: .85rem;
-        font-weight: 700;
+        gap: 8px;
+        padding: 10px 25px;
+        border: 1px solid var(--border-color);
+        background: white;
+        color: var(--primary-green);
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
         text-decoration: none;
-        background: var(--bg-card);
-        transition: all .2s;
+        transition: 0.2s;
     }
 
-    .rpa-more-btn:hover {
-        border-color: var(--primary);
-        background: var(--primary-light);
-    }
+        .lm-btn-outline-more:hover {
+            background: var(--badge-green-bg);
+        }
 
-    /* Empty */
-    .rpa-empty {
+    .lm-empty-state {
         text-align: center;
-        padding: 4rem;
-        background: #fff;
-        border-radius: 14px;
+        padding: 30px;
+        background: white;
+        border-radius: 20px;
+        border: 1px dashed #d0d0d0;
+        color: var(--text-muted);
     }
 
-        .rpa-empty i {
-            font-size: 3.5rem;
-            color: #cbd5e1;
-            margin-bottom: 1rem;
-        }
-
-        .rpa-empty h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: .5rem;
-        }
-
-        .rpa-empty p {
-            color: #94a3b8;
-        }
-
-    @@media(max-width:900px) {
-        .rpa-grid {
+    /* Responsive */
+    @@media (max-width: 1024px) {
+        .lm-grid-layout {
             grid-template-columns: 1fr;
         }
 
-        .rpa-right-col {
-            grid-template-columns: repeat(2,1fr);
+        .lm-recommend-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .small-cards-grid {
+            grid-template-columns: repeat(3, 1fr);
         }
     }
 
-    @@media(max-width:768px) {
-        .renter-sidebar {
-            left: -210px;
-            transition: left .3s;
+    @@media (max-width: 768px) {
+        .lm-sidebar {
+            display: none;
         }
 
-        .renter-main {
+        .lm-main {
             margin-left: 0;
         }
 
-        .renter-hero {
+        .lm-hero {
+            padding: 2rem;
+        }
+
+        .lm-container {
             padding: 1.5rem;
         }
 
-        .renter-content-row {
-            padding: 1rem;
+        .small-cards-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .active-rental-card {
+            flex-direction: column;
+        }
+
+            .active-rental-card .lm-card-img {
+                width: 100%;
+                height: 200px;
+            }
+
+        .history-rental-card {
+            flex-direction: column;
+            align-items: flex-start;
         }
     }
 </style>
 
 <script>
     function filterTab(el, cat) {
-        document.querySelectorAll('.rpa-tab').forEach(function(t){ t.classList.remove('active'); });
+        document.querySelectorAll('.lm-rtab').forEach(function(t){ t.classList.remove('active'); });
         el.classList.add('active');
-        document.querySelectorAll('.rpc').forEach(function(c){
+        document.querySelectorAll('.lm-product-card').forEach(function(c){
             if (cat === 'all' || c.dataset.cat === cat) {
                 c.style.display = '';
             } else {

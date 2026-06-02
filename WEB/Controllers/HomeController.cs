@@ -21,7 +21,7 @@ namespace WEB.Controllers
             _apiService = apiService;
         }
 
-        public async Task<IActionResult> Index(string mode = null)
+        public async Task<IActionResult> Index(string? mode = null)
         {
             // Kiểm tra đã đăng nhập chưa
             var isLoggedIn = !string.IsNullOrEmpty(HttpContext.Session.GetString("JWTToken"));
@@ -98,11 +98,23 @@ namespace WEB.Controllers
                 var endpoint = userId.HasValue ? $"Product?currentUserId={userId.Value}" : "Product";
                 var allProductsResponse = await _productService.GetFilteredProductsAsync(endpoint);
                 ViewBag.AllProducts = allProductsResponse?.Data ?? new List<ProductViewModel>();
+
+                if (userId.HasValue)
+                {
+                    // Load đơn thuê của người thuê này
+                    var myRentalsResponse = await _productService.GetRentalsByUserAsync(userId.Value);
+                    ViewBag.MyRentals = myRentalsResponse?.Data ?? new List<RentalViewModel>();
+                }
+                else
+                {
+                    ViewBag.MyRentals = new List<RentalViewModel>();
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading products for renter dashboard");
                 ViewBag.AllProducts = new List<ProductViewModel>();
+                ViewBag.MyRentals = new List<RentalViewModel>();
             }
             
             return View();
@@ -240,13 +252,64 @@ namespace WEB.Controllers
             else
                 TempData["ErrorMessage"] = response?.Message ?? "Hủy đơn thất bại!";
 
-            return RedirectToAction(nameof(OwnerDashboard));
+            string referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer))
+            {
+                return Redirect(referer);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // ✅ POST: /Home/ReceiveRental — Người thuê xác nhận đã nhận đồ (InProgress → Active)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReceiveRental(int rentalId)
+        {
+            var isLoggedIn = !string.IsNullOrEmpty(HttpContext.Session.GetString("JWTToken"));
+            if (!isLoggedIn)
+                return RedirectToAction("Login", "Account");
+
+            var response = await _apiService.PutAsync<object, ApiResponse<RentalViewModel>>(
+                $"Rental/{rentalId}/receive", new { });
+
+            if (response?.Success == true)
+                TempData["SuccessMessage"] = response.Message ?? "Xác nhận nhận đồ thành công!";
+            else
+                TempData["ErrorMessage"] = response?.Message ?? "Xác nhận nhận đồ thất bại!";
+
+            return RedirectToAction(nameof(RenterDashboard));
+        }
+
+        // ✅ POST: /Home/ReturnRental — Người thuê xác nhận đã trả đồ (Active → Returned)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReturnRental(int rentalId)
+        {
+            var isLoggedIn = !string.IsNullOrEmpty(HttpContext.Session.GetString("JWTToken"));
+            if (!isLoggedIn)
+                return RedirectToAction("Login", "Account");
+
+            var response = await _apiService.PutAsync<object, ApiResponse<RentalViewModel>>(
+                $"Rental/{rentalId}/return", new { });
+
+            if (response?.Success == true)
+                TempData["SuccessMessage"] = response.Message ?? "Xác nhận trả đồ thành công! Chờ chủ đồ kiểm tra.";
+            else
+                TempData["ErrorMessage"] = response?.Message ?? "Xác nhận trả đồ thất bại!";
+
+            return RedirectToAction(nameof(RenterDashboard));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult About()
+        {
+            return View();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace THUEDONGANHAN.DTOs.Request
         public decimal PricePerDay { get; set; }
         public decimal? PricePerWeek { get; set; }
         public decimal? PricePerMonth { get; set; }
-        public decimal Deposit { get; set; }
+        public decimal? Deposit { get; set; }
         public int Quantity { get; set; }
         public string? ImageUrl { get; set; }
         public string? Location { get; set; }

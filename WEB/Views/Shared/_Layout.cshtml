@@ -10,6 +10,132 @@
     <link rel="stylesheet" href="~/css/animations.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+        /* ========================================================
+                   LENDMODERN THEME VARIABLES
+                   ======================================================== */
+        :root {
+            --lend-brown: #8c5a35;
+            --lend-brown-dark: #6e4425;
+            --lend-bg: #f8f6f3;
+            --lend-text: #2d3748;
+            --lend-text-light: #718096;
+            --lend-accent: #e2a875;
+        }
+
+        body {
+            background-color: var(--lend-bg);
+            color: var(--lend-text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Tinh chỉnh Header / Navbar */
+        .modern-header {
+            background: #ffffff;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            border-bottom: 1px solid #f0eaeb;
+        }
+
+        .brand-logo .logo-icon i {
+            color: var(--lend-brown);
+        }
+
+        .brand-name {
+            color: var(--lend-brown-dark);
+            font-weight: 800;
+        }
+
+        .brand-tagline {
+            color: var(--lend-text-light);
+        }
+
+        .nav-item {
+            color: var(--lend-text);
+            font-weight: 500;
+        }
+
+            .nav-item:hover, .nav-item.active {
+                color: var(--lend-brown);
+            }
+
+                .nav-item:hover i {
+                    color: var(--lend-accent);
+                }
+
+        /* Nút Đăng nhập / Đăng ký */
+        .btn-login {
+            color: var(--lend-brown);
+            border: 1px solid var(--lend-brown);
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-login:hover {
+                background: var(--lend-brown);
+                color: white;
+            }
+
+        .btn-register {
+            background: var(--lend-brown);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+            .btn-register:hover {
+                background: var(--lend-brown-dark);
+            }
+
+        /* Nút Scroll to Top */
+        .scroll-to-top {
+            background: var(--lend-brown);
+            color: white;
+            box-shadow: 0 4px 12px rgba(140, 90, 53, 0.3);
+        }
+
+            .scroll-to-top:hover {
+                background: var(--lend-brown-dark);
+            }
+
+        /* Tinh chỉnh Footer */
+        .simple-footer {
+            background: #ffffff;
+            border-top: 1px solid #eae5e0;
+        }
+
+        .simple-footer-heading {
+            color: var(--lend-brown-dark);
+        }
+
+        .simple-footer-links a {
+            color: var(--lend-text-light);
+        }
+
+            .simple-footer-links a:hover {
+                color: var(--lend-brown);
+            }
+
+        .simple-logo-icon i {
+            color: var(--lend-brown);
+        }
+
+        .simple-logo-text {
+            color: var(--lend-brown-dark);
+        }
+
+        .simple-social-link {
+            background: var(--lend-bg);
+            color: var(--lend-brown);
+        }
+
+            .simple-social-link:hover {
+                background: var(--lend-brown);
+                color: white;
+            }
+
         /* Footer full-width khi ở trang dashboard */
         .dashboard-page .simple-footer {
             width: 100% !important;
@@ -17,10 +143,195 @@
             position: relative;
             z-index: 200;
         }
+
+        /* Dropdown thông báo */
+        .notification-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fdf8f5;
+            color: var(--lend-brown);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+            .notification-btn:hover {
+                background: #f5ece5;
+                color: var(--lend-brown-dark);
+                transform: scale(1.05);
+            }
+
+        .notification-badge {
+            background: #ef4444; /* Giữ màu đỏ cho chú ý */
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            padding: 0 4px;
+            animation: pulse-badge 2s infinite;
+        }
+        @@keyframes pulse-badge {
+            0%
+
+        {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+
+        }
+
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 380px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(140, 90, 53, 0.1), 0 10px 10px -5px rgba(140, 90, 53, 0.04);
+            border: 1px solid rgba(140, 90, 53, 0.1);
+            z-index: 9999;
+            overflow: hidden;
+            transform-origin: top right;
+            animation: dropdown-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @@keyframes dropdown-fade-in {
+            from
+
+        {
+            opacity: 0;
+            transform: scale(0.95) translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        }
+
+        .notification-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid #f5ece5;
+            background: rgba(253, 248, 245, 0.5);
+        }
+
+            .notification-dropdown-header h4 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 800;
+                color: var(--lend-brown-dark);
+            }
+
+            .notification-dropdown-header button {
+                background: none;
+                border: none;
+                color: var(--lend-brown);
+                font-size: 0.8rem;
+                font-weight: 700;
+                cursor: pointer;
+                padding: 0;
+                transition: color 0.2s;
+            }
+
+                .notification-dropdown-header button:hover {
+                    color: var(--lend-brown-dark);
+                    text-decoration: underline;
+                }
+
+        .notification-list-scroll {
+            max-height: 360px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f9f5f2;
+            align-items: flex-start;
+            position: relative;
+        }
+
+            .notification-item:hover {
+                background: #fdfaf8;
+            }
+
+            .notification-item.unread {
+                background: rgba(140, 90, 53, 0.03);
+            }
+
+                .notification-item.unread:hover {
+                    background: rgba(140, 90, 53, 0.06);
+                }
+
+        .notif-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--lend-brown);
+            align-self: center;
+            flex-shrink: 0;
+            margin-left: auto;
+            box-shadow: 0 0 8px var(--lend-brown);
+        }
+
+        /* Tab chuyển đổi user mode (Dashboard) */
+        .user-mode-tab.active {
+            background: var(--lend-brown);
+            color: white;
+            border-color: var(--lend-brown);
+        }
     </style>
 </head>
 @{
-            var bodyIsDash = ViewData["Title"]?.ToString() == "Người thuê" || ViewData["Title"]?.ToString() == "Người cho thuê";
+                var bodyIsDash = ViewData["Title"]?.ToString() == "Người thuê" || ViewData["Title"]?.ToString() == "Người cho thuê";
 }
 <body class="@(bodyIsDash ? "dashboard-page" : "")">
     @{
@@ -62,7 +373,7 @@
                             <i class="fas fa-plus-circle"></i>
                             <span>Đăng tin</span>
                         </a>
-                        <a class="nav-item" asp-controller="Home" asp-action="Privacy">
+                        <a class="nav-item" asp-controller="Home" asp-action="About">
                             <i class="fas fa-info-circle"></i>
                             <span>Giới thiệu</span>
                         </a>
@@ -70,35 +381,56 @@
 
                     <!-- User Actions -->
                     <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
-                        <a href="/Product/Cart" class="notification-btn" title="Giỏ hàng" style="text-decoration: none; position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: #475569; border: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                            <i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i>
-                            <span id="cart-badge" style="background: #ef4444; position: absolute; top: -5px; right: -5px; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid white; display: none;">0</span>
-                        </a>
-
                         @if (!string.IsNullOrEmpty(userName))
                         {
+                            <a href="/Product/Cart" class="notification-btn" title="Giỏ hàng" style="text-decoration: none;">
+                                <i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i>
+                                <span id="cart-badge" style="background: #ef4444; position: absolute; top: -5px; right: -5px; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid white; display: none;">0</span>
+                            </a>
                             <!-- Wallet balance display in Navbar -->
-                            <a href="/Wallet" class="wallet-nav-btn" title="Ví tài khoản" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-weight: 700; text-decoration: none; border: 1px solid rgba(245, 158, 11, 0.2); transition: all 0.3s ease; font-size: 0.9rem;">
+                            <a href="/Wallet" class="wallet-nav-btn" title="Ví tài khoản" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; background: rgba(140, 90, 53, 0.1); color: var(--lend-brown); font-weight: 700; text-decoration: none; border: 1px solid rgba(140, 90, 53, 0.2); transition: all 0.3s ease; font-size: 0.9rem;">
                                 <i class="fas fa-wallet" style="font-size: 1rem;"></i>
                                 <span id="nav-wallet-balance">0đ</span>
                             </a>
 
-                            <button class="notification-btn" title="Thông báo">
-                                <i class="fas fa-bell"></i>
-                                <span class="notification-badge">3</span>
-                            </button>
+                            <div class="notification-dropdown-container">
+                                <button class="notification-btn" id="notification-bell-btn" title="Thông báo" onclick="toggleNotificationDropdown(event)">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="notification-badge" id="notification-unread-badge" style="display: none;">0</span>
+                                </button>
+
+                                <!-- Dropdown list -->
+                                <div class="notification-dropdown" id="notificationDropdown">
+                                    <div class="notification-dropdown-header">
+                                        <h4>Thông báo</h4>
+                                        <button onclick="markAllNotificationsRead(event)">Đánh dấu đã đọc tất cả</button>
+                                    </div>
+                                    <div class="notification-list-scroll" id="notificationList">
+                                        <!-- Dynamic content -->
+                                        <div style="padding: 2rem 1rem; text-align: center; color: #94a3b8;">
+                                            <i class="far fa-bell" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                                            Không có thông báo mới
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nút Trò chuyện trên Navbar -->
+                            <a href="/Message" class="notification-btn" title="Trò chuyện" style="text-decoration: none;">
+                                <i class="fas fa-comment-dots"></i>
+                            </a>
 
                             <div class="user-menu">
-                                <button class="user-menu-btn" onclick="toggleUserDropdown()">
-                                    <div class="user-avatar">
+                                <button class="user-menu-btn" onclick="toggleUserDropdown()" style="border: 1px solid rgba(140, 90, 53, 0.2);">
+                                    <div class="user-avatar" style="background: var(--lend-brown); color: white;">
                                         <i class="fas fa-user"></i>
                                     </div>
-                                    <span class="user-name">@userName</span>
-                                    <i class="fas fa-chevron-down"></i>
+                                    <span class="user-name" style="color: var(--lend-text);">@userName</span>
+                                    <i class="fas fa-chevron-down" style="color: var(--lend-brown);"></i>
                                 </button>
                                 <div class="user-dropdown" id="userDropdown">
                                     <div class="dropdown-header">
-                                        <div class="user-avatar-large">
+                                        <div class="user-avatar-large" style="background: var(--lend-brown); color: white;">
                                             <i class="fas fa-user"></i>
                                         </div>
                                         <div class="user-info">
@@ -109,15 +441,15 @@
                                     <div class="dropdown-divider"></div>
                                     @if (Context.Session.GetString("UserRole") == "Admin")
                                     {
-                                        <a href="/Admin/Dashboard" class="dropdown-item" style="color: #6366f1; font-weight: bold; background: rgba(99, 102, 241, 0.05);">
-                                            <i class="fas fa-user-shield" style="color: #6366f1;"></i>
+                                        <a href="/Admin/Dashboard" class="dropdown-item" style="color: var(--lend-brown); font-weight: bold; background: rgba(140, 90, 53, 0.05);">
+                                            <i class="fas fa-user-shield" style="color: var(--lend-brown);"></i>
                                             <span>Quản trị hệ thống</span>
                                         </a>
                                         <div class="dropdown-divider"></div>
                                     }
                                     <a href="/Wallet" class="dropdown-item">
-                                        <i class="fas fa-wallet" style="color: #f59e0b;"></i>
-                                        <span>Ví ký quỹ: <strong id="dropdown-wallet-balance" style="color: #d97706;">0đ</strong></span>
+                                        <i class="fas fa-wallet" style="color: var(--lend-accent);"></i>
+                                        <span>Ví ký quỹ: <strong id="dropdown-wallet-balance" style="color: var(--lend-brown-dark);">0đ</strong></span>
                                     </a>
                                     <a href="#" class="dropdown-item">
                                         <i class="fas fa-user-circle"></i>
@@ -126,6 +458,10 @@
                                     <a href="/Home/RenterDashboard" class="dropdown-item">
                                         <i class="fas fa-box"></i>
                                         <span>Đơn thuê của tôi</span>
+                                    </a>
+                                    <a href="/Message" class="dropdown-item">
+                                        <i class="fas fa-comments" style="color: var(--lend-brown);"></i>
+                                        <span>Trò chuyện của tôi</span>
                                     </a>
                                     <a href="#" class="dropdown-item">
                                         <i class="fas fa-heart"></i>
@@ -253,7 +589,7 @@
             <!-- Copyright -->
             <div class="simple-footer-bottom">
                 <p class="simple-copyright">
-                    © 2024 UTE Rent. Developed for UTE Students Community.
+                    © 2026 UTE Rent. Developed for UTE Students Community.
                 </p>
             </div>
         </div>
@@ -320,30 +656,25 @@
             }
         });
 
-        // Header và Tabs scroll effect - ẩn khi scroll xuống, hiện khi scroll lên
+        // Header và Tabs scroll effect
         let lastScroll = 0;
         const header = document.querySelector('.modern-header');
         const tabs = document.querySelector('.user-mode-tabs');
 
-        // Thêm class has-tabs vào body nếu có tabs để đẩy nội dung xuống
         if (tabs) document.body.classList.add('has-tabs');
 
         window.addEventListener('scroll', function() {
             const currentScroll = window.pageYOffset;
 
-            // Nếu scroll xuống và đã scroll hơn 100px
             if (currentScroll > lastScroll && currentScroll > 100) {
-                // Ẩn header và tabs khi scroll xuống
                 header.classList.add('scroll-down');
                 header.classList.remove('scroll-up');
                 if (tabs) {
                     tabs.classList.add('scroll-down');
                     tabs.classList.remove('scroll-up');
                 }
-            } 
-            // Nếu scroll lên
+            }
             else if (currentScroll < lastScroll) {
-                // Hiện header và tabs khi scroll lên
                 header.classList.remove('scroll-down');
                 header.classList.add('scroll-up');
                 if (tabs) {
@@ -352,7 +683,6 @@
                 }
             }
 
-            // Thêm shadow khi scroll
             if (currentScroll > 50) {
                 header.classList.add('scrolled');
                 if (tabs) tabs.classList.add('scrolled');
@@ -364,36 +694,273 @@
             lastScroll = currentScroll;
         });
 
-        // Fetch Wallet Balance dynamically using AJAX/fetch with JWT Token
-        @if (!string.IsNullOrEmpty(userName))
-        {
-            <text>
-            async function fetchNavbarWalletBalance() {
-                try {
-                    const response = await fetch('/Wallet/GetBalance', {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            const formatted = new Intl.NumberFormat('vi-VN').format(result.data) + 'đ';
-                            const navBalance = document.getElementById('nav-wallet-balance');
-                            const dropBalance = document.getElementById('dropdown-wallet-balance');
-                            if (navBalance) navBalance.innerText = formatted;
-                            if (dropBalance) dropBalance.innerText = formatted;
-                        }
+        // GLOBAL NOTIFICATION ENGINE
+        async function fetchNavbarWalletBalance() {
+            try {
+                const response = await fetch('/Wallet/GetBalance', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
-                } catch (e) {
-                    console.error("Lỗi khi tải số dư ví lên navbar: ", e);
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const formatted = new Intl.NumberFormat('vi-VN').format(result.data) + 'đ';
+                        const navBalance = document.getElementById('nav-wallet-balance');
+                        const dropBalance = document.getElementById('dropdown-wallet-balance');
+                        if (navBalance) navBalance.innerText = formatted;
+                        if (dropBalance) dropBalance.innerText = formatted;
+                    }
+                }
+            } catch (e) {
+                console.error("Lỗi khi tải số dư ví lên navbar: ", e);
+            }
+        }
+
+        function toggleNotificationDropdown(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('notificationDropdown');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userDropdown) userDropdown.classList.remove('active');
+
+            if (dropdown) {
+                const isDisplayed = dropdown.style.display === 'block';
+                dropdown.style.display = isDisplayed ? 'none' : 'block';
+                if (!isDisplayed) {
+                    fetchNavbarNotifications();
                 }
             }
+        }
 
-            // Gọi tải số dư ví ngay khi load trang
-            window.addEventListener('DOMContentLoaded', fetchNavbarWalletBalance);
-            </text>
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const bellBtn = document.getElementById('notification-bell-btn');
+            if (dropdown && !dropdown.contains(event.target) && (!bellBtn || !bellBtn.contains(event.target))) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        async function fetchNavbarUnreadCount() {
+            try {
+                const response = await fetch('/Notification/GetUnreadCount');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const badge = document.getElementById('notification-unread-badge');
+                        if (badge) {
+                            const count = result.data;
+                            if (count > 0) {
+                                badge.innerText = count;
+                                badge.style.display = 'flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Lỗi lấy số lượng thông báo chưa đọc:", e);
+            }
+        }
+
+        async function fetchNavbarNotifications() {
+            const listContainer = document.getElementById('notificationList');
+            if (!listContainer) return;
+
+            try {
+                listContainer.innerHTML = `
+                    <div style="padding: 2rem 1rem; text-align: center; color: #94a3b8;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--lend-brown);"></i>
+                        Đang tải thông báo...
+                    </div>
+                `;
+
+                const response = await fetch('/Notification/GetNotifications');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data && result.data.length > 0) {
+                        renderNotificationsList(result.data);
+                    } else {
+                        renderEmptyNotifications();
+                    }
+                } else {
+                    renderEmptyNotifications();
+                }
+            } catch (e) {
+                console.error("Lỗi tải danh sách thông báo:", e);
+                renderEmptyNotifications();
+            }
+        }
+
+        function renderNotificationsList(notifications) {
+            const listContainer = document.getElementById('notificationList');
+            if (!listContainer) return;
+
+            listContainer.innerHTML = '';
+            notifications.forEach(notif => {
+                const item = document.createElement('div');
+                item.className = `notification-item ${notif.isRead ? '' : 'unread'}`;
+
+                const isRead = notif.isRead;
+                const type = notif.type || 'System';
+                const iconClass = getIconClass(type);
+                const bg = getIconBackground(type);
+                const color = getIconColor(type);
+                const timeAgo = formatTimeAgo(notif.createdAt);
+
+                item.innerHTML = `
+                    <div class="notif-icon" style="background: ${bg}; color: ${color};">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="notif-content" style="flex: 1; min-width: 0;">
+                        <div style="font-size: 0.85rem; font-weight: ${isRead ? '500' : '700'}; color: var(--lend-text); margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${notif.title}
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--lend-text-light); line-height: 1.3; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            ${notif.body}
+                        </div>
+                        <div style="font-size: 0.7rem; color: #94a3b8; font-weight: 500;">
+                            ${timeAgo}
+                        </div>
+                    </div>
+                    ${isRead ? '' : '<div class="unread-dot"></div>'}
+                `;
+
+                item.onclick = function(e) {
+                    handleNotificationClick(e, notif.notificationId, type, notif.referenceId);
+                };
+
+                listContainer.appendChild(item);
+            });
+        }
+
+        function renderEmptyNotifications() {
+            const listContainer = document.getElementById('notificationList');
+            if (listContainer) {
+                listContainer.innerHTML = `
+                    <div style="padding: 2.5rem 1rem; text-align: center; color: var(--lend-text-light);">
+                        <i class="far fa-bell" style="font-size: 2.2rem; margin-bottom: 0.5rem; display: block; color: #cbd5e1;"></i>
+                        Không có thông báo mới
+                    </div>
+                `;
+            }
+        }
+
+        function getIconClass(type) {
+            switch (type) {
+                case 'RentalRequest': return 'fas fa-plus-circle';
+                case 'RentalConfirmed': return 'fas fa-check-circle';
+                case 'RentalActive': return 'fas fa-shipping-fast';
+                case 'RentalCompleted': return 'fas fa-handshake';
+                case 'RentalCancelled': return 'fas fa-times-circle';
+                case 'SaleOrderCreated': return 'fas fa-shopping-bag';
+                case 'SaleOrderConfirmed': return 'fas fa-check-double';
+                default: return 'fas fa-bell';
+            }
+        }
+
+        /* Chuyển các màu nhấn của icon thông báo sang tone Nâu/Cam phù hợp */
+        function getIconBackground(type) {
+            switch (type) {
+                case 'RentalRequest': return 'rgba(140, 90, 53, 0.1)';
+                case 'RentalConfirmed': return 'rgba(16, 185, 129, 0.1)';
+                case 'RentalActive': return 'rgba(245, 158, 11, 0.1)';
+                case 'RentalCompleted': return 'rgba(140, 90, 53, 0.15)';
+                case 'RentalCancelled': return 'rgba(239, 68, 68, 0.1)';
+                case 'SaleOrderCreated': return 'rgba(16, 185, 129, 0.1)';
+                case 'SaleOrderConfirmed': return 'rgba(140, 90, 53, 0.1)';
+                default: return 'rgba(113, 128, 150, 0.1)';
+            }
+        }
+
+        function getIconColor(type) {
+            switch (type) {
+                case 'RentalRequest': return 'var(--lend-brown)';
+                case 'RentalConfirmed': return '#10b981';
+                case 'RentalActive': return '#f59e0b';
+                case 'RentalCompleted': return 'var(--lend-brown-dark)';
+                case 'RentalCancelled': return '#ef4444';
+                case 'SaleOrderCreated': return '#10b981';
+                case 'SaleOrderConfirmed': return 'var(--lend-brown)';
+                default: return 'var(--lend-text-light)';
+            }
+        }
+
+        function formatTimeAgo(dateString) {
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+
+                if (diffMins < 1) return 'Vừa xong';
+                if (diffMins < 60) return `${diffMins} phút trước`;
+
+                const diffHours = Math.floor(diffMins / 60);
+                if (diffHours < 24) return `${diffHours} giờ trước`;
+
+                const diffDays = Math.floor(diffHours / 24);
+                if (diffDays === 1) return 'Hôm qua';
+                if (diffDays < 7) return `${diffDays} ngày trước`;
+
+                return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            } catch (e) {
+                return 'Gần đây';
+            }
+        }
+
+        async function handleNotificationClick(event, id, type, refId) {
+            if (event) event.stopPropagation();
+
+            try {
+                await fetch(`/Notification/MarkAsRead?id=${id}`, { method: 'POST' });
+            } catch (e) {
+                console.error("Lỗi đánh dấu đã đọc:", e);
+            }
+
+            const dropdown = document.getElementById('notificationDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+
+            if (type === 'RentalRequest' || type === 'SaleOrderCreated') {
+                window.location.href = '/Home/OwnerDashboard';
+            } else if (type === 'RentalConfirmed' || type === 'RentalActive' || type === 'RentalCompleted' || type === 'RentalCancelled' || type === 'SaleOrderConfirmed') {
+                window.location.href = '/Home/RenterDashboard';
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        async function markAllNotificationsRead(event) {
+            if (event) event.stopPropagation();
+
+            try {
+                const response = await fetch('/Notification/MarkAllRead', { method: 'POST' });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        fetchNavbarUnreadCount();
+                        fetchNavbarNotifications();
+                    }
+                }
+            } catch (e) {
+                console.error("Lỗi đánh dấu đã đọc tất cả:", e);
+            }
+        }
+
+        // Active triggers only if user logged in
+        @if (!string.IsNullOrEmpty(userName))
+        {
+                <text>
+                window.addEventListener('DOMContentLoaded', () => {
+                    fetchNavbarWalletBalance();
+                    fetchNavbarUnreadCount();
+
+                    // Định kỳ kiểm tra thông báo mới mỗi 15 giây
+                    setInterval(fetchNavbarUnreadCount, 15000);
+                });
+                </text>
         }
 
         // Cập nhật số lượng giỏ hàng trên badge
@@ -413,7 +980,7 @@
                 console.error("Lỗi cập nhật badge giỏ hàng:", e);
             }
         }
-        
+
         window.addEventListener('DOMContentLoaded', updateLayoutCartBadge);
     </script>
 </body>

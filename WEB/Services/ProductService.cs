@@ -85,6 +85,11 @@ namespace WEB.Services
             return await _apiService.GetAsync<ApiResponse<List<RentalViewModel>>>($"Rental/owner/{ownerId}");
         }
 
+        public async Task<ApiResponse<List<RentalViewModel>>?> GetRentalsByUserAsync(int userId)
+        {
+            return await _apiService.GetAsync<ApiResponse<List<RentalViewModel>>>($"Rental/user/{userId}");
+        }
+
         public async Task<ApiResponse<RentalViewModel>?> GetRentalByIdAsync(int rentalId)
         {
             return await _apiService.GetAsync<ApiResponse<RentalViewModel>>($"Rental/{rentalId}");

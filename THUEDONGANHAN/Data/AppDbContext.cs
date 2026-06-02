@@ -18,12 +18,12 @@ namespace THUEDONGANHAN.Data
         public DbSet<Rental> Rentals { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SaleOrder> SaleOrders { get; set; }
         public DbSet<OTPVerification> OTPVerifications { get; set; } // ✅ v4.0: THÊM OTP
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Complaint> Complaints { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -103,12 +103,19 @@ namespace THUEDONGANHAN.Data
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // RefreshToken - User
-            modelBuilder.Entity<RefreshToken>()
-                .HasOne(rt => rt.User)
-                .WithMany(u => u.RefreshTokens)
-                .HasForeignKey(rt => rt.UserId)
+            // Complaint - Rental
+            modelBuilder.Entity<Complaint>()
+                .HasOne(c => c.Rental)
+                .WithMany()
+                .HasForeignKey(c => c.RentalId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Complaint - User
+            modelBuilder.Entity<Complaint>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Message - Sender (User)
             modelBuilder.Entity<Message>()
@@ -198,10 +205,6 @@ namespace THUEDONGANHAN.Data
 
             modelBuilder.Entity<Student>()
                 .HasIndex(s => s.Email)
-                .IsUnique();
-
-            modelBuilder.Entity<RefreshToken>()
-                .HasIndex(rt => rt.Token)
                 .IsUnique();
 
             modelBuilder.Entity<Category>()

@@ -8,16 +8,40 @@ namespace WEB.Controllers
     public class AdminController : Controller
     {
         private readonly ApiService _apiService;
+        private readonly ComplaintService _complaintService;
         private readonly ILogger<AdminController> _logger;
         private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public AdminController(ApiService apiService, ILogger<AdminController> logger)
+        public AdminController(ApiService apiService, ComplaintService complaintService, ILogger<AdminController> logger)
         {
             _apiService = apiService;
+            _complaintService = complaintService;
             _logger = logger;
+        }
+
+        // Helper method để lấy số lượng sản phẩm chờ duyệt
+        private async Task SetPendingProductsCountAsync()
+        {
+            try
+            {
+                var response = await _apiService.GetAsync<ApiResponse<JsonElement>>("Admin/pending-products?page=1&pageSize=1");
+                if (response?.Success == true && response.Data.ValueKind != JsonValueKind.Undefined)
+                {
+                    var pagination = response.Data.GetProperty("pagination");
+                    ViewBag.PendingProductsCount = pagination.GetProperty("totalItems").GetInt32();
+                }
+                else
+                {
+                    ViewBag.PendingProductsCount = 0;
+                }
+            }
+            catch
+            {
+                ViewBag.PendingProductsCount = 0;
+            }
         }
 
         // Kiểm tra quyền Admin
@@ -32,6 +56,8 @@ namespace WEB.Controllers
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
+
+            await SetPendingProductsCountAsync();
 
             try
             {
@@ -90,6 +116,8 @@ namespace WEB.Controllers
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
+
+            await SetPendingProductsCountAsync();
 
             try
             {
@@ -235,6 +263,8 @@ namespace WEB.Controllers
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
+
+            await SetPendingProductsCountAsync();
 
             try
             {
@@ -738,6 +768,62 @@ namespace WEB.Controllers
             }
 
             return RedirectToAction(nameof(Products));
+        }
+
+        // GET: /Admin/Complaints
+        [HttpGet]
+        public async Task<IActionResult> Complaints()
+        {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
+            var token = HttpContext.Session.GetString("JWTToken");
+            var response = await _complaintService.GetAllComplaintsAsync();
+
+            if (response != null && response.Success)
+            {
+                return View(response.Data);
+            }
+
+            return View(new List<ComplaintViewModel>());
+        }
+
+        // POST: /Admin/UpdateComplaintStatus
+        [HttpPost]
+        public async Task<IActionResult> UpdateComplaintStatus(int complaintId, string status)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" });
+
+            var response = await _complaintService.UpdateComplaintStatusAsync(complaintId, status);
+
+            if (response != null && response.Success)
+            {
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false, message = response?.Message ?? "Update failed" });
+        }
+        // POST: /Admin/ResolveComplaint
+        [HttpPost]
+        public async Task<IActionResult> ResolveComplaint(int complaintId, decimal ownerCompensation, decimal renterRefund, string adminNotes)
+        {
+            if (!IsAdmin()) return Json(new { success = false, message = "Unauthorized" });
+
+            var token = HttpContext.Session.GetString("JWTToken");
+            var requestData = new
+            {
+                OwnerCompensation = ownerCompensation,
+                RenterRefund = renterRefund,
+                AdminNotes = adminNotes
+            };
+
+            var response = await _complaintService.ResolveComplaintAsync(complaintId, requestData, token ?? "");
+
+            if (response != null && response.Success)
+            {
+                return Json(new { success = true });
+            }
+
+            return Json(new { success = false, message = response?.Message ?? "Resolution failed" });
         }
     }
 }

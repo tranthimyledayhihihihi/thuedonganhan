@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\WEB\\WEB.csproj": {}
+    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj": {}
   },
   "projects": {
-    "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\WEB\\WEB.csproj": {
+    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\WEB\\WEB.csproj",
+        "projectUniqueName": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj",
         "projectName": "WEB",
-        "projectPath": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\WEB\\WEB.csproj",
+        "projectPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "E:\\HK225\\TMDT\\ThueDoNganHan\\thuedonganhan\\WEB\\obj\\",
+        "outputPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

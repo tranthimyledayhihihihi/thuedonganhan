@@ -1,160 +1,548 @@
 @model WEB.Models.AdminCommissionsViewModel
 @{
-    ViewData["Title"] = "Hoa hồng";
+    ViewData["Title"] = "Hoa hồng hệ thống";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<style>
-.adm-page-header { margin-bottom: 1.5rem; }
-.adm-page-header h1 { font-size: 1.45rem; font-weight: 800; color: #111827; margin-bottom: .25rem; }
-.adm-page-header p  { font-size: .875rem; color: #6b7280; }
+<div class="lm-admin-wrapper">
 
-/* Balance hero card */
-.balance-hero {
-    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-    border-radius: 16px; padding: 2rem 2.5rem;
-    color: #fff; margin-bottom: 1.5rem;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 8px 24px rgba(13,148,136,.25);
-}
-.balance-hero-left {}
-.balance-hero-label { font-size: .82rem; font-weight: 600; opacity: .8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: .5rem; }
-.balance-hero-value { font-size: 2.5rem; font-weight: 800; margin-bottom: .4rem; }
-.balance-hero-note  { font-size: .85rem; opacity: .8; }
-.balance-hero-icon  { font-size: 5rem; opacity: .2; }
-
-/* Info box */
-.info-box {
-    background: #f0fdfa; border: 1px solid #99f6e4;
-    border-radius: 12px; padding: 1.25rem 1.5rem;
-    margin-bottom: 1.5rem;
-}
-.info-box h4 { font-size: .95rem; font-weight: 700; color: #0f766e; margin-bottom: .75rem; }
-.info-box ul { margin: 0; padding-left: 1.25rem; }
-.info-box li { font-size: .875rem; color: #134e4a; margin-bottom: .35rem; line-height: 1.5; }
-
-.adm-panel { background: #fff; border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; margin-bottom: 1.25rem; }
-.adm-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.4rem; border-bottom: 1px solid #f3f4f6; }
-.adm-panel-title { font-size: 1rem; font-weight: 700; color: #111827; }
-.adm-table { width: 100%; border-collapse: collapse; }
-.adm-table th { font-size: .7rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; padding: .75rem 1.2rem; text-align: left; border-bottom: 1px solid #f3f4f6; background: #fafafa; white-space: nowrap; }
-.adm-table td { padding: .9rem 1.2rem; border-bottom: 1px solid #f9fafb; font-size: .875rem; color: #374151; vertical-align: middle; }
-.adm-table tr:last-child td { border-bottom: none; }
-.adm-table tr:hover td { background: #fafafa; }
-.badge-pill { display: inline-block; padding: .25rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
-.badge-commission { background: #ede9fe; color: #7c3aed; }
-.adm-pagination { display: flex; justify-content: center; align-items: center; gap: .4rem; padding: 1.1rem 1.4rem; border-top: 1px solid #f3f4f6; }
-.adm-page-btn { min-width: 36px; height: 36px; padding: 0 .6rem; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #374151; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .18s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
-.adm-page-btn:hover { border-color: #0d9488; color: #0d9488; }
-.adm-page-btn.active { background: #0d9488; border-color: #0d9488; color: #fff; }
-.adm-page-btn.disabled { opacity: .4; pointer-events: none; }
-.empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; }
-.empty-state i { font-size: 2.5rem; margin-bottom: .75rem; display: block; }
-</style>
-
-<div class="adm-page-header">
-    <h1><i class="fas fa-coins" style="color:#0d9488;margin-right:.5rem;"></i>Hoa hồng hệ thống</h1>
-    <p>Lịch sử thu hoa hồng 5% từ các đơn thuê hoàn thành</p>
-</div>
-
-<!-- Balance hero -->
-<div class="balance-hero">
-    <div class="balance-hero-left">
-        <div class="balance-hero-label"><i class="fas fa-wallet" style="margin-right:.4rem;"></i>Số dư ví Admin</div>
-        <div class="balance-hero-value">@Model.AdminBalance.ToString("N0")đ</div>
-        <div class="balance-hero-note">Tổng hoa hồng 5% từ @Model.Pagination.TotalItems giao dịch</div>
-    </div>
-    <div class="balance-hero-icon"><i class="fas fa-chart-line"></i></div>
-</div>
-
-<!-- Info -->
-<div class="info-box">
-    <h4><i class="fas fa-info-circle" style="margin-right:.4rem;"></i>Cơ chế hoa hồng</h4>
-    <ul>
-        <li>Hệ thống tự động thu <strong>5% hoa hồng</strong> từ mỗi đơn thuê</li>
-        <li>Hoa hồng được tính khi <strong>người cho thuê xác nhận giao hàng</strong></li>
-        <li>Người cho thuê nhận <strong>95% giá trị đơn thuê</strong>, Admin nhận <strong>5%</strong></li>
-        <li>Tiền cọc không tính hoa hồng và sẽ được hoàn trả khi trả đồ nguyên vẹn</li>
-    </ul>
-</div>
-
-<!-- Table -->
-<div class="adm-panel">
-    <div class="adm-panel-header">
-        <span class="adm-panel-title">Lịch sử giao dịch hoa hồng</span>
-        <span style="font-size:.82rem;color:#6b7280;">@Model.Pagination.TotalItems giao dịch</span>
+    <div class="lm-page-header">
+        <div class="lm-breadcrumb">UTE Rent Admin</div>
+        <h1 class="lm-page-title">Hoa hồng hệ thống</h1>
+        <p class="lm-page-subtitle">Lịch sử thu hoa hồng 5% từ các đơn thuê hoàn thành trên nền tảng.</p>
     </div>
 
-    @if (Model.Items.Any())
-    {
-        <div style="overflow-x:auto;">
-            <table class="adm-table">
-                <thead>
-                    <tr>
-                        <th>Mã GD</th>
-                        <th>Mô tả</th>
-                        <th>Số tiền</th>
-                        <th>Loại</th>
-                        <th>Đơn thuê</th>
-                        <th>Thời gian</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var c in Model.Items)
-                    {
-                        <tr>
-                            <td>
-                                <span style="background:#f3f4f6;color:#374151;padding:.2rem .6rem;border-radius:6px;font-size:.78rem;font-weight:700;">
-                                    #@c.TransactionId
-                                </span>
-                            </td>
-                            <td style="color:#374151;">@c.Description</td>
-                            <td style="font-weight:700;color:#10b981;">
-                                <i class="fas fa-arrow-up" style="font-size:.7rem;"></i> +@c.Amount.ToString("N0")đ
-                            </td>
-                            <td><span class="badge-pill badge-commission">@c.Type</span></td>
-                            <td>
-                                @if (c.ReferenceId.HasValue)
-                                {
-                                    <span style="background:#dbeafe;color:#1e40af;padding:.2rem .6rem;border-radius:6px;font-size:.78rem;font-weight:700;">
-                                        #@c.ReferenceId
-                                    </span>
-                                }
-                                else { <span style="color:#9ca3af;">—</span> }
-                            </td>
-                            <td style="color:#9ca3af;font-size:.82rem;">
-                                <i class="far fa-clock" style="margin-right:.3rem;"></i>@c.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="lm-top-grid">
+        <div class="lm-balance-hero">
+            <div class="lm-bh-content">
+                <div class="lm-bh-label"><i class="fas fa-wallet"></i> Số dư ví Admin</div>
+                <div class="lm-bh-value">@Model.AdminBalance.ToString("N0")đ</div>
+                <div class="lm-bh-note">
+                    <span class="lm-badge-light">Tổng giao dịch: @Model.Pagination.TotalItems</span>
+                </div>
+            </div>
+            <div class="lm-bh-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="lm-bh-deco"></div>
         </div>
 
-        @if (Model.Pagination.TotalPages > 1)
+        <div class="lm-info-card">
+            <div class="lm-ic-header">
+                <i class="fas fa-info-circle"></i> Cơ chế hoa hồng
+            </div>
+            <ul class="lm-ic-list">
+                <li>Hệ thống tự động thu <strong>5% hoa hồng</strong> từ mỗi đơn thuê.</li>
+                <li>Hoa hồng được tính khi <strong>người cho thuê xác nhận giao hàng</strong>.</li>
+                <li>Người cho thuê nhận <strong>95% giá trị đơn thuê</strong>, Admin nhận <strong>5%</strong>.</li>
+                <li>Tiền cọc không tính hoa hồng và sẽ được hoàn trả khi trả đồ nguyên vẹn.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="lm-table-card">
+        <div class="lm-card-header">
+            <h2 class="lm-card-title">Lịch sử giao dịch hoa hồng</h2>
+            <span class="lm-count-badge">@Model.Pagination.TotalItems giao dịch</span>
+        </div>
+
+        @if (Model.Items.Any())
         {
-            <div class="adm-pagination">
-                <a class="adm-page-btn @(!Model.Pagination.HasPreviousPage ? "disabled" : "")"
-                   href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage - 1 })">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-                @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
-                {
-                    <a class="adm-page-btn @(i == Model.Pagination.CurrentPage ? "active" : "")"
-                       href="@Url.Action("Commissions", new { page = i })">@i</a>
-                }
-                <a class="adm-page-btn @(!Model.Pagination.HasNextPage ? "disabled" : "")"
-                   href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage + 1 })">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+            <div class="lm-table-responsive">
+                <table class="lm-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">MÃ GD</th>
+                            <th style="width: 35%;">MÔ TẢ</th>
+                            <th>SỐ TIỀN</th>
+                            <th>LOẠI</th>
+                            <th>ĐƠN THUÊ</th>
+                            <th>THỜI GIAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="lm-tag-gray">#@c.TransactionId</span>
+                                </td>
+                                <td>
+                                    <div class="lm-desc-text">@c.Description</div>
+                                </td>
+                                <td>
+                                    <div class="lm-amount-text">
+                                        <i class="fas fa-arrow-up"></i> +@c.Amount.ToString("N0")đ
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="lm-tag-brown">@c.Type</span>
+                                </td>
+                                <td>
+                                    @if (c.ReferenceId.HasValue)
+                                    {
+                                        <a href="/Admin/Rentals?search=@c.ReferenceId" class="lm-tag-green-link">
+                                            #@c.ReferenceId
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="lm-text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="lm-time-text">
+                                        <i class="far fa-clock"></i> @c.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Pagination.TotalPages > 1)
+            {
+                <div class="lm-pagination-wrapper">
+                    <a class="lm-page-btn @(!Model.Pagination.HasPreviousPage ? "disabled" : "")"
+                       href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage - 1 })">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <div class="lm-page-numbers">
+                        @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                        {
+                            <a class="lm-page-btn @(i == Model.Pagination.CurrentPage ? "active" : "")"
+                               href="@Url.Action("Commissions", new { page = i })">@i</a>
+                        }
+                    </div>
+
+                    <a class="lm-page-btn @(!Model.Pagination.HasNextPage ? "disabled" : "")"
+                       href="@Url.Action("Commissions", new { page = Model.Pagination.CurrentPage + 1 })">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="lm-empty-state">
+                <i class="fas fa-inbox"></i>
+                <h4>Chưa có giao dịch hoa hồng nào</h4>
+                <p>Mọi giao dịch sẽ được ghi nhận tự động tại đây.</p>
             </div>
         }
-    }
-    else
-    {
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <p>Chưa có giao dịch hoa hồng nào</p>
-        </div>
-    }
+    </div>
+
 </div>
+
+<style>
+    :root {
+        --bg-body: #fcfaf6;
+        --card-bg: #ffffff;
+        --text-main: #1a1a1a;
+        --text-muted: #8b8b8b;
+        --primary-green: #4a6754;
+        --primary-green-hover: #3b5243;
+        --primary-brown: #8b5a3c;
+        --primary-brown-hover: #734a30;
+        --border-color: #f0ebe1;
+        --badge-green-bg: #e6f0e9;
+        --badge-green-text: #2f5c3f;
+        --badge-brown-bg: #fdf3e7;
+        --badge-brown-text: #b86e24;
+        --badge-gray: #f1f5f9;
+        --badge-gray-text: #64748b;
+    }
+
+    .lm-admin-wrapper {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: 40px;
+    }
+
+    /* Header */
+    .lm-page-header {
+        margin-bottom: 25px;
+    }
+
+    .lm-breadcrumb {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .lm-page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 5px 0;
+    }
+
+    .lm-page-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0;
+    }
+
+    /* Top Grid */
+    .lm-top-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    /* Balance Hero */
+    .lm-balance-hero {
+        background: var(--primary-green);
+        border-radius: 20px;
+        padding: 35px 40px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(74, 103, 84, 0.2);
+    }
+
+    .lm-bh-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .lm-bh-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lm-bh-value {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        line-height: 1;
+    }
+
+    .lm-badge-light {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+
+    .lm-bh-icon {
+        position: relative;
+        z-index: 2;
+        font-size: 6rem;
+        opacity: 0.15;
+        transform: rotate(-10deg);
+    }
+
+    .lm-bh-deco {
+        position: absolute;
+        top: -50px;
+        right: -20px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    /* Info Card */
+    .lm-info-card {
+        background: var(--badge-brown-bg);
+        border: 1px solid #f9e5ce;
+        border-radius: 20px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .lm-ic-header {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--primary-brown);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .lm-ic-list {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-main);
+    }
+
+        .lm-ic-list li {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+            .lm-ic-list li:last-child {
+                margin-bottom: 0;
+            }
+
+        .lm-ic-list strong {
+            color: var(--primary-brown);
+            font-weight: 800;
+        }
+
+    /* Table Panel */
+    .lm-table-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .lm-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 30px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .lm-card-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .lm-count-badge {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-brown);
+        background: var(--badge-brown-bg);
+        padding: 6px 14px;
+        border-radius: 50px;
+    }
+
+    .lm-table-responsive {
+        overflow-x: auto;
+    }
+
+    .lm-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .lm-table th {
+            padding: 18px 30px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+            background: #fafafa;
+            white-space: nowrap;
+        }
+
+        .lm-table td {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .lm-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .lm-table tr:hover td {
+            background: #fdfaf6;
+        }
+
+    /* Table Content Styles */
+    .lm-tag-gray {
+        background: var(--badge-gray);
+        color: var(--badge-gray-text);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-family: monospace;
+    }
+
+    .lm-tag-brown {
+        background: var(--badge-brown-bg);
+        color: var(--badge-brown-text);
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .lm-tag-green-link {
+        display: inline-block;
+        background: var(--badge-green-bg);
+        color: var(--primary-green);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .lm-tag-green-link:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+    .lm-desc-text {
+        font-size: 0.9rem;
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    .lm-amount-text {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #16a34a;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .lm-amount-text i {
+            font-size: 0.75rem;
+        }
+
+    .lm-time-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Pagination */
+    .lm-pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 30px;
+        border-top: 1px solid var(--border-color);
+        background: #fafafa;
+    }
+
+    .lm-page-numbers {
+        display: flex;
+        gap: 5px;
+    }
+
+    .lm-page-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: white;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .lm-page-btn:hover:not(.disabled) {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .lm-page-btn.active {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+        }
+
+        .lm-page-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            background: #f5f5f5;
+        }
+
+    /* Empty State */
+    .lm-empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+        .lm-empty-state i {
+            font-size: 3.5rem;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .lm-empty-state h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0 0 10px 0;
+        }
+
+        .lm-empty-state p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+    /* Responsive */
+    @@media (max-width: 900px) {
+        .lm-top-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .lm-bh-value {
+            font-size: 2.5rem;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .lm-balance-hero {
+            padding: 25px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .lm-bh-icon {
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+        }
+
+        .lm-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+    }
+</style>

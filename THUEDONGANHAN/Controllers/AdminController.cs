@@ -433,7 +433,7 @@ namespace THUEDONGANHAN.Controllers
                 product.Deposit = request.Deposit;
                 product.Quantity = request.Quantity;
                 product.Location = request.Location;
-                product.Description = request.Description;
+                product.Description = request.Description ?? string.Empty;
                 product.UpdatedAt = DateTime.Now;
 
                 await _context.SaveChangesAsync();

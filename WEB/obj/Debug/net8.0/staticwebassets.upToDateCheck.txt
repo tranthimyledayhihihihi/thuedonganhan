@@ -22,3 +22,7 @@ wwwroot\images\xedap.png
 wwwroot\js\advanced-effects.js
 wwwroot\js\animations.js
 wwwroot\js\site.js
+wwwroot\uploads\complaints\2f8ab69f-ec74-416c-9848-1bec13b122dd_aodai.jpg
+wwwroot\uploads\complaints\51621984-f96c-474e-aa07-4bc60497b4b9_123.png
+wwwroot\uploads\complaints\8a286228-d3c4-47a2-beb9-10cb8cbeccb0_ainongnghiep.png
+wwwroot\uploads\complaints\c1bf37a6-b98e-40a6-b922-7dae940823e8_,,,.png

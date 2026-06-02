@@ -11,6 +11,7 @@ namespace THUEDONGANHAN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")] // ✅ KHÓA TOÀN BỘ CHỈ CHO ADMIN TRUY CẬP
     public class StudentController : ControllerBase
     {
         private readonly AppDbContext _context;

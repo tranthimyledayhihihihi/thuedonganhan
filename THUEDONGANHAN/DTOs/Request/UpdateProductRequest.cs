@@ -12,7 +12,7 @@ namespace THUEDONGANHAN.DTOs.Request
         public decimal PricePerDay { get; set; }
         public decimal? PricePerWeek { get; set; }
         public decimal? PricePerMonth { get; set; }
-        public decimal Deposit { get; set; }
+        public decimal? Deposit { get; set; }
         public int Quantity { get; set; }
         public string? ImageUrl { get; set; }
         public string? Location { get; set; }
@@ -23,5 +23,6 @@ namespace THUEDONGANHAN.DTOs.Request
         public string ProductType { get; set; } = "Rent"; // Rent | Sale | Both
         public bool IsForSale { get; set; } = false;
         public decimal? SalePrice { get; set; }
+        public List<string>? ProductImages { get; set; }
     }
 }

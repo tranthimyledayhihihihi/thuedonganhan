@@ -59,7 +59,6 @@ namespace THUEDONGANHAN.Models
         public virtual ICollection<Product> Products { get; set; } = new List<Product>();
         public virtual ICollection<Rental> RentalsAsRenter { get; set; } = new List<Rental>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
-        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public virtual ICollection<Message> SentMessages { get; set; } = new List<Message>();
         public virtual ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
         public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
