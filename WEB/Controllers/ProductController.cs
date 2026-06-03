@@ -300,9 +300,19 @@ namespace WEB.Controllers
                     }
 
                     var p = pRes.Data;
-                    
-                    // Parse start date
-                    DateTime start = DateTime.Parse(item.StartDate);
+
+                    if (item.Duration <= 0)
+                    {
+                        lastError = $"Thời gian thuê sản phẩm {item.ProductId} phải lớn hơn 0.";
+                        continue;
+                    }
+
+                    // Parse start date — skip item nếu ngày không hợp lệ
+                    if (!DateTime.TryParse(item.StartDate, out DateTime start))
+                    {
+                        lastError = $"Ngày bắt đầu không hợp lệ cho sản phẩm {item.ProductId}.";
+                        continue;
+                    }
                     DateTime end = start;
 
                     if (item.RentalUnit == "Hour") end = start.AddHours(item.Duration);
@@ -314,6 +324,12 @@ namespace WEB.Controllers
                     if (item.RentalUnit == "Hour") pricePerUnit = p.PricePerHour ?? 0;
                     else if (item.RentalUnit == "Week") pricePerUnit = p.PricePerWeek ?? 0;
                     else if (item.RentalUnit == "Month") pricePerUnit = p.PricePerMonth ?? 0;
+
+                    if (pricePerUnit <= 0)
+                    {
+                        lastError = $"Sản phẩm {item.ProductId} không có giá hợp lệ cho gói thuê này.";
+                        continue;
+                    }
 
                     decimal totalPrice = pricePerUnit * item.Duration;
 

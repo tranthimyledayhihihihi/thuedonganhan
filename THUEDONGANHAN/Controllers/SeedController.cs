@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using THUEDONGANHAN.Data;
@@ -7,6 +8,7 @@ namespace THUEDONGANHAN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class SeedController : ControllerBase
     {
         private readonly AppDbContext _context;

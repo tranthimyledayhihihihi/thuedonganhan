@@ -602,6 +602,14 @@
 <script>
     let cart = [];
 
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     function loadCart() {
         try {
             cart = JSON.parse(localStorage.getItem('uterent_cart') || '[]');
@@ -645,12 +653,12 @@
 
             const itemHtml = `
                 <div class="lm-cart-item" id="cart-item-${item.productId}">
-                    <img src="${item.imageUrl}" alt="${item.name}" class="lm-item-img"
+                    <img src="${escHtml(item.imageUrl)}" alt="${escHtml(item.name)}" class="lm-item-img"
                          onerror="this.src='https://via.placeholder.com/140x140/8B5E3C/ffffff?text=Product'" />
 
                     <div class="lm-item-info">
                         <div class="lm-item-top">
-                            <a href="/Product/Details/${item.productId}" class="lm-item-title">${item.name}</a>
+                            <a href="/Product/Details/${item.productId}" class="lm-item-title">${escHtml(item.name)}</a>
                             <button type="button" class="lm-delete-btn" onclick="deleteCartItem(${item.productId})" title="Xóa">
                                 <i class="far fa-trash-alt"></i>
                             </button>

@@ -571,4 +571,71 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.querySelectorAll('.lm-file-input').forEach(function(input) {
+            input.addEventListener('change', function() {
+                var area = this.closest('.lm-upload-area');
+                var file = this.files[0];
+                if (!file) return;
+
+                // Remove old preview if any
+                var old = area.querySelector('.lm-preview-wrap');
+                if (old) old.remove();
+
+                var wrap = document.createElement('div');
+                wrap.className = 'lm-preview-wrap';
+
+                if (file.type.startsWith('image/')) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        wrap.innerHTML =
+                            '<img src="' + e.target.result + '" class="lm-preview-img" />' +
+                            '<span class="lm-preview-name">' + file.name + '</span>' +
+                            '<span class="lm-preview-size">(' + (file.size / 1024).toFixed(0) + ' KB)</span>';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Video or other file — show icon + name
+                    wrap.innerHTML =
+                        '<i class="fas fa-file-video" style="font-size:2.5rem;color:#8b5a3c;margin-bottom:8px;"></i>' +
+                        '<span class="lm-preview-name">' + file.name + '</span>' +
+                        '<span class="lm-preview-size">(' + (file.size / 1024 / 1024).toFixed(1) + ' MB)</span>';
+                }
+
+                area.querySelector('i.fa-cloud-upload-alt').style.display = 'none';
+                area.querySelector('p').style.display = 'none';
+                area.querySelector('span:not(.lm-preview-name):not(.lm-preview-size)').style.display = 'none';
+                area.appendChild(wrap);
+            });
+        });
+    </script>
+    <style>
+        .lm-preview-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+        .lm-preview-img {
+            max-height: 160px;
+            max-width: 100%;
+            border-radius: 10px;
+            object-fit: contain;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .lm-preview-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a6754;
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .lm-preview-size {
+            font-size: 0.75rem;
+            color: #8b8b8b;
+        }
+    </style>
 }

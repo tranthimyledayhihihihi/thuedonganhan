@@ -180,7 +180,7 @@
                                             <button type="button" class="lm-btn lm-btn-primary" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Resolving')">
                                                 <i class="fas fa-spinner"></i> Tiếp nhận
                                             </button>
-                                            <button type="button" class="lm-btn lm-btn-danger" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Rejected')">
+                                            <button type="button" class="lm-btn lm-btn-danger" onclick="openRejectModal(@complaint.ComplaintId)">
                                                 <i class="fas fa-ban"></i> Từ chối
                                             </button>
                                         }
@@ -189,7 +189,7 @@
                                             <button type="button" class="lm-btn lm-btn-success" onclick="openResolveModal(@complaint.ComplaintId, @(complaint.Rental?.TotalPrice ?? 0), @(complaint.Rental?.DepositAmount ?? 0))">
                                                 <i class="fas fa-gavel"></i> Phân xử
                                             </button>
-                                            <button type="button" class="lm-btn lm-btn-danger" onclick="updateComplaintStatus(@complaint.ComplaintId, 'Rejected')">
+                                            <button type="button" class="lm-btn lm-btn-danger" onclick="openRejectModal(@complaint.ComplaintId)">
                                                 <i class="fas fa-ban"></i> Từ chối
                                             </button>
                                         }
@@ -218,9 +218,45 @@
 
 @Html.AntiForgeryToken()
 
+<!-- Modal Từ chối (nhập lý do) -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content lm-modal-content">
+            <div class="lm-modal-header">
+                <h5 class="lm-modal-title" style="color:#dc2626;">
+                    <i class="fas fa-ban"></i> Từ chối khiếu nại
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body lm-modal-body">
+                <input type="hidden" id="rejectComplaintId" />
+                <div class="lm-alert-warning" style="background:var(--badge-red-bg); border-left-color:var(--badge-red-text);">
+                    <div class="alert-title" style="color:var(--badge-red-text);">
+                        <i class="fas fa-exclamation-triangle"></i> Thao tác không thể hoàn tác
+                    </div>
+                    <ul style="color:var(--text-main);">
+                        <li>Khiếu nại sẽ bị đóng lại với trạng thái <b>Từ chối</b>.</li>
+                        <li>Người gửi khiếu nại sẽ không được hoàn tiền qua phân xử này.</li>
+                    </ul>
+                </div>
+                <div class="lm-modal-section" style="margin-bottom:0;">
+                    <label class="lm-form-label">Lý do từ chối <span style="color:var(--badge-red-text);">*</span></label>
+                    <textarea class="lm-textarea" id="rejectReasonInput" rows="3" placeholder="Nhập lý do từ chối khiếu nại này..."></textarea>
+                </div>
+            </div>
+            <div class="lm-modal-footer">
+                <button type="button" class="lm-btn lm-btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="lm-btn lm-btn-danger" style="background:var(--badge-red-text);color:#fff;" onclick="submitReject()">
+                    <i class="fas fa-ban"></i> Xác nhận Từ chối
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Phân xử (Thừa kế cấu trúc Bootstrap nhưng ghi đè style nội bộ) -->
 <div class="modal fade" id="resolveModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content lm-modal-content">
             <div class="lm-modal-header">
                 <h5 class="lm-modal-title">
@@ -229,7 +265,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="lm-modal-body">
+            <div class="modal-body lm-modal-body">
                 <input type="hidden" id="resolveComplaintId" />
 
                 <div class="lm-alert-warning">
@@ -1268,6 +1304,49 @@
             area.style.display = override ? 'flex' : 'none';
 
             if (!override) calculateArbitration();
+        }
+
+        // ── Reject modal ──────────────────────────────────────
+        let bsRejectModal = null;
+
+        function openRejectModal(id) {
+            document.getElementById('rejectComplaintId').value = id;
+            document.getElementById('rejectReasonInput').value = '';
+            const modalEl = document.getElementById('rejectModal');
+            bsRejectModal = new bootstrap.Modal(modalEl);
+            bsRejectModal.show();
+        }
+
+        function submitReject() {
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if (!reason) {
+                document.getElementById('rejectReasonInput').focus();
+                document.getElementById('rejectReasonInput').style.borderColor = 'var(--badge-red-text)';
+                return;
+            }
+            document.getElementById('rejectReasonInput').style.borderColor = '';
+
+            const id = document.getElementById('rejectComplaintId').value;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch('/Admin/UpdateComplaintStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `complaintId=${id}&status=Rejected&adminNotes=${encodeURIComponent(reason)}&__RequestVerificationToken=${token}`
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    if (bsRejectModal) bsRejectModal.hide();
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
+                console.error(err);
+            });
         }
 
         function submitResolve() {

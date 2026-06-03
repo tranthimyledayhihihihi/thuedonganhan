@@ -152,8 +152,9 @@ namespace THUEDONGANHAN.Controllers
                 var chats = allUserMsgs
                     .GroupBy(m => m.SenderId == currentUserId ? m.ReceiverId : m.SenderId)
                     .Select(g => {
-                        var otherUser = g.First().SenderId == currentUserId ? g.First().Receiver : g.First().Sender;
-                        var lastMsg = g.First();
+                        var firstMsg = g.First();
+                        var otherUser = firstMsg.SenderId == currentUserId ? firstMsg.Receiver : firstMsg.Sender;
+                        if (otherUser == null) return null;
                         var unreadCount = g.Count(m => m.ReceiverId == currentUserId && !m.IsRead);
 
                         return new
@@ -162,11 +163,12 @@ namespace THUEDONGANHAN.Controllers
                             fullName = otherUser.FullName,
                             email = otherUser.Email,
                             avatarUrl = otherUser.AvatarUrl ?? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(otherUser.FullName)}&background=2563eb&color=fff",
-                            lastMessage = lastMsg.Content,
-                            lastMessageTime = lastMsg.CreatedAt,
+                            lastMessage = firstMsg.Content,
+                            lastMessageTime = firstMsg.CreatedAt,
                             unreadCount = unreadCount
                         };
                     })
+                    .Where(x => x != null)
                     .ToList();
 
                 return Ok(ApiResponse<object>.SuccessResponse(chats, "Tải danh sách trò chuyện thành công"));
