@@ -188,7 +188,7 @@ namespace THUEDONGANHAN.Controllers
                         .ThenInclude(r => r!.Product)
                     .FirstOrDefaultAsync(c => c.ComplaintId == id);
 
-                if (complaint == null) return NotFound(ApiResponse<Complaint>.ErrorResponse("Không tìm thấy khiếu nại."));
+                if (complaint == null) return NotFound(ApiResponse<Complaint>.ErrorResponse($"Không tìm thấy khiếu nại với ID = {id}."));
                 if (complaint.Status == "Resolved") return BadRequest(ApiResponse<Complaint>.ErrorResponse("Khiếu nại này đã được giải quyết rồi."));
 
                 var rental = complaint.Rental!;

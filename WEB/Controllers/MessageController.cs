@@ -153,5 +153,45 @@ namespace WEB.Controllers
                 return Json(new { success = false, message = "Lỗi kết nối máy chủ" });
             }
         }
+
+        // GET: /Message/GetAdminProfile
+        [HttpGet]
+        public async Task<IActionResult> GetAdminProfile()
+        {
+            try
+            {
+                var response = await _apiService.GetAsync<ApiResponse<JsonElement>>("Message/admin");
+                if (response != null && response.Success)
+                {
+                    return Json(new { success = true, data = response.Data });
+                }
+                return Json(new { success = false, message = response?.Message ?? "Không thể lấy thông tin admin" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy thông tin admin");
+                return Json(new { success = false, message = "Lỗi kết nối máy chủ" });
+            }
+        }
+
+        // GET: /Message/GetUnreadCount
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            try
+            {
+                var response = await _apiService.GetAsync<ApiResponse<int>>("Message/unread-count");
+                if (response != null && response.Success)
+                {
+                    return Json(new { success = true, data = response.Data });
+                }
+                return Json(new { success = false, message = response?.Message ?? "Lỗi" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi gọi API unread-count");
+                return Json(new { success = false, message = "Lỗi" });
+            }
+        }
     }
 }

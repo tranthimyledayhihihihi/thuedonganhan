@@ -491,6 +491,7 @@
         var userName = Context.Session.GetString("UserName") ?? "Admin";
         var firstLetter = userName.Length > 0 ? userName[0].ToString().ToUpper() : "A";
         var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     }
 
     <!-- Sidebar cố định -->
@@ -539,6 +540,12 @@
             <a href="@Url.Action("Complaints", "Admin")" class="adm-nav-item @(action == "Complaints" ? "active" : "")">
                 <span class="nav-icon"><i class="fas fa-exclamation-circle"></i></span>
                 Khiếu nại
+            </a>
+
+            <div class="adm-nav-section">Hỗ trợ</div>
+            <a href="/Message" class="adm-nav-item @(controller == "Message" ? "active" : "")">
+                <span class="nav-icon"><i class="fas fa-comments"></i></span>
+                Tin nhắn hỗ trợ
             </a>
         </nav>
 

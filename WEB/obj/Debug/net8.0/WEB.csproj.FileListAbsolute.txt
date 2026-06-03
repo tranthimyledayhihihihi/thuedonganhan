@@ -735,7 +735,6 @@ E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\WEB\obj\Debug\net8.0\WEB.genruntimecon
 E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\WEB\obj\Debug\net8.0\ref\WEB.dll
 E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\WEB\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 E:\THUEDONGANHAN\THUEDONGANHAN\WEB\obj\Debug\net8.0\WEB.sourcelink.json
-E:\THUEDONGANHAN\THUEDONGANHAN\WEB\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 E:\HK225\TMDT\NH\thuedonganhan\WEB\bin\Debug\net8.0\appsettings.Development.json
 E:\HK225\TMDT\NH\thuedonganhan\WEB\bin\Debug\net8.0\appsettings.json
 E:\HK225\TMDT\NH\thuedonganhan\WEB\bin\Debug\net8.0\WEB.staticwebassets.runtime.json
@@ -1105,3 +1104,4 @@ E:\HK225\TMDT\NH\thuedonganhan\WEB\obj\Debug\net8.0\WEB.pdb
 E:\HK225\TMDT\NH\thuedonganhan\WEB\obj\Debug\net8.0\WEB.genruntimeconfig.cache
 E:\HK225\TMDT\NH\thuedonganhan\WEB\obj\Debug\net8.0\ref\WEB.dll
 E:\HK225\TMDT\NH\thuedonganhan\WEB\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+E:\THUEDONGANHAN\THUEDONGANHAN\WEB\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

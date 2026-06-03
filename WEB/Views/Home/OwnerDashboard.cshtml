@@ -7,7 +7,46 @@
     var totalProducts = myProducts.Count;
     var rentedProducts = myProducts.Count(p => !p.IsAvailable);
     var availableProducts = myProducts.Count(p => p.IsAvailable);
-    var totalRevenue = myProducts.Sum(p => p.PricePerDay) * 30;
+    
+    // Doanh thu thực tế tháng này
+    var totalRevenue = myRentals
+        .Where(r => r.Status != "Cancelled" && r.Status != "Pending" && r.CreatedAt.Month == DateTime.Today.Month && r.CreatedAt.Year == DateTime.Today.Year)
+        .Sum(r => r.TotalPrice);
+
+    // Đánh giá trung bình từ sản phẩm của chủ cửa hàng
+    var ratedProducts = myProducts.Where(p => p.AverageRating > 0).ToList();
+    var averageRating = ratedProducts.Any() ? ratedProducts.Average(p => p.AverageRating) : 0.0m;
+
+    // Cấp bậc thành viên
+    var completedRentalsCount = myRentals.Count(r => r.Status == "Completed");
+    var targetRentals = 10;
+    var remainingRentals = Math.Max(0, targetRentals - completedRentalsCount);
+    var memberLevel = completedRentalsCount >= 10 ? "Chủ đồ Kim Cương" : (completedRentalsCount >= 5 ? "Chủ đồ Vàng" : "Chủ đồ Bạc");
+
+    // Dữ liệu biểu đồ 7 ngày qua
+    var last7Days = Enumerable.Range(0, 7)
+        .Select(i => DateTime.Today.AddDays(-6 + i))
+        .ToList();
+
+    var dayNames = new Dictionary<DayOfWeek, string>
+    {
+        { DayOfWeek.Sunday, "CN" },
+        { DayOfWeek.Monday, "T2" },
+        { DayOfWeek.Tuesday, "T3" },
+        { DayOfWeek.Wednesday, "T4" },
+        { DayOfWeek.Thursday, "T5" },
+        { DayOfWeek.Friday, "T6" },
+        { DayOfWeek.Saturday, "T7" }
+    };
+
+    var chartLabels = string.Join(",", last7Days.Select(d => $"'{dayNames[d.DayOfWeek]}'"));
+    var chartData = string.Join(",", last7Days.Select(day => 
+        myRentals.Where(r => r.CreatedAt.Date == day.Date && 
+                            r.Status != "Cancelled" && 
+                            r.Status != "Pending")
+                 .Sum(r => r.TotalPrice)
+                 .ToString("F0")
+    ));
 }
 
 @functions {
@@ -92,7 +131,16 @@
                     <div class="lm-stat-icon" style="background:#f1f5f9; color:#64748b;"><i class="fas fa-star"></i></div>
                     <div class="lm-stat-body">
                         <div class="lm-stat-label">Đánh giá trung bình</div>
-                        <div class="lm-stat-value">4.8 <i class="fas fa-star" style="color:#f59e0b;font-size:1.1rem;"></i></div>
+                        <div class="lm-stat-value">
+                            @if (averageRating > 0)
+                            {
+                                @averageRating.ToString("F1") <i class="fas fa-star" style="color:#f59e0b;font-size:1.1rem;"></i>
+                            }
+                            else
+                            {
+                                <span style="font-size: 1.1rem; color: var(--text-muted);">Chưa có</span>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,8 +161,15 @@
 
                 <div class="lm-promo-card">
                     <div class="lm-promo-icon"><i class="fas fa-gem"></i></div>
-                    <h3 class="lm-promo-title">Chủ đồ Kim Cương</h3>
-                    <p class="lm-promo-desc">Bạn chỉ còn 2 lượt cho thuê nữa để đạt mốc Kim Cương và nhận ưu đãi giảm 2% phí dịch vụ nền tảng.</p>
+                    <h3 class="lm-promo-title">@memberLevel</h3>
+                    @if (remainingRentals > 0)
+                    {
+                        <p class="lm-promo-desc">Bạn chỉ còn @remainingRentals lượt cho thuê hoàn thành nữa để đạt mốc Kim Cương và nhận ưu đãi giảm 2% phí dịch vụ nền tảng.</p>
+                    }
+                    else
+                    {
+                        <p class="lm-promo-desc">Chúc mừng! Bạn đã đạt mốc Kim Cương và đang nhận ưu đãi giảm 2% phí dịch vụ nền tảng.</p>
+                    }
                     <a href="#" class="lm-btn-promo">Xem chi tiết</a>
                 </div>
             </div>
@@ -1001,10 +1056,10 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                labels: [@Html.Raw(chartLabels)],
                 datasets: [{
                     label: 'Doanh thu',
-                    data: [320000, 480000, 310000, 540000, 430000, 720000, 610000],
+                    data: [@chartData],
                     backgroundColor: [
                         '#e6f0e9', '#e6f0e9', '#e6f0e9',
                         '#e6f0e9', '#e6f0e9', '#4a6754', '#e6f0e9'

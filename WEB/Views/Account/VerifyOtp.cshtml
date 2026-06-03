@@ -2,67 +2,90 @@
 
 @{
     ViewData["Title"] = "Xác thực OTP";
+    ViewData["HideGlobalAlert"] = true;
 }
 
-<div class="auth-container">
-    <div class="auth-wrapper">
-        <div class="auth-branding">
-            <div class="auth-branding-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
+<link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+
+<div class="auth-page-body">
+    <!-- Background visual blobs -->
+    <div class="auth-bg-blob auth-blob-1"></div>
+    <div class="auth-bg-blob auth-blob-2"></div>
+    
+    <div class="auth-unique-container" style="max-width: 950px;">
+        <!-- Brand/Illustration Column -->
+        <div class="auth-unique-sidebar">
+            <div class="auth-sidebar-header">
+                <div class="auth-sidebar-badge">
+                    <i class="fas fa-shield-alt"></i> Bảo mật tài khoản
+                </div>
+                <h1 class="auth-sidebar-title">Xác thực<br /><span>thông tin</span></h1>
+                <p class="auth-sidebar-desc">Vui lòng xác thực mã OTP được gửi tới email trường của bạn để kích hoạt tài khoản và tiếp tục truy cập.</p>
             </div>
-            <h1>Bảo mật<br />Tài khoản</h1>
-            <p>Vui lòng xác thực email sinh viên của bạn để tiếp tục sử dụng hệ thống.</p>
+            
+            <div class="auth-sidebar-footer">
+                <div class="auth-sidebar-illustration">
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&h=400&fit=crop" alt="Security OTP Verification" />
+                </div>
+            </div>
         </div>
-
-        <div class="auth-card">
-            <a href="/Account/Login" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                </svg>
-                Quay lại đăng nhập
+        
+        <!-- Form Column -->
+        <div class="auth-unique-form-section" style="padding: 3.5rem 3rem 2rem;">
+            <a href="/Account/Login" class="auth-back-home">
+                <i class="fas fa-arrow-left"></i> Quay lại
             </a>
-
-            <div class="auth-card-header">
-                <h2>Xác thực OTP</h2>
-                <p>Một mã gồm 6 chữ số đã được gửi đến email của bạn.</p>
+            
+            <div class="auth-form-header">
+                <h2 class="auth-form-title"><i class="fas fa-key" style="color: var(--auth-yellow);"></i> Xác thực OTP</h2>
+                <p class="auth-form-subtitle">Nhập mã xác thực gồm 6 chữ số đã được gửi tới email của bạn.</p>
             </div>
-
+            
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success">
-                    @TempData["SuccessMessage"]
+                <div class="auth-alert auth-alert-info">
+                    <i class="fas fa-check-circle" style="color: var(--auth-teal); margin-right: 0.5rem;"></i> @TempData["SuccessMessage"]
                 </div>
             }
-
+            
             @if (TempData["ErrorMessage"] != null)
             {
-                <div class="alert alert-danger">
-                    @TempData["ErrorMessage"]
+                <div class="auth-alert auth-alert-danger">
+                    <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i> @TempData["ErrorMessage"]
                 </div>
             }
-
+            
             <form asp-action="VerifyOtp" method="post">
-                <div asp-validation-summary="ModelOnly" class="validation-summary-errors text-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="auth-validation-summary"></div>
                 
                 <input type="hidden" asp-for="Email" />
 
-                <div class="form-group">
-                    <label class="form-label">EMAIL</label>
-                    <input type="text" class="form-control" value="@Model.Email" disabled />
+                <div class="auth-input-group">
+                    <label class="auth-label">Email sinh viên</label>
+                    <div class="auth-input-wrapper">
+                        <span class="auth-input-icon">@@</span>
+                        <input type="text" class="auth-input" value="@Model.Email" readonly style="background-color: var(--auth-dark-brown-light); cursor: not-allowed; opacity: 0.85;" />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="OTPCode" class="form-label">Mã OTP (6 chữ số)</label>
-                    <input asp-for="OTPCode" class="form-control" placeholder="123456" maxlength="6" autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;" />
-                    <span asp-validation-for="OTPCode" class="text-danger"></span>
+                <div class="auth-input-group">
+                    <label asp-for="OTPCode" class="auth-label">Mã OTP (6 chữ số)</label>
+                    <div class="auth-input-wrapper">
+                        <i class="fas fa-lock auth-input-icon" style="left: 1.1rem; font-size: 0.9rem;"></i>
+                        <input asp-for="OTPCode" class="auth-input" placeholder="Nhập mã 6 số" maxlength="6" autocomplete="off" 
+                               style="text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5rem; padding-left: 1rem; padding-right: 1rem;" />
+                    </div>
+                    <span asp-validation-for="OTPCode" class="auth-field-error"></span>
                 </div>
 
-                <button type="submit" id="btnVerify" class="btn-primary" style="margin-top: 1.5rem;">
-                    Đăng ký (<span id="countdown">60</span>s)
+                <button type="submit" id="btnVerify" class="auth-btn-submit" style="margin-top: 1.5rem;">
+                    <span>Xác thực ngay (<span id="countdown">60</span>s)</span> <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
+            
+            <div style="margin-top: 2rem; font-size: 0.82rem; text-align: center; color: var(--auth-dark-brown); opacity: 0.7; line-height: 1.5;">
+                <i class="fas fa-info-circle" style="color: var(--auth-teal);"></i> Không nhận được mã? Hãy kiểm tra trong thư mục <strong>Spam (Thư rác)</strong> hoặc hòm thư phụ của bạn.
+            </div>
         </div>
     </div>
 </div>
@@ -77,7 +100,7 @@
             const timerId = setInterval(() => {
                 timeLeft--;
                 if (timeLeft >= 0) {
-                    countdownEl.textContent = timeLeft;
+                    countdownEl.textContent = timeLeft + 's';
                 } else {
                     clearInterval(timerId);
                     countdownEl.textContent = 'Hết hạn';

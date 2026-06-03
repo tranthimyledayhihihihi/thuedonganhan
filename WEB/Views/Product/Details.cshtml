@@ -341,7 +341,7 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="lm-action-buttons">
+                    <div class="lm-action-buttons" style="display: flex; flex-direction: column; gap: 10px;">
                         @if (ViewBag.IsOwner == true)
                         {
                             <button type="button" class="lm-btn-disabled" disabled>SẢN PHẨM CỦA BẠN</button>
@@ -354,6 +354,9 @@
                             <button type="button" class="lm-btn-outline-primary" onclick="addToCart()">
                                 <i class="fas fa-shopping-cart"></i> THÊM VÀO GIỎ HÀNG
                             </button>
+                            <a href="/Message?receiverId=@Model?.OwnerId&productId=@Model?.ProductId" class="lm-btn-outline-primary" style="display: flex; justify-content: center; align-items: center; text-decoration: none; border-color: #4f6356; color: #4f6356;">
+                                <i class="far fa-comments"></i> NHẮN TIN VỚI CHỦ ĐỒ
+                            </a>
                         }
                         else
                         {
@@ -362,6 +365,9 @@
                             </a>
                             <a href="/Account/Login?returnUrl=@Context.Request.Path" class="lm-btn-outline-primary" style="display: flex; justify-content: center; align-items: center; text-decoration: none;">
                                 ĐĂNG NHẬP ĐỂ THÊM VÀO GIỎ
+                            </a>
+                            <a href="/Account/Login?returnUrl=@Context.Request.Path" class="lm-btn-outline-primary" style="display: flex; justify-content: center; align-items: center; text-decoration: none; border-color: #4f6356; color: #4f6356;">
+                                ĐĂNG NHẬP ĐỂ NHẮN TIN
                             </a>
                         }
                     </div>
@@ -416,21 +422,28 @@
         <h2 class="lm-section-title">Người cho thuê</h2>
         <div class="lm-owner-card">
             <div class="lm-owner-info">
-                <img src="https://ui-avatars.com/api/?name=Sinh+Vien+UTE&background=2563eb&color=fff" alt="Avatar" class="lm-owner-avatar" />
+                <img src="https://ui-avatars.com/api/?name=@(Uri.EscapeDataString(Model?.Owner?.FullName ?? "User"))&background=2563eb&color=fff" alt="Avatar" class="lm-owner-avatar" />
                 <div>
-                    <h3 class="lm-owner-name">Sinh viên UTE</h3>
-                    <p class="lm-owner-join">Đã xác thực danh tính sinh viên</p>
+                    <h3 class="lm-owner-name">@(Model?.Owner?.FullName ?? "Sinh viên UTE")</h3>
+                    <p class="lm-owner-join">Đã xác thực danh tính sinh viên @(string.IsNullOrEmpty(Model?.Owner?.Email) ? "" : $"| {Model.Owner.Email}")</p>
                     <div class="lm-owner-stats">
                         <span><i class="fas fa-bolt"></i> Phản hồi: Dưới 1 giờ</span>
                         <span><i class="fas fa-star"></i> Uy tín: Cao</span>
                     </div>
                 </div>
             </div>
-            @if (ViewBag.IsLoggedIn == true && ViewBag.IsOwner != true)
+            @if (ViewBag.IsLoggedIn == true)
             {
-                <a href="/Message?receiverId=@Model?.OwnerId&productId=@Model?.ProductId" class="lm-btn-outline" style="text-decoration: none; text-align: center;">
-                    Gửi tin nhắn
-                </a>
+                @if (ViewBag.IsOwner != true)
+                {
+                    <a href="/Message?receiverId=@Model?.OwnerId&productId=@Model?.ProductId" class="lm-btn-outline" style="text-decoration: none; text-align: center;">
+                        <i class="far fa-comments"></i> Chat trực tuyến
+                    </a>
+                }
+                else
+                {
+                    <button type="button" class="lm-btn-outline disabled" disabled>Đây là sản phẩm của bạn</button>
+                }
             }
             else
             {
@@ -505,7 +518,7 @@
         background-color: #faf9f6;
         color: #1f2937;
         padding: 40px 20px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
     }
 
     .lm-main-grid {

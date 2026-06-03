@@ -282,7 +282,6 @@ E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\THUEDON
 E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\THUEDONGANHAN.genruntimeconfig.cache
 E:\HK225\TMDT\ThueDoNganHan\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\ref\THUEDONGANHAN.dll
 E:\THUEDONGANHAN\THUEDONGANHAN\THUEDONGANHAN\obj\Debug\net8.0\THUEDONGANHAN.sourcelink.json
-E:\THUEDONGANHAN\THUEDONGANHAN\THUEDONGANHAN\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\bin\Debug\net8.0\appsettings.Development.json
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\bin\Debug\net8.0\appsettings.json
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\bin\Debug\net8.0\THUEDONGANHAN.staticwebassets.runtime.json
@@ -426,3 +425,4 @@ E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\THUEDONGANHAN.pdb
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\THUEDONGANHAN.genruntimeconfig.cache
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\ref\THUEDONGANHAN.dll
 E:\HK225\TMDT\NH\thuedonganhan\THUEDONGANHAN\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+E:\THUEDONGANHAN\THUEDONGANHAN\THUEDONGANHAN\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

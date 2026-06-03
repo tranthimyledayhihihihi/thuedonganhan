@@ -122,6 +122,11 @@ namespace WEB.Controllers
                 }
             }
 
+            if (string.IsNullOrEmpty(request.Title))
+            {
+                request.Title = request.Reason;
+            }
+
             var response = await _complaintService.CreateComplaintAsync(request, token);
             if (response != null && response.Success)
             {

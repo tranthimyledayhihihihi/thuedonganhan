@@ -378,37 +378,48 @@
                             <td>
                                 <div class="status-cell">
                                     <span class="status-dot @(user.IsActive ? "dot-active" : "dot-inactive")"></span>
-                                    @(user.IsActive ? "Đang hoạt động" : "Bị khóa")
+                                    @if (user.IsActive)
+                                    {
+                                        <span>Đang hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        var reasonText = !string.IsNullOrEmpty(user.LockReason) ? $"\nLý do: {user.LockReason}" : "";
+                                        var lockText = user.LockEnd.HasValue 
+                                            ? $"Khóa đến {user.LockEnd.Value.ToString("dd/MM/yyyy HH:mm")}" 
+                                            : "Khóa vĩnh viễn";
+                                        <span style="color:#ef4444;font-size:0.82rem;font-weight:600;cursor:help;" title="@(lockText + reasonText)">
+                                            @lockText
+                                        </span>
+                                    }
                                 </div>
                             </td>
-                            <td style="color:#6b7280;font-size:.82rem;">
-                                —
+                            <td style="color:#4b5563;font-size:.82rem;">
+                                @user.CreatedAt.ToString("dd/MM/yyyy")
                             </td>
                             <td>
-                                @if (user.Role != "Admin")
+                                @if (user.IsActive)
                                 {
-                                    <form method="post" asp-action="ToggleUserActive"
+                                    <button type="button"
+                                            class="um-btn um-btn-sm um-btn-lock btn-open-lock-modal"
+                                            data-userid="@user.UserId"
+                                            data-fullname="@user.FullName">
+                                        <i class="fas fa-lock"></i> Khóa
+                                    </button>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-action="UnlockUser"
                                           asp-route-userId="@user.UserId"
                                           asp-route-search="@search"
                                           asp-route-filterType="@filterType"
                                           style="display:inline;">
                                         @Html.AntiForgeryToken()
-                                        @if (user.IsActive)
-                                        {
-                                            <button type="submit"
-                                                    class="um-btn um-btn-sm um-btn-lock"
-                                                    onclick="return confirm('Khóa tài khoản @user.FullName?')">
-                                                <i class="fas fa-lock"></i> Khóa
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button type="submit"
-                                                    class="um-btn um-btn-sm um-btn-unlock"
-                                                    onclick="return confirm('Mở khóa tài khoản @user.FullName?')">
-                                                <i class="fas fa-lock-open"></i> Mở khóa
-                                            </button>
-                                        }
+                                        <button type="submit"
+                                                class="um-btn um-btn-sm um-btn-unlock"
+                                                onclick="return confirm('Mở khóa tài khoản @user.FullName?')">
+                                            <i class="fas fa-lock-open"></i> Mở khóa
+                                        </button>
                                     </form>
                                 }
                             </td>
@@ -470,3 +481,257 @@
         </div>
     }
 </div>
+
+<!-- Lock User Modal -->
+<div id="lockModal" class="lock-modal-overlay" style="display:none;">
+    <div class="lock-modal-content">
+        <div class="lock-modal-header">
+            <h3>Khóa tài khoản người dùng</h3>
+            <button class="lock-modal-close" onclick="closeLockModal()">&times;</button>
+        </div>
+        <form method="post" asp-action="LockUser">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="userId" id="lockUserId" />
+            <input type="hidden" name="search" value="@search" />
+            <input type="hidden" name="filterType" value="@filterType" />
+            
+            <div class="lock-modal-body">
+                <div class="lock-warning-banner">
+                    <i class="fas fa-exclamation-triangle lock-warning-icon"></i>
+                    <div>
+                        Bạn đang thực hiện khóa tài khoản của:
+                        <div class="lock-target-name" id="lockUserName"></div>
+                    </div>
+                </div>
+                
+                <div class="lock-form-group">
+                    <label for="lockDuration">
+                        <i class="far fa-clock"></i> Thời hạn khóa:
+                    </label>
+                    <select name="duration" id="lockDuration" class="lock-form-control">
+                        <option value="1week">1 Tuần (7 ngày)</option>
+                        <option value="1month">1 Tháng (30 ngày)</option>
+                        <option value="permanent">Vĩnh viễn (Khóa vô thời hạn)</option>
+                    </select>
+                </div>
+                
+                <div class="lock-form-group">
+                    <label for="lockReason">
+                        <i class="far fa-edit"></i> Lý do khóa:
+                    </label>
+                    <textarea name="reason" id="lockReason" class="lock-form-control" rows="3" required placeholder="Nhập lý do vi phạm (ví dụ: Huỷ đơn nhiều lần, gian lận thanh toán,...)"></textarea>
+                </div>
+            </div>
+            
+            <div class="lock-modal-footer">
+                <button type="button" class="lock-btn-cancel" onclick="closeLockModal()">Hủy</button>
+                <button type="submit" class="lock-btn-confirm">Xác nhận khóa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Lock Modal Styling */
+.lock-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.lock-modal-content {
+    background: #ffffff;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lock-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.lock-modal-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.lock-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.lock-modal-close:hover {
+    color: #111827;
+}
+
+.lock-modal-body {
+    padding: 1.5rem;
+}
+
+/* Warning Banner */
+.lock-warning-banner {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #991b1b;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.lock-warning-icon {
+    font-size: 1.5rem;
+    color: #ef4444;
+    flex-shrink: 0;
+}
+
+.lock-target-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 0.15rem;
+}
+
+.lock-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.lock-form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.lock-form-group label i {
+    color: #6b7280;
+    margin-right: 0.35rem;
+}
+
+.lock-form-control {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+.lock-form-control:focus {
+    outline: none;
+    border-color: #ef4444;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.lock-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #f9fafb;
+    border-top: 1px solid #f3f4f6;
+}
+
+.lock-btn-cancel {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.lock-btn-cancel:hover {
+    background: #f3f4f6;
+}
+
+.lock-btn-confirm {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    background: #ef4444;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.lock-btn-confirm:hover {
+    background: #dc2626;
+}
+
+@@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@@keyframes slideUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
+<script>
+    function openLockModal(userId, userName) {
+        document.getElementById('lockUserId').value = userId;
+        document.getElementById('lockUserName').innerText = userName;
+        document.getElementById('lockModal').style.display = 'flex';
+        document.getElementById('lockReason').value = '';
+    }
+
+    function closeLockModal() {
+        document.getElementById('lockModal').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-open-lock-modal').forEach(button => {
+            button.addEventListener('click', function() {
+                var userId = this.getAttribute('data-userid');
+                var fullName = this.getAttribute('data-fullname');
+                openLockModal(userId, fullName);
+            });
+        });
+    });
+
+    window.addEventListener('click', function(e) {
+        var modal = document.getElementById('lockModal');
+        if (e.target == modal) {
+            closeLockModal();
+        }
+    });
+</script>

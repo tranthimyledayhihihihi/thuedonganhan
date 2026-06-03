@@ -42,6 +42,11 @@ namespace THUEDONGANHAN.Models
 
         public bool IsActive { get; set; } = true;
 
+        public DateTime? LockEnd { get; set; }
+
+        [MaxLength(500)]
+        public string? LockReason { get; set; }
+
         public bool IsVerified { get; set; } = false;
 
         public int? StudentId { get; set; }

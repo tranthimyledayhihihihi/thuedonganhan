@@ -174,7 +174,22 @@ namespace THUEDONGANHAN.Controllers
 
                 if (!user.IsActive)
                 {
-                    return BadRequest(ApiResponse<AuthResponse>.ErrorResponse("Tài khoản đã bị khóa"));
+                    if (user.LockEnd.HasValue && user.LockEnd.Value <= DateTime.Now)
+                    {
+                        user.IsActive = true;
+                        user.LockEnd = null;
+                        user.LockReason = null;
+                        user.UpdatedAt = DateTime.Now;
+                        _context.Users.Update(user);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        var timeMsg = user.LockEnd.HasValue 
+                            ? $"Tài khoản đã bị khóa đến {user.LockEnd.Value.ToString("dd/MM/yyyy HH:mm")} do: {user.LockReason ?? "Vi phạm điều khoản"}" 
+                            : $"Tài khoản đã bị khóa vĩnh viễn do: {user.LockReason ?? "Vi phạm điều khoản"}";
+                        return BadRequest(ApiResponse<AuthResponse>.ErrorResponse(timeMsg));
+                    }
                 }
 
                 // ✅ FIX: Kiểm tra IsVerified (chỉ bắt buộc trong production)

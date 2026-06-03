@@ -15,6 +15,7 @@ namespace THUEDONGANHAN.DTOs.Response
         public string ProductType { get; set; } = "Rent";
         public bool IsForSale { get; set; }
         public decimal? SalePrice { get; set; }
+        public decimal AverageRating { get; set; }
         
         public int Quantity { get; set; }
         public string? ImageUrl { get; set; }

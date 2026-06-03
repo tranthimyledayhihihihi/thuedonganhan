@@ -24,6 +24,7 @@ namespace WEB.Models
         public string ProductType { get; set; } = "Rent"; // Rent | Sale | Both
         public bool IsForSale { get; set; }
         public decimal? SalePrice { get; set; }
+        public decimal AverageRating { get; set; }
 
         // Navigation properties
         public CategoryViewModel? Category { get; set; }

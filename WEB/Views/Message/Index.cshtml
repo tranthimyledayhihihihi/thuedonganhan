@@ -1,5 +1,10 @@
 @{
     ViewData["Title"] = "Tin nhắn";
+    var userRole = Context.Session.GetString("UserRole");
+    if (userRole == "Admin")
+    {
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    }
 }
 
 <div class="message-wrapper-bg">
@@ -126,6 +131,20 @@
         overflow: hidden;
         border: 1px solid var(--border-color);
         font-family: var(--font-main);
+    }
+
+    /* Admin Panel Overrides */
+    .adm-content .message-wrapper-bg {
+        background-color: transparent;
+        padding: 0;
+        min-height: auto;
+    }
+
+    .adm-content .message-container {
+        height: calc(100vh - 160px);
+        max-width: 100%;
+        border-radius: 12px;
+        box-shadow: none;
     }
 
     /* Chat Sidebar */

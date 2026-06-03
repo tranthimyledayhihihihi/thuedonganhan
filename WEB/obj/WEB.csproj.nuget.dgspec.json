@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj": {}
+    "E:\\THUEDONGANHAN\\THUEDONGANHAN\\WEB\\WEB.csproj": {}
   },
   "projects": {
-    "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj": {
+    "E:\\THUEDONGANHAN\\THUEDONGANHAN\\WEB\\WEB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj",
+        "projectUniqueName": "E:\\THUEDONGANHAN\\THUEDONGANHAN\\WEB\\WEB.csproj",
         "projectName": "WEB",
-        "projectPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\WEB.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "E:\\HK225\\TMDT\\NH\\thuedonganhan\\WEB\\obj\\",
+        "projectPath": "E:\\THUEDONGANHAN\\THUEDONGANHAN\\WEB\\WEB.csproj",
+        "packagesPath": "C:\\Users\\WILLIAMMYLE\\.nuget\\packages\\",
+        "outputPath": "E:\\THUEDONGANHAN\\THUEDONGANHAN\\WEB\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\WILLIAMMYLE\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

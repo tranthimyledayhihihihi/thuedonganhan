@@ -416,8 +416,9 @@
                             </div>
 
                             <!-- Nút Trò chuyện trên Navbar -->
-                            <a href="/Message" class="notification-btn" title="Trò chuyện" style="text-decoration: none;">
+                            <a href="/Message" class="notification-btn" title="Trò chuyện" style="text-decoration: none; position: relative;">
                                 <i class="fas fa-comment-dots"></i>
+                                <span class="notification-badge" id="message-unread-badge" style="display: none; background: #ef4444;">0</span>
                             </a>
 
                             <div class="user-menu">
@@ -497,13 +498,13 @@
     </header>
 
     <main role="main" style="flex: 1;">
-        @if (TempData["SuccessMessage"] != null)
+        @if (TempData["SuccessMessage"] != null && ViewData["HideGlobalAlert"] == null)
         {
             <div class="alert alert-success" style="margin: 1.5rem auto; max-width: 1200px; padding: 0 1rem;">
                 ✅ @TempData["SuccessMessage"]
             </div>
         }
-        @if (TempData["ErrorMessage"] != null)
+        @if (TempData["ErrorMessage"] != null && ViewData["HideGlobalAlert"] == null)
         {
             <div class="alert alert-danger" style="margin: 1.5rem auto; max-width: 1200px; padding: 0 1rem;">
                 ❌ @TempData["ErrorMessage"]
@@ -949,6 +950,29 @@
             }
         }
 
+        async function fetchNavbarUnreadMessagesCount() {
+            try {
+                const response = await fetch('/Message/GetUnreadCount');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const badge = document.getElementById('message-unread-badge');
+                        if (badge) {
+                            const count = result.data;
+                            if (count > 0) {
+                                badge.innerText = count;
+                                badge.style.display = 'flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Lỗi lấy số lượng tin nhắn chưa đọc:", e);
+            }
+        }
+
         // Active triggers only if user logged in
         @if (!string.IsNullOrEmpty(userName))
         {
@@ -956,9 +980,13 @@
                 window.addEventListener('DOMContentLoaded', () => {
                     fetchNavbarWalletBalance();
                     fetchNavbarUnreadCount();
+                    fetchNavbarUnreadMessagesCount();
 
-                    // Định kỳ kiểm tra thông báo mới mỗi 15 giây
-                    setInterval(fetchNavbarUnreadCount, 15000);
+                    // Định kỳ kiểm tra thông báo mới và tin nhắn chưa đọc mỗi 15 giây
+                    setInterval(() => {
+                        fetchNavbarUnreadCount();
+                        fetchNavbarUnreadMessagesCount();
+                    }, 15000);
                 });
                 </text>
         }

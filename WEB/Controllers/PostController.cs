@@ -88,10 +88,10 @@ namespace WEB.Controllers
                 // Gọi API để tạo product
                 var response = await _productService.CreateProductAsync(request, jwtToken);
                 
-                if (response != null && response.Success)
+                if (response != null && response.Success && response.Data != null)
                 {
                     TempData["SuccessMessage"] = "Đăng tin thành công!";
-                    return RedirectToAction("Index", "Home", new { mode = "owner" });
+                    return RedirectToAction("Details", "Product", new { id = response.Data.ProductId });
                 }
                 else
                 {
@@ -225,7 +225,7 @@ namespace WEB.Controllers
                 if (response != null && response.Success)
                 {
                     TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
-                    return RedirectToAction("Index", "Home", new { mode = "owner" });
+                    return RedirectToAction("Details", "Product", new { id = id });
                 }
                 else
                 {

@@ -81,6 +81,28 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Auto migrate Lock columns
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.ExecuteSqlRaw(@"
+            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Users') AND name = 'LockEnd')
+            BEGIN
+                ALTER TABLE dbo.Users ADD LockEnd DATETIME2 NULL;
+            END
+            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Users') AND name = 'LockReason')
+            BEGIN
+                ALTER TABLE dbo.Users ADD LockReason NVARCHAR(500) NULL;
+            END
+        ");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error running migration SQL: {ex.Message}");
+    }
+}
 app.MapControllers();
 
 app.Run();

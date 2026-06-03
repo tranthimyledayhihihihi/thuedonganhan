@@ -45,6 +45,9 @@ namespace WEB.Models
         public bool IsVerified { get; set; }
         public int RentalCount { get; set; }
         public int ProductCount { get; set; }
+        public DateTime? LockEnd { get; set; }
+        public string? LockReason { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     // ViewModel cho trang quản lý đơn thuê

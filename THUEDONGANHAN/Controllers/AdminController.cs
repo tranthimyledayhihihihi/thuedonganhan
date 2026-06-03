@@ -128,6 +128,9 @@ namespace THUEDONGANHAN.Controllers
                         u.Balance,
                         u.IsActive,
                         u.IsVerified,
+                        u.LockEnd,
+                        u.LockReason,
+                        u.CreatedAt,
                         RentalCount = u.RentalsAsRenter.Count,
                         ProductCount = u.Products.Count
                     })
@@ -389,6 +392,78 @@ namespace THUEDONGANHAN.Controllers
             }
         }
 
+        // PUT: api/Admin/users/{id}/lock
+        [HttpPut("users/{id}/lock")]
+        public async Task<ActionResult<ApiResponse<bool>>> LockUser(int id, [FromBody] DTOs.Request.LockUserRequest request)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Người dùng không tồn tại"));
+
+                user.IsActive = false;
+                user.LockReason = request.Reason;
+                
+                if (request.Duration == "1week")
+                {
+                    user.LockEnd = DateTime.Now.AddDays(7);
+                }
+                else if (request.Duration == "1month")
+                {
+                    user.LockEnd = DateTime.Now.AddMonths(1);
+                }
+                else
+                {
+                    user.LockEnd = null; // Permanent
+                }
+
+                user.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                var durationStr = request.Duration switch
+                {
+                    "1week" => "1 tuần",
+                    "1month" => "1 tháng",
+                    _ => "vĩnh viễn"
+                };
+
+                return Ok(ApiResponse<bool>.SuccessResponse(true,
+                    $"Đã khóa tài khoản {user.FullName} trong {durationStr}"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error locking user");
+                return StatusCode(500, ApiResponse<bool>.ErrorResponse($"Lỗi server: {ex.Message}"));
+            }
+        }
+
+        // PUT: api/Admin/users/{id}/unlock
+        [HttpPut("users/{id}/unlock")]
+        public async Task<ActionResult<ApiResponse<bool>>> UnlockUser(int id)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                    return NotFound(ApiResponse<bool>.ErrorResponse("Người dùng không tồn tại"));
+
+                user.IsActive = true;
+                user.LockEnd = null;
+                user.LockReason = null;
+                user.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                return Ok(ApiResponse<bool>.SuccessResponse(true,
+                    $"Đã mở khóa tài khoản {user.FullName}"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error unlocking user");
+                return StatusCode(500, ApiResponse<bool>.ErrorResponse($"Lỗi server: {ex.Message}"));
+            }
+        }
+
         // DELETE: api/Admin/products/{id}
         [HttpDelete("products/{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteProduct(int id)
@@ -401,11 +476,36 @@ namespace THUEDONGANHAN.Controllers
 
                 // Kiểm tra xem có đơn thuê đang hoạt động không
                 var hasActiveRentals = await _context.Rentals
-                    .AnyAsync(r => r.ProductId == id && (r.Status == "Active" || r.Status == "Confirmed"));
+                    .AnyAsync(r => r.ProductId == id && 
+                        (r.Status == "Pending" || r.Status == "Confirmed" || 
+                         r.Status == "InProgress" || r.Status == "Active" || r.Status == "Returned"));
 
                 if (hasActiveRentals)
-                    return BadRequest(ApiResponse<bool>.ErrorResponse("Không thể xóa sản phẩm đang có đơn thuê hoạt động"));
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("Không thể xóa sản phẩm đang có đơn thuê hoạt động."));
 
+                // Kiểm tra xem có đơn mua đang hoạt động không
+                var hasActiveSaleOrders = await _context.SaleOrders
+                    .AnyAsync(so => so.ProductId == id && 
+                        (so.Status == "Pending" || so.Status == "Confirmed"));
+
+                if (hasActiveSaleOrders)
+                    return BadRequest(ApiResponse<bool>.ErrorResponse("Không thể xóa sản phẩm đang có đơn mua chưa hoàn tất."));
+
+                // Kiểm tra lịch sử giao dịch (bao gồm cả đơn đã hoàn thành/hủy)
+                var hasHistory = await _context.Rentals.AnyAsync(r => r.ProductId == id) ||
+                                 await _context.SaleOrders.AnyAsync(so => so.ProductId == id);
+
+                if (hasHistory)
+                {
+                    // Soft-delete
+                    product.IsAvailable = false;
+                    product.IsApproved = false;
+                    product.UpdatedAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    return Ok(ApiResponse<bool>.SuccessResponse(true, "Sản phẩm đã có lịch sử giao dịch, hệ thống đã chuyển trạng thái ẩn để bảo toàn dữ liệu."));
+                }
+
+                // Hard-delete
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
 

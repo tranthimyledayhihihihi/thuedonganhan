@@ -590,7 +590,7 @@ namespace THUEDONGANHAN.Controllers
                 if (product == null)
                     return NotFound(ApiResponse<bool>.ErrorResponse("Không tìm thấy sản phẩm"));
 
-                if (product.OwnerId != currentUserId.Value)
+                if (product.OwnerId != currentUserId.Value && !User.IsInRole("Admin"))
                     return Forbid();
 
                 // ✅ BUG #14 FIX: Không cho xóa sản phẩm có đơn thuê đang hoạt động
@@ -612,6 +612,21 @@ namespace THUEDONGANHAN.Controllers
                     return BadRequest(ApiResponse<bool>.ErrorResponse(
                         "Không thể xóa sản phẩm đang có đơn mua chưa hoàn tất."));
 
+                // Kiểm tra lịch sử giao dịch (bao gồm cả đơn đã hoàn thành/hủy)
+                var hasHistory = await _context.Rentals.AnyAsync(r => r.ProductId == id) ||
+                                 await _context.SaleOrders.AnyAsync(so => so.ProductId == id);
+
+                if (hasHistory)
+                {
+                    // Soft-delete
+                    product.IsAvailable = false;
+                    product.IsApproved = false;
+                    product.UpdatedAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    return Ok(ApiResponse<bool>.SuccessResponse(true, "Sản phẩm đã có lịch sử giao dịch, hệ thống đã chuyển trạng thái ẩn để bảo toàn dữ liệu."));
+                }
+
+                // Hard-delete
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
 
@@ -640,6 +655,7 @@ namespace THUEDONGANHAN.Controllers
                 ProductType = p.ProductType,
                 IsForSale = p.IsForSale,
                 SalePrice = p.SalePrice,
+                AverageRating = p.AverageRating,
                 Quantity = p.Quantity,
                 ImageUrl = (!string.IsNullOrEmpty(p.ImageUrl) && p.ImageUrl.StartsWith("/uploads/"))
                             ? $"{Request.Scheme}://{Request.Host}{Request.PathBase}{p.ImageUrl}"

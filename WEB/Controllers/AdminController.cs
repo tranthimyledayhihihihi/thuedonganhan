@@ -328,6 +328,66 @@ namespace WEB.Controllers
             return RedirectToAction(nameof(Users), new { search, filterType });
         }
 
+        // POST: /Admin/LockUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LockUser(int userId, string duration, string reason, string? search = null, string? filterType = "all")
+        {
+            if (!IsAdmin())
+                return RedirectToAction("Index", "Home");
+
+            try
+            {
+                var payload = new
+                {
+                    duration,
+                    reason
+                };
+
+                var response = await _apiService.PutAsync<object, ApiResponse<bool>>(
+                    $"Admin/users/{userId}/lock", payload);
+
+                if (response?.Success == true)
+                    TempData["SuccessMessage"] = response.Message;
+                else
+                    TempData["ErrorMessage"] = response?.Message ?? "Khóa tài khoản thất bại";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error locking user");
+                TempData["ErrorMessage"] = "Không thể thực hiện thao tác";
+            }
+
+            return RedirectToAction(nameof(Users), new { search, filterType });
+        }
+
+        // POST: /Admin/UnlockUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnlockUser(int userId, string? search = null, string? filterType = "all")
+        {
+            if (!IsAdmin())
+                return RedirectToAction("Index", "Home");
+
+            try
+            {
+                var response = await _apiService.PutAsync<object, ApiResponse<bool>>(
+                    $"Admin/users/{userId}/unlock", new { });
+
+                if (response?.Success == true)
+                    TempData["SuccessMessage"] = response.Message;
+                else
+                    TempData["ErrorMessage"] = response?.Message ?? "Mở khóa tài khoản thất bại";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error unlocking user");
+                TempData["ErrorMessage"] = "Không thể thực hiện thao tác";
+            }
+
+            return RedirectToAction(nameof(Users), new { search, filterType });
+        }
+
         // POST: /Admin/DeleteProduct
         [HttpPost]
         [ValidateAntiForgeryToken]

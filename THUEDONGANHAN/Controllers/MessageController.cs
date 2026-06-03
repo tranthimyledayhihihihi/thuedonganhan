@@ -208,5 +208,60 @@ namespace THUEDONGANHAN.Controllers
                 return StatusCode(500, ApiResponse<object>.ErrorResponse($"Lỗi hệ thống: {ex.Message}"));
             }
         }
+
+        // GET: api/Message/admin
+        [HttpGet("admin")]
+        public async Task<ActionResult<ApiResponse<object>>> GetAdminProfile()
+        {
+            try
+            {
+                var admin = await _context.Users
+                    .Where(u => u.Role == "Admin" && u.IsActive)
+                    .Select(u => new
+                    {
+                        userId = u.UserId,
+                        fullName = u.FullName,
+                        email = u.Email,
+                        avatarUrl = u.AvatarUrl ?? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(u.FullName)}&background=2563eb&color=fff"
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (admin == null)
+                {
+                    return NotFound(ApiResponse<object>.ErrorResponse("Không tìm thấy quản trị viên hệ thống"));
+                }
+
+                return Ok(ApiResponse<object>.SuccessResponse(admin, "Lấy thông tin quản trị viên thành công"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi lấy thông tin quản trị viên");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse($"Lỗi hệ thống: {ex.Message}"));
+            }
+        }
+
+        // GET: api/Message/unread-count
+        [HttpGet("unread-count")]
+        public async Task<ActionResult<ApiResponse<int>>> GetUnreadMessageCount()
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                if (currentUserId == null)
+                {
+                    return Unauthorized(ApiResponse<int>.ErrorResponse("Không xác định được người dùng"));
+                }
+
+                var count = await _context.Messages
+                    .CountAsync(m => m.ReceiverId == currentUserId && !m.IsRead);
+
+                return Ok(ApiResponse<int>.SuccessResponse(count, "Lấy số tin nhắn chưa đọc thành công"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy số tin nhắn chưa đọc");
+                return StatusCode(500, ApiResponse<int>.ErrorResponse($"Lỗi hệ thống: {ex.Message}"));
+            }
+        }
     }
 }

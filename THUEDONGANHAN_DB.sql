@@ -136,6 +136,8 @@ CREATE TABLE dbo.Users (
     -- [v4] StudentId NOT NULL (trừ Admin) + UNIQUE
     StudentId    INT           NULL,
     LastLoginAt  DATETIME2     NULL,
+    LockEnd      DATETIME2     NULL,
+    LockReason   NVARCHAR(500) NULL,
     CreatedAt    DATETIME2     NOT NULL DEFAULT SYSUTCDATETIME(),
     UpdatedAt    DATETIME2     NULL,
 
@@ -1177,7 +1179,8 @@ VALUES
     (9,  '21115053122101', N'Ngô Văn Khoa',    '21115053122101@sv.ute.udn.vn', '0901234569', N'Công nghệ Thông tin',  N'Khoa CNTT',   N'21T1', 2021, 'Active', '2025-01-01'),
     (10, '21115053122102', N'Phan Thị Lan',    '21115053122102@sv.ute.udn.vn', '0901234570', N'Kỹ thuật Phần mềm',    N'Khoa CNTT',   N'21T1', 2021, 'Active', '2025-01-01'),
     (11, '21115053122103', N'Trương Minh Mẫn', '21115053122103@sv.ute.udn.vn', '0901234571', N'Công nghệ Thông tin',  N'Khoa CNTT',   N'21T2', 2021, 'Active', '2025-01-01'),
-    (12, '20115053122001', N'Đinh Thị Ngân',   '20115053122001@sv.ute.udn.vn', '0901234572', N'Kỹ thuật Điện',        N'Khoa Điện',   N'20T1', 2020, 'Active', '2025-01-01');
+    (12, '20115053122001', N'Đinh Thị Ngân',   '20115053122001@sv.ute.udn.vn', '0901234572', N'Kỹ thuật Điện',        N'Khoa Điện',   N'20T1', 2020, 'Active', '2025-01-01'),
+    (13, '23115053122399', N'Nguyễn Văn An Test', '23115053122399@sv.ute.udn.vn', '0901234599', N'Công nghệ Thông tin',  N'Khoa CNTT',   N'23T1', 2023, 'Active', '2025-01-01');
 SET IDENTITY_INSERT dbo.Students OFF;
 GO
 
@@ -1202,10 +1205,10 @@ VALUES
      'Admin', 'Both', 1, 1, NULL, '2025-01-01'),
 
     -- [v4] Email khớp chính xác Students.Email (không số 0 đầu)
-    (2, N'Nguyễn Văn An',
-     '23115053122326@sv.ute.udn.vn', '0901234561',
+    (2, N'Nguyễn Văn An Test',
+     '23115053122399@sv.ute.udn.vn', '0901234599',
      '$2a$11$IZGpvObw6hU4f9dRe.FZTuGRfuVVVrxAstkErvkwLxCYpEONdqj7G',
-     'User', 'Both', 1, 1, 1, '2025-01-01'),
+     'User', 'Both', 1, 1, 13, '2025-01-01'),
 
     (3, N'Trần Thị Bình',
      '23115053122327@sv.ute.udn.vn', '0901234562',
